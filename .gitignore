@@ -1,0 +1,78 @@
+# Dependencies
+node_modules/
+*/node_modules/
+**/node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+frontend/dist/
+frontend/.vite/
+backend/dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+arduino_projects.db
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Package lock files (opcional, comentar si quieres commitearlos)
+# package-lock.json
+# yarn.lock
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Coverage
+coverage/
+*.coverage
+.nyc_output/
+
+# Wokwi libs build artifacts (no ignorar el código fuente, solo builds)
+wokwi-libs/*/dist/
+wokwi-libs/*/node_modules/
+wokwi-libs/*/.cache/
+
+# NO ignorar los repositorios de Wokwi
+!wokwi-libs/wokwi-elements/
+!wokwi-libs/avr8js/
+!wokwi-libs/rp2040js/
+!wokwi-libs/wokwi-features/
+.claude/settings.local.json
+.history/*
