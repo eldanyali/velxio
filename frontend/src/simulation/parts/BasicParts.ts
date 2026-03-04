@@ -1,5 +1,4 @@
 import { PartSimulationRegistry } from './PartSimulationRegistry';
-import type { AVRSimulator } from '../AVRSimulator';
 
 /**
  * Basic Pushbutton implementation (full-size)

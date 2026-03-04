@@ -1,4 +1,4 @@
-import { CPU, AVRTimer, timer0Config, timer1Config, timer2Config, AVRUSART, usart0Config, AVRIOPort, portBConfig, portCConfig, portDConfig, avrInstruction, PinState, AVRADC, adcConfig } from 'avr8js';
+import { CPU, AVRTimer, timer0Config, timer1Config, timer2Config, AVRUSART, usart0Config, AVRIOPort, portBConfig, portCConfig, portDConfig, avrInstruction, AVRADC, adcConfig } from 'avr8js';
 import { PinManager } from './PinManager';
 import { hexToUint8Array } from '../utils/hexParser';
 
@@ -27,10 +27,8 @@ const PWM_PINS = [
 
 export class AVRSimulator {
   private cpu: CPU | null = null;
-  private timer0: AVRTimer | null = null;
-  private timer1: AVRTimer | null = null;
-  private timer2: AVRTimer | null = null;
-  private usart: AVRUSART | null = null;
+  /** Peripherals kept alive by reference so GC doesn't collect their CPU hooks */
+  private peripherals: unknown[] = [];
   private portB: AVRIOPort | null = null;
   private portC: AVRIOPort | null = null;
   private portD: AVRIOPort | null = null;
@@ -73,11 +71,13 @@ export class AVRSimulator {
     // Initialize CPU (ATmega328p @ 16MHz)
     this.cpu = new CPU(this.program);
 
-    // Initialize peripherals
-    this.timer0 = new AVRTimer(this.cpu, timer0Config);
-    this.timer1 = new AVRTimer(this.cpu, timer1Config);
-    this.timer2 = new AVRTimer(this.cpu, timer2Config);
-    this.usart = new AVRUSART(this.cpu, usart0Config, 16000000); // 16MHz
+    // Initialize peripherals (kept alive so their CPU hooks are not GC'd)
+    this.peripherals = [
+      new AVRTimer(this.cpu, timer0Config),
+      new AVRTimer(this.cpu, timer1Config),
+      new AVRTimer(this.cpu, timer2Config),
+      new AVRUSART(this.cpu, usart0Config, 16000000),
+    ];
 
     // Initialize ADC (analogRead support)
     this.adc = new AVRADC(this.cpu, adcConfig);
@@ -93,7 +93,7 @@ export class AVRSimulator {
     // Set up pin change hooks
     this.setupPinHooks();
 
-    console.log('AVR CPU initialized successfully (ADC + Timer1/Timer2 enabled)');
+    console.log(`AVR CPU initialized (${this.peripherals.length} peripherals, ADC + Timer1/Timer2 enabled)`);
   }
 
   /**
@@ -225,10 +225,12 @@ export class AVRSimulator {
       console.log('Resetting AVR CPU...');
 
       this.cpu = new CPU(this.program);
-      this.timer0 = new AVRTimer(this.cpu, timer0Config);
-      this.timer1 = new AVRTimer(this.cpu, timer1Config);
-      this.timer2 = new AVRTimer(this.cpu, timer2Config);
-      this.usart = new AVRUSART(this.cpu, usart0Config, 16000000);
+      this.peripherals = [
+        new AVRTimer(this.cpu, timer0Config),
+        new AVRTimer(this.cpu, timer1Config),
+        new AVRTimer(this.cpu, timer2Config),
+        new AVRUSART(this.cpu, usart0Config, 16000000),
+      ];
       this.adc = new AVRADC(this.cpu, adcConfig);
 
       this.portB = new AVRIOPort(this.cpu, portBConfig);
