@@ -49,6 +49,7 @@ export const DynamicComponent: React.FC<DynamicComponentProps> = ({
 
   const handleComponentEvent = useSimulatorStore((s) => s.handleComponentEvent);
   const running = useSimulatorStore((s) => s.running);
+  const simulator = useSimulatorStore((s) => s.simulator);
 
   // Check if component is interactive (has simulation logic with attachEvents)
   const logic = PartSimulationRegistry.get(metadata.id || id.split('-')[0]);
@@ -182,43 +183,38 @@ export const DynamicComponent: React.FC<DynamicComponentProps> = ({
     el.addEventListener('button-press', onButtonPress);
     el.addEventListener('button-release', onButtonRelease);
 
-    const logic = PartSimulationRegistry.get(metadata.id || id.split('-')[0]); // Fallback if id is like led-1
+    const logic = PartSimulationRegistry.get(metadata.id || id.split('-')[0]);
 
     let cleanupSimulationEvents: (() => void) | undefined;
-    if (logic && logic.attachEvents) {
-      // We need AVRSimulator instance. We can grab it from store.
-      const simulator = useSimulatorStore.getState().simulator;
-      if (simulator) {
-        // Helper to find Arduino pin connected to a component pin
-        const getArduinoPin = (componentPinName: string): number | null => {
-          const wires = useSimulatorStore.getState().wires.filter(
-            w => (w.start.componentId === id && w.start.pinName === componentPinName) ||
-              (w.end.componentId === id && w.end.pinName === componentPinName)
-          );
+    if (logic && logic.attachEvents && simulator) {
+      // Helper to find Arduino pin connected to a component pin
+      const getArduinoPin = (componentPinName: string): number | null => {
+        const wires = useSimulatorStore.getState().wires.filter(
+          w => (w.start.componentId === id && w.start.pinName === componentPinName) ||
+            (w.end.componentId === id && w.end.pinName === componentPinName)
+        );
 
-          for (const w of wires) {
-            const arduinoEndpoint = w.start.componentId === 'arduino-uno' ? w.start :
-              w.end.componentId === 'arduino-uno' ? w.end : null;
-            if (arduinoEndpoint) {
-              const pin = parseInt(arduinoEndpoint.pinName, 10);
-              if (!isNaN(pin)) return pin;
-            }
+        for (const w of wires) {
+          const arduinoEndpoint = w.start.componentId === 'arduino-uno' ? w.start :
+            w.end.componentId === 'arduino-uno' ? w.end : null;
+          if (arduinoEndpoint) {
+            const pin = parseInt(arduinoEndpoint.pinName, 10);
+            if (!isNaN(pin)) return pin;
           }
-          return null;
-        };
+        }
+        return null;
+      };
 
-        cleanupSimulationEvents = logic.attachEvents(el, simulator, getArduinoPin);
-      }
+      cleanupSimulationEvents = logic.attachEvents(el, simulator, getArduinoPin);
     }
 
     return () => {
       if (cleanupSimulationEvents) cleanupSimulationEvents();
 
-      // Old hardcoded events (to be removed in future if Pushbutton registry works fully)
       el.removeEventListener('button-press', onButtonPress);
       el.removeEventListener('button-release', onButtonRelease);
     };
-  }, [id, handleComponentEvent, metadata.id]);
+  }, [id, handleComponentEvent, metadata.id, simulator]);
 
   return (
     <div

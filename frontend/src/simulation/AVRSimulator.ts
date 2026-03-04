@@ -1,4 +1,4 @@
-import { CPU, AVRTimer, timer0Config, AVRUSART, usart0Config, AVRIOPort, portBConfig, portCConfig, portDConfig, avrInstruction, PinState } from 'avr8js';
+import { CPU, AVRTimer, timer0Config, timer1Config, timer2Config, AVRUSART, usart0Config, AVRIOPort, portBConfig, portCConfig, portDConfig, avrInstruction, PinState, AVRADC, adcConfig } from 'avr8js';
 import { PinManager } from './PinManager';
 import { hexToUint8Array } from '../utils/hexParser';
 
@@ -7,18 +7,34 @@ import { hexToUint8Array } from '../utils/hexParser';
  *
  * Features:
  * - CPU emulation at 16MHz
- * - Timer0 support
+ * - Timer0/Timer1/Timer2 support (enables millis(), delay(), PWM)
  * - USART support (Serial)
  * - GPIO ports (PORTB, PORTC, PORTD)
+ * - ADC support (analogRead())
+ * - PWM monitoring via OCR register polling
  * - Pin state tracking via PinManager
  */
+
+// OCR register addresses → Arduino pin mapping for PWM
+const PWM_PINS = [
+  { ocrAddr: 0x47, pin: 6,  label: 'OCR0A' }, // Timer0A → D6
+  { ocrAddr: 0x48, pin: 5,  label: 'OCR0B' }, // Timer0B → D5
+  { ocrAddr: 0x88, pin: 9,  label: 'OCR1AL' }, // Timer1A low byte → D9
+  { ocrAddr: 0x8A, pin: 10, label: 'OCR1BL' }, // Timer1B low byte → D10
+  { ocrAddr: 0xB3, pin: 11, label: 'OCR2A' }, // Timer2A → D11
+  { ocrAddr: 0xB4, pin: 3,  label: 'OCR2B' }, // Timer2B → D3
+];
+
 export class AVRSimulator {
   private cpu: CPU | null = null;
   private timer0: AVRTimer | null = null;
+  private timer1: AVRTimer | null = null;
+  private timer2: AVRTimer | null = null;
   private usart: AVRUSART | null = null;
   private portB: AVRIOPort | null = null;
   private portC: AVRIOPort | null = null;
   private portD: AVRIOPort | null = null;
+  private adc: AVRADC | null = null;
   private program: Uint16Array | null = null;
   private running = false;
   private animationFrame: number | null = null;
@@ -27,6 +43,7 @@ export class AVRSimulator {
   private lastPortBValue = 0;
   private lastPortCValue = 0;
   private lastPortDValue = 0;
+  private lastOcrValues: number[] = new Array(PWM_PINS.length).fill(-1);
 
   constructor(pinManager: PinManager) {
     this.pinManager = pinManager;
@@ -58,17 +75,32 @@ export class AVRSimulator {
 
     // Initialize peripherals
     this.timer0 = new AVRTimer(this.cpu, timer0Config);
+    this.timer1 = new AVRTimer(this.cpu, timer1Config);
+    this.timer2 = new AVRTimer(this.cpu, timer2Config);
     this.usart = new AVRUSART(this.cpu, usart0Config, 16000000); // 16MHz
+
+    // Initialize ADC (analogRead support)
+    this.adc = new AVRADC(this.cpu, adcConfig);
 
     // Initialize IO ports
     this.portB = new AVRIOPort(this.cpu, portBConfig);
     this.portC = new AVRIOPort(this.cpu, portCConfig);
     this.portD = new AVRIOPort(this.cpu, portDConfig);
 
+    // Reset OCR tracking
+    this.lastOcrValues = new Array(PWM_PINS.length).fill(-1);
+
     // Set up pin change hooks
     this.setupPinHooks();
 
-    console.log('AVR CPU initialized successfully');
+    console.log('AVR CPU initialized successfully (ADC + Timer1/Timer2 enabled)');
+  }
+
+  /**
+   * Expose ADC instance so components (potentiometer, etc.) can inject voltages
+   */
+  getADC(): AVRADC | null {
+    return this.adc;
   }
 
   /**
@@ -78,17 +110,9 @@ export class AVRSimulator {
     if (!this.cpu) return;
 
     console.log('Setting up pin hooks...');
-    console.log('Initial PORTB:', this.portB);
-    console.log('Initial PORTC:', this.portC);
-    console.log('Initial PORTD:', this.portD);
 
     // PORTB (Digital pins 8-13)
-    // Pin 13 (LED_BUILTIN) = PORTB5
     this.portB!.addListener((value, _oldValue) => {
-      console.log(`[PORTB LISTENER CALLED] register value: 0x${value.toString(16).padStart(2, '0')}`);
-      console.log(`  Binary: ${value.toString(2).padStart(8, '0')}`);
-      console.log(`  Pin 13 (bit 5) state: ${this.portB!.pinState(5) === PinState.High ? 'HIGH' : 'LOW'}`);
-
       if (value !== this.lastPortBValue) {
         this.pinManager.updatePort('PORTB', value, this.lastPortBValue);
         this.lastPortBValue = value;
@@ -97,8 +121,6 @@ export class AVRSimulator {
 
     // PORTC (Analog pins A0-A5)
     this.portC!.addListener((value, _oldValue) => {
-      console.log(`[PORTC LISTENER CALLED] register value: 0x${value.toString(16).padStart(2, '0')}`);
-
       if (value !== this.lastPortCValue) {
         this.pinManager.updatePort('PORTC', value, this.lastPortCValue);
         this.lastPortCValue = value;
@@ -107,8 +129,6 @@ export class AVRSimulator {
 
     // PORTD (Digital pins 0-7)
     this.portD!.addListener((value, _oldValue) => {
-      console.log(`[PORTD LISTENER CALLED] register value: 0x${value.toString(16).padStart(2, '0')}`);
-
       if (value !== this.lastPortDValue) {
         this.pinManager.updatePort('PORTD', value, this.lastPortDValue);
         this.lastPortDValue = value;
@@ -116,6 +136,23 @@ export class AVRSimulator {
     });
 
     console.log('Pin hooks configured successfully');
+  }
+
+  /**
+   * Poll OCR registers and notify PinManager of PWM duty cycle changes
+   */
+  private pollPwmRegisters(): void {
+    if (!this.cpu) return;
+
+    for (let i = 0; i < PWM_PINS.length; i++) {
+      const { ocrAddr, pin } = PWM_PINS[i];
+      const ocrValue = this.cpu.data[ocrAddr];
+      if (ocrValue !== this.lastOcrValues[i]) {
+        this.lastOcrValues[i] = ocrValue;
+        const dutyCycle = ocrValue / 255;
+        this.pinManager.updatePwm(pin, dutyCycle);
+      }
+    }
   }
 
   /**
@@ -129,34 +166,27 @@ export class AVRSimulator {
 
     this.running = true;
     console.log('Starting AVR simulation...');
-    console.log('CPU state:', {
-      pc: this.cpu.pc,
-      cycles: this.cpu.cycles,
-      data: this.cpu.data.slice(0, 10) // First 10 bytes of RAM
-    });
-    console.log('Program loaded:', this.program?.length, 'words');
 
     let frameCount = 0;
-    const execute = (timestamp: number) => {
+    const execute = (_timestamp: number) => {
       if (!this.running || !this.cpu) return;
 
-      // Execute instructions in batches for performance
       // ATmega328p @ 16MHz = 16M cycles/sec
       // At 60fps: 16,000,000 / 60 ≈ 267,000 cycles per frame
       const cyclesPerFrame = Math.floor(267000 * this.speed);
 
       try {
         for (let i = 0; i < cyclesPerFrame; i++) {
-          // Execute one AVR instruction and update peripherals
-          avrInstruction(this.cpu);  // CRITICAL: Execute the actual instruction
+          avrInstruction(this.cpu);  // Execute the AVR instruction
           this.cpu.tick();            // Update peripheral timers and cycles
         }
 
-        // Log every 60 frames (once per second at 60fps)
+        // Poll PWM registers every frame
+        this.pollPwmRegisters();
+
         frameCount++;
         if (frameCount % 60 === 0) {
           console.log(`[CPU] Frame ${frameCount}, PC: ${this.cpu.pc}, Cycles: ${this.cpu.cycles}`);
-          console.log(`[CPU] PORTB register value: 0x${this.cpu.data[0x25].toString(16).padStart(2, '0')}`);
         }
       } catch (error) {
         console.error('Simulation error:', error);
@@ -164,7 +194,6 @@ export class AVRSimulator {
         return;
       }
 
-      // Schedule next frame
       this.animationFrame = requestAnimationFrame(execute);
     };
 
@@ -195,20 +224,21 @@ export class AVRSimulator {
     if (this.cpu && this.program) {
       console.log('Resetting AVR CPU...');
 
-      // Reinitialize CPU
       this.cpu = new CPU(this.program);
       this.timer0 = new AVRTimer(this.cpu, timer0Config);
+      this.timer1 = new AVRTimer(this.cpu, timer1Config);
+      this.timer2 = new AVRTimer(this.cpu, timer2Config);
       this.usart = new AVRUSART(this.cpu, usart0Config, 16000000);
+      this.adc = new AVRADC(this.cpu, adcConfig);
 
-      // Reinitialize ports
       this.portB = new AVRIOPort(this.cpu, portBConfig);
       this.portC = new AVRIOPort(this.cpu, portCConfig);
       this.portD = new AVRIOPort(this.cpu, portDConfig);
 
-      // Reset port values
       this.lastPortBValue = 0;
       this.lastPortCValue = 0;
       this.lastPortDValue = 0;
+      this.lastOcrValues = new Array(PWM_PINS.length).fill(-1);
 
       this.setupPinHooks();
 
@@ -216,36 +246,23 @@ export class AVRSimulator {
     }
   }
 
-  /**
-   * Check if simulator is running
-   */
   isRunning(): boolean {
     return this.running;
   }
 
-  /**
-   * Set simulation speed (1.0 = normal, 0.5 = half speed, 2.0 = double speed)
-   */
   setSpeed(speed: number): void {
     this.speed = Math.max(0.1, Math.min(10.0, speed));
     console.log(`Simulation speed set to ${this.speed}x`);
   }
 
-  /**
-   * Get current simulation speed
-   */
   getSpeed(): number {
     return this.speed;
   }
 
-  /**
-   * Execute a single instruction (for step-by-step debugging)
-   */
   step(): void {
     if (!this.cpu) return;
-
-    avrInstruction(this.cpu);  // Execute the instruction
-    this.cpu.tick();            // Update peripherals
+    avrInstruction(this.cpu);
+    this.cpu.tick();
   }
 
   /**

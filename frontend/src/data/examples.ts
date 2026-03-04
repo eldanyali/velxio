@@ -415,7 +415,7 @@ void setup() {
     pinMode(BUTTON_PINS[i], INPUT_PULLUP);
   }
 
-  randomSeed(analogRead(A0));
+  randomSeed(millis());
   newGame();
 }
 
