@@ -146,13 +146,6 @@ export class ComponentRegistry {
   }
 
   /**
-   * Check if registry is loaded
-   */
-  isLoaded(): boolean {
-    return this.loaded;
-  }
-
-  /**
    * Get component count
    */
   getComponentCount(): number {

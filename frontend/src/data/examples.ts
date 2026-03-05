@@ -596,14 +596,15 @@ void loop() {
   {
     id: 'tft-display',
     title: 'TFT ILI9341 Display',
-    description: 'Color TFT display demo: fills, text, and a bouncing ball animation using the Arduino TFT library',
+    description: 'Color TFT display demo: fills, text, and a bouncing ball animation using the Adafruit ILI9341 library (240x320)',
     category: 'displays',
     difficulty: 'intermediate',
-    code: `// TFT ILI9341 Display Demo
-// Library: TFT by Arduino, Adafruit
+    code: `// TFT ILI9341 Display Demo (240x320)
+// Library: Adafruit ILI9341 + Adafruit GFX
 // Connect: CS=10, DC/RS=9, RST=8, LED=7, MOSI=11(SPI), SCK=13(SPI)
 
-#include <TFT.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_ILI9341.h>
 #include <SPI.h>
 
 #define TFT_CS   10
@@ -611,66 +612,65 @@ void loop() {
 #define TFT_RST   8
 #define TFT_LED   7
 
-TFT TFTscreen = TFT(TFT_CS, TFT_DC, TFT_RST);
+Adafruit_ILI9341 tft(TFT_CS, TFT_DC, TFT_RST);
 
-int ballX = 64, ballY = 90;
+// Background color: dark blue
+#define BG_COLOR 0x0006
+
+// Ball state
+int ballX = 120, ballY = 200;
 int ballDX = 3, ballDY = 2;
-const int BALL_R = 8;
+const int BALL_R = 10;
+
+// Play-field boundaries
+const int FX = 5, FY = 110, FW = 230, FH = 200;
 
 void drawStaticUI() {
-  // Background
-  TFTscreen.background(0, 0, 50);
+  tft.fillScreen(BG_COLOR);
 
   // Title
-  TFTscreen.setTextSize(2);
-  TFTscreen.stroke(255, 220, 0);
-  TFTscreen.text("WOKWI TFT", 5, 5);
+  tft.setTextSize(3);
+  tft.setTextColor(tft.color565(255, 220, 0));
+  tft.setCursor(20, 10);
+  tft.print("WOKWI TFT");
 
   // Subtitle
-  TFTscreen.setTextSize(1);
-  TFTscreen.stroke(180, 180, 255);
-  TFTscreen.text("ILI9341 Demo", 12, 28);
+  tft.setTextSize(2);
+  tft.setTextColor(tft.color565(180, 180, 255));
+  tft.setCursor(30, 50);
+  tft.print("ILI9341 Demo");
 
   // Color palette bars
-  TFTscreen.noStroke();
-  TFTscreen.fill(220, 50, 50);
-  TFTscreen.rect(5, 45, 36, 14);
-  TFTscreen.fill(50, 200, 50);
-  TFTscreen.rect(45, 45, 36, 14);
-  TFTscreen.fill(50, 100, 240);
-  TFTscreen.rect(85, 45, 36, 14);
+  tft.fillRect(10, 82, 70, 18, tft.color565(220, 50, 50));
+  tft.fillRect(85, 82, 70, 18, tft.color565(50, 200, 50));
+  tft.fillRect(160, 82, 70, 18, tft.color565(50, 100, 240));
 
   // Play-field border
-  TFTscreen.stroke(80, 80, 130);
-  TFTscreen.noFill();
-  TFTscreen.rect(2, 68, 124, 88);
+  tft.drawRect(FX, FY, FW, FH, tft.color565(80, 80, 130));
 }
 
 void setup() {
   pinMode(TFT_LED, OUTPUT);
-  digitalWrite(TFT_LED, HIGH);   // Backlight on
+  digitalWrite(TFT_LED, HIGH);
 
-  TFTscreen.begin();
+  tft.begin();
   drawStaticUI();
 }
 
 void loop() {
   // Erase old ball
-  TFTscreen.noStroke();
-  TFTscreen.fill(0, 0, 50);
-  TFTscreen.circle(ballX, ballY, BALL_R);
+  tft.fillCircle(ballX, ballY, BALL_R, BG_COLOR);
 
   // Update position
   ballX += ballDX;
   ballY += ballDY;
 
   // Bounce off field borders
-  if (ballX < 3  + BALL_R || ballX > 124 - BALL_R) ballDX = -ballDX;
-  if (ballY < 69 + BALL_R || ballY > 155 - BALL_R) ballDY = -ballDY;
+  if (ballX < FX + BALL_R + 1 || ballX > FX + FW - BALL_R - 1) ballDX = -ballDX;
+  if (ballY < FY + BALL_R + 1 || ballY > FY + FH - BALL_R - 1) ballDY = -ballDY;
 
   // Draw ball
-  TFTscreen.fill(255, 140, 0);
-  TFTscreen.circle(ballX, ballY, BALL_R);
+  tft.fillCircle(ballX, ballY, BALL_R, tft.color565(255, 140, 0));
 
   delay(30);
 }

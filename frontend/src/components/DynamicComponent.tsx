@@ -186,7 +186,7 @@ export const DynamicComponent: React.FC<DynamicComponentProps> = ({
     const logic = PartSimulationRegistry.get(metadata.id || id.split('-')[0]);
 
     let cleanupSimulationEvents: (() => void) | undefined;
-    if (logic && logic.attachEvents && simulator) {
+    if (logic && logic.attachEvents && simulator && running) {
       // Helper to find Arduino pin connected to a component pin
       const getArduinoPin = (componentPinName: string): number | null => {
         const wires = useSimulatorStore.getState().wires.filter(
