@@ -8,7 +8,7 @@ If you find this project helpful, please consider giving it a star! Your support
 
 [![GitHub stars](https://img.shields.io/github/stars/davidmonterocrespo24/openwokwi?style=social)](https://github.com/davidmonterocrespo24/openwokwi/stargazers)
 [![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-pink?logo=githubsponsors)](https://github.com/sponsors/davidmonterocrespo24)
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-blue?logo=paypal)](https://paypal.me/dmonterocrepoclub)
+[![PayPal](https://img.shields.io/badge/Donate-PayPal-blue?logo=paypal)](https://paypal.me/odoonext)
 
 Every star counts and helps make this project better! You can also support the project financially through GitHub Sponsors or PayPal -- any contribution helps keep the development going.
 
