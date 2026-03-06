@@ -9,6 +9,7 @@ services:
       - "3080:80"
     environment:
       - DATABASE_URL=sqlite+aiosqlite:////app/data/velxio.db
+      - DATA_DIR=/app/data
     volumes:
       - ./data:/app/data
     healthcheck:

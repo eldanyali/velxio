@@ -4,6 +4,11 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8001/api';
 
 const api = axios.create({ baseURL: API_BASE, withCredentials: true });
 
+export interface SketchFile {
+  name: string;
+  content: string;
+}
+
 export interface ProjectResponse {
   id: string;
   name: string;
@@ -11,7 +16,8 @@ export interface ProjectResponse {
   description: string | null;
   is_public: boolean;
   board_type: string;
-  code: string;
+  files: SketchFile[];
+  code: string;           // legacy fallback
   components_json: string;
   wires_json: string;
   owner_username: string;
@@ -24,7 +30,8 @@ export interface ProjectSaveData {
   description?: string;
   is_public: boolean;
   board_type: string;
-  code: string;
+  files: SketchFile[];
+  code?: string;          // legacy fallback
   components_json: string;
   wires_json: string;
 }
@@ -36,6 +43,11 @@ export async function getMyProjects(): Promise<ProjectResponse[]> {
 
 export async function getUserProjects(username: string): Promise<ProjectResponse[]> {
   const { data } = await api.get<ProjectResponse[]>(`/user/${username}`);
+  return data;
+}
+
+export async function getProjectById(id: string): Promise<ProjectResponse> {
+  const { data } = await api.get<ProjectResponse>(`/projects/${id}`);
   return data;
 }
 

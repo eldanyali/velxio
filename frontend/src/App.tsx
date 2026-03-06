@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { UserProfilePage } from './pages/UserProfilePage';
 import { ProjectPage } from './pages/ProjectPage';
+import { ProjectByIdPage } from './pages/ProjectByIdPage';
 import { useAuthStore } from './store/useAuthStore';
 import './App.css';
 
@@ -25,7 +26,9 @@ function App() {
         <Route path="/examples" element={<ExamplesPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        {/* Specific literal routes must come before wildcard /:username */}
+        {/* Canonical project URL by ID */}
+        <Route path="/project/:id" element={<ProjectByIdPage />} />
+        {/* Legacy slug route — redirects to /project/:id */}
         <Route path="/:username/:projectName" element={<ProjectPage />} />
         <Route path="/:username" element={<UserProfilePage />} />
       </Routes>

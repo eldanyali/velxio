@@ -1,28 +1,28 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getProject } from '../services/projectService';
+import { getProjectById } from '../services/projectService';
 import { useEditorStore } from '../store/useEditorStore';
 import { useSimulatorStore } from '../store/useSimulatorStore';
 import { useProjectStore } from '../store/useProjectStore';
 import { EditorPage } from './EditorPage';
 
-/**
- * Legacy route: /:username/:projectName
- * Loads the project by slug then redirects to /project/:id so the canonical
- * URL is always the ID-based one.
- */
-export const ProjectPage: React.FC = () => {
-  const { username, projectName } = useParams<{ username: string; projectName: string }>();
+export const ProjectByIdPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const loadFiles = useEditorStore((s) => s.loadFiles);
   const { setComponents, setWires, setBoardType } = useSimulatorStore();
   const setCurrentProject = useProjectStore((s) => s.setCurrentProject);
+  const currentProject = useProjectStore((s) => s.currentProject);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!username || !projectName) return;
-    getProject(username, projectName)
+    if (!id) return;
+    // If this project is already loaded in the store (e.g. navigated here
+    // right after saving) skip the fetch to avoid overwriting unsaved state.
+    if (currentProject?.id === id && ready) return;
+
+    getProjectById(id)
       .then((project) => {
         const files =
           project.files.length > 0
@@ -34,7 +34,7 @@ export const ProjectPage: React.FC = () => {
           setComponents(JSON.parse(project.components_json));
           setWires(JSON.parse(project.wires_json));
         } catch {
-          // keep defaults
+          // keep defaults if JSON is malformed
         }
         setCurrentProject({
           id: project.id,
@@ -42,8 +42,6 @@ export const ProjectPage: React.FC = () => {
           ownerUsername: project.owner_username,
           isPublic: project.is_public,
         });
-        // Redirect to canonical ID URL
-        navigate(`/project/${project.id}`, { replace: true });
         setReady(true);
       })
       .catch((err) => {
@@ -52,14 +50,17 @@ export const ProjectPage: React.FC = () => {
         else if (s === 403) setError('This project is private.');
         else setError('Failed to load project.');
       });
-  }, [username, projectName]);
+  }, [id]);
 
   if (error) {
     return (
       <div style={{ minHeight: '100vh', background: '#1e1e1e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ color: '#f44747', fontSize: 16, textAlign: 'center' }}>
           <p>{error}</p>
-          <button onClick={() => navigate('/')} style={{ marginTop: 12, background: '#0e639c', border: 'none', color: '#fff', padding: '8px 16px', borderRadius: 4, cursor: 'pointer' }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{ marginTop: 12, background: '#0e639c', border: 'none', color: '#fff', padding: '8px 16px', borderRadius: 4, cursor: 'pointer' }}
+          >
             Go home
           </button>
         </div>

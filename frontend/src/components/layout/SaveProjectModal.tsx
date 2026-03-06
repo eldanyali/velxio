@@ -44,6 +44,7 @@ export const SaveProjectModal: React.FC<SaveProjectModalProps> = ({ onClose }) =
       description: description.trim() || undefined,
       is_public: isPublic,
       board_type: boardType,
+      files: files.map((f) => ({ name: f.name, content: f.content })),
       code,
       components_json: JSON.stringify(components),
       wires_json: JSON.stringify(wires),
@@ -62,7 +63,7 @@ export const SaveProjectModal: React.FC<SaveProjectModalProps> = ({ onClose }) =
         ownerUsername: saved.owner_username,
         isPublic: saved.is_public,
       });
-      navigate(`/${saved.owner_username}/${saved.slug}`, { replace: true });
+      navigate(`/project/${saved.id}`, { replace: true });
       onClose();
     } catch (err: any) {
       setError(err?.response?.data?.detail || 'Save failed.');
