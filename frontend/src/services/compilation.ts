@@ -28,7 +28,7 @@ export async function compileCode(
     console.log('Files:', files.map((f) => f.name));
 
     const response = await axios.post<CompileResult>(
-      `${API_BASE}/compile`,
+      `${API_BASE}/compile/`,
       { files, board_fqbn: board },
       { withCredentials: true }
     );
