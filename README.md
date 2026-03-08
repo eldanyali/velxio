@@ -10,6 +10,9 @@ A fully local, open-source Arduino emulator. Write Arduino code, compile it, and
 [![License: AGPLv3](https://img.shields.io/badge/License-AGPL%20v3-blue?style=for-the-badge)](LICENSE)
 [![Commercial License](https://img.shields.io/badge/Commercial%20License-Available-green?style=for-the-badge)](COMMERCIAL_LICENSE.md)
 
+---
+<a href="https://www.producthunt.com/products/velxio?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-velxio" target="_blank" rel="noopener noreferrer"><img alt="Velxio - Arduino emulator running entirely in the browser | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1092514&amp;theme=dark&amp;t=1772998619179"></a>
+
 
 
 ---
