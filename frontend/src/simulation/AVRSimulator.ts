@@ -203,13 +203,34 @@ export class AVRSimulator {
     this.running = true;
     console.log('Starting AVR simulation...');
 
+    // ATmega328p @ 16MHz
+    const CPU_HZ = 16_000_000;
+    const CYCLES_PER_MS = CPU_HZ / 1000;
+
+    // Cap: never execute more than 50ms worth of cycles in one frame.
+    // This prevents a runaway burst when the tab was backgrounded and
+    // then becomes visible again (browser may deliver a huge delta).
+    const MAX_DELTA_MS = 50;
+
+    let lastTimestamp = 0;
     let frameCount = 0;
-    const execute = (_timestamp: number) => {
+
+    const execute = (timestamp: number) => {
       if (!this.running || !this.cpu) return;
 
-      // ATmega328p @ 16MHz = 16M cycles/sec
-      // At 60fps: 16,000,000 / 60 ≈ 267,000 cycles per frame
-      const cyclesPerFrame = Math.floor(267000 * this.speed);
+      // First frame: just record the timestamp and yield
+      if (lastTimestamp === 0) {
+        lastTimestamp = timestamp;
+        this.animationFrame = requestAnimationFrame(execute);
+        return;
+      }
+
+      // Clamp delta so we never overshoot after a paused/backgrounded tab
+      const rawDelta = timestamp - lastTimestamp;
+      const deltaMs  = Math.min(rawDelta, MAX_DELTA_MS);
+      lastTimestamp  = timestamp;
+
+      const cyclesPerFrame = Math.floor(CYCLES_PER_MS * deltaMs * this.speed);
 
       try {
         for (let i = 0; i < cyclesPerFrame; i++) {
