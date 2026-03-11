@@ -353,14 +353,9 @@ export class AVRSimulator {
     const execute = (timestamp: number) => {
       if (!this.running || !this.cpu) return;
 
-      // First frame: just record the timestamp and yield
-      if (lastTimestamp === 0) {
-        lastTimestamp = timestamp;
-        this.animationFrame = requestAnimationFrame(execute);
-        return;
-      }
-
-      // Clamp delta so we never overshoot after a paused/backgrounded tab
+      // Clamp delta so we never overshoot after a paused/backgrounded tab.
+      // MAX_DELTA_MS already handles large initial deltas (e.g. first frame),
+      // so no separate first-frame guard is needed.
       const rawDelta = timestamp - lastTimestamp;
       const deltaMs  = Math.min(rawDelta, MAX_DELTA_MS);
       lastTimestamp  = timestamp;
