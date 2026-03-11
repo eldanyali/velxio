@@ -85,6 +85,25 @@ export const SimulatorCanvas = () => {
   const panRef = useRef({ x: 0, y: 0 });
   const zoomRef = useRef(1);
 
+  // Refs that mirror state/props for use inside touch event closures
+  // (touch listeners are added imperatively and can't access current React state)
+  const runningRef = useRef(running);
+  runningRef.current = running;
+  const componentsRef = useRef(components);
+  componentsRef.current = components;
+  const boardPositionRef = useRef(boardPosition);
+  boardPositionRef.current = boardPosition;
+
+  // Touch-specific state refs (for single-finger drag and pinch-to-zoom)
+  const touchDraggedComponentIdRef = useRef<string | null>(null);
+  const touchDragOffsetRef = useRef({ x: 0, y: 0 });
+  const touchClickStartTimeRef = useRef(0);
+  const touchClickStartPosRef = useRef({ x: 0, y: 0 });
+  const pinchStartDistRef = useRef(0);
+  const pinchStartZoomRef = useRef(1);
+  const pinchStartMidRef = useRef({ x: 0, y: 0 });
+  const pinchStartPanRef = useRef({ x: 0, y: 0 });
+
   // Convert viewport coords to world (canvas) coords
   const toWorld = useCallback((screenX: number, screenY: number) => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -122,6 +141,212 @@ export const SimulatorCanvas = () => {
     el.addEventListener('wheel', onWheel, { passive: false });
     return () => el.removeEventListener('wheel', onWheel);
   }, []);
+
+  // Attach touch listeners as non-passive so preventDefault() works, enabling
+  // single-finger pan, single-finger component drag, and two-finger pinch-to-zoom.
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+
+    const onTouchStart = (e: TouchEvent) => {
+      e.preventDefault(); // Prevent browser scroll / mouse-event synthesis
+
+      pinchStartDistRef.current = 0; // Reset pinch state on each new gesture
+
+      if (e.touches.length === 2) {
+        // ── Two-finger pinch: cancel any active drag/pan and prepare zoom ──
+        isPanningRef.current = false;
+        touchDraggedComponentIdRef.current = null;
+
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchStartDistRef.current = Math.sqrt(dx * dx + dy * dy);
+        pinchStartZoomRef.current = zoomRef.current;
+        pinchStartPanRef.current = { ...panRef.current };
+
+        const rect = el.getBoundingClientRect();
+        pinchStartMidRef.current = {
+          x: (e.touches[0].clientX + e.touches[1].clientX) / 2 - rect.left,
+          y: (e.touches[0].clientY + e.touches[1].clientY) / 2 - rect.top,
+        };
+        return;
+      }
+
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+      touchClickStartTimeRef.current = Date.now();
+      touchClickStartPosRef.current = { x: touch.clientX, y: touch.clientY };
+
+      // Identify what element was touched
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      const componentWrapper = target?.closest('[data-component-id]') as HTMLElement | null;
+      const boardOverlay = target?.closest('[data-board-overlay]') as HTMLElement | null;
+
+      if (componentWrapper && !runningRef.current) {
+        // ── Single finger on a component: start drag ──
+        const componentId = componentWrapper.getAttribute('data-component-id');
+        if (componentId) {
+          const component = componentsRef.current.find((c) => c.id === componentId);
+          if (component) {
+            const world = toWorld(touch.clientX, touch.clientY);
+            touchDraggedComponentIdRef.current = componentId;
+            touchDragOffsetRef.current = {
+              x: world.x - component.x,
+              y: world.y - component.y,
+            };
+            setSelectedComponentId(componentId);
+          }
+        }
+      } else if (boardOverlay && !runningRef.current) {
+        // ── Single finger on the board overlay: start board drag ──
+        const board = boardPositionRef.current;
+        const world = toWorld(touch.clientX, touch.clientY);
+        touchDraggedComponentIdRef.current = '__board__';
+        touchDragOffsetRef.current = {
+          x: world.x - board.x,
+          y: world.y - board.y,
+        };
+      } else {
+        // ── Single finger on empty canvas: start pan ──
+        isPanningRef.current = true;
+        panStartRef.current = {
+          mouseX: touch.clientX,
+          mouseY: touch.clientY,
+          panX: panRef.current.x,
+          panY: panRef.current.y,
+        };
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+
+      if (e.touches.length === 2 && pinchStartDistRef.current > 0) {
+        // ── Two-finger pinch: update zoom ──
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const scale = dist / pinchStartDistRef.current;
+        const newZoom = Math.min(5, Math.max(0.1, pinchStartZoomRef.current * scale));
+
+        const mid = pinchStartMidRef.current;
+        const startPan = pinchStartPanRef.current;
+        const startZoom = pinchStartZoomRef.current;
+        const worldX = (mid.x - startPan.x) / startZoom;
+        const worldY = (mid.y - startPan.y) / startZoom;
+        const newPan = {
+          x: mid.x - worldX * newZoom,
+          y: mid.y - worldY * newZoom,
+        };
+
+        zoomRef.current = newZoom;
+        panRef.current = newPan;
+        const worldEl = el.querySelector('.canvas-world') as HTMLElement | null;
+        if (worldEl) {
+          worldEl.style.transform = `translate(${newPan.x}px, ${newPan.y}px) scale(${newZoom})`;
+        }
+        return;
+      }
+
+      if (e.touches.length !== 1) return;
+      const touch = e.touches[0];
+
+      if (isPanningRef.current) {
+        // ── Single finger pan ──
+        const dx = touch.clientX - panStartRef.current.mouseX;
+        const dy = touch.clientY - panStartRef.current.mouseY;
+        const newPan = {
+          x: panStartRef.current.panX + dx,
+          y: panStartRef.current.panY + dy,
+        };
+        panRef.current = newPan;
+        const worldEl = el.querySelector('.canvas-world') as HTMLElement | null;
+        if (worldEl) {
+          worldEl.style.transform = `translate(${newPan.x}px, ${newPan.y}px) scale(${zoomRef.current})`;
+        }
+      } else if (touchDraggedComponentIdRef.current) {
+        // ── Single finger component/board drag ──
+        const world = toWorld(touch.clientX, touch.clientY);
+        if (touchDraggedComponentIdRef.current === '__board__') {
+          setBoardPosition({
+            x: world.x - touchDragOffsetRef.current.x,
+            y: world.y - touchDragOffsetRef.current.y,
+          });
+        } else {
+          updateComponent(touchDraggedComponentIdRef.current, {
+            x: world.x - touchDragOffsetRef.current.x,
+            y: world.y - touchDragOffsetRef.current.y,
+          } as any);
+        }
+      }
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      e.preventDefault();
+
+      // ── Finish pinch zoom: commit values to React state ──
+      if (pinchStartDistRef.current > 0 && e.touches.length < 2) {
+        setZoom(zoomRef.current);
+        setPan({ ...panRef.current });
+        pinchStartDistRef.current = 0;
+      }
+
+      if (e.touches.length > 0) return; // Still fingers on screen
+
+      // ── Finish panning ──
+      if (isPanningRef.current) {
+        isPanningRef.current = false;
+        setPan({ ...panRef.current });
+      }
+
+      const changed = e.changedTouches[0];
+
+      // ── Finish component/board drag ──
+      if (touchDraggedComponentIdRef.current) {
+        const elapsed = Date.now() - touchClickStartTimeRef.current;
+        const dx = changed ? changed.clientX - touchClickStartPosRef.current.x : 0;
+        const dy = changed ? changed.clientY - touchClickStartPosRef.current.y : 0;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Short tap with minimal movement → open property dialog
+        if (dist < 5 && elapsed < 300 && touchDraggedComponentIdRef.current !== '__board__') {
+          const component = componentsRef.current.find(
+            (c) => c.id === touchDraggedComponentIdRef.current
+          );
+          if (component) {
+            setPropertyDialogComponentId(touchDraggedComponentIdRef.current);
+            setPropertyDialogPosition({ x: component.x, y: component.y });
+            setShowPropertyDialog(true);
+          }
+        }
+
+        recalculateAllWirePositions();
+        touchDraggedComponentIdRef.current = null;
+        return;
+      }
+
+      // ── Short tap on empty canvas: deselect ──
+      if (changed) {
+        const elapsed = Date.now() - touchClickStartTimeRef.current;
+        const dx = changed.clientX - touchClickStartPosRef.current.x;
+        const dy = changed.clientY - touchClickStartPosRef.current.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 5 && elapsed < 300) {
+          setSelectedComponentId(null);
+        }
+      }
+    };
+
+    el.addEventListener('touchstart', onTouchStart, { passive: false });
+    el.addEventListener('touchmove', onTouchMove, { passive: false });
+    el.addEventListener('touchend', onTouchEnd, { passive: false });
+
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart);
+      el.removeEventListener('touchmove', onTouchMove);
+      el.removeEventListener('touchend', onTouchEnd);
+    };
+  }, [toWorld, setBoardPosition, updateComponent, recalculateAllWirePositions]);
 
   // Recalculate wire positions after web components initialize their pinInfo
   useEffect(() => {
@@ -643,6 +868,7 @@ export const SimulatorCanvas = () => {
             {/* Board interaction overlay for dragging */}
             {!running && (
               <div
+                data-board-overlay="true"
                 style={{
                   position: 'absolute',
                   left: boardPosition.x,

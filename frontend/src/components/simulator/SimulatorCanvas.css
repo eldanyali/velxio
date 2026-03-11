@@ -160,6 +160,7 @@
     repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255,255,255,0.025) 19px, rgba(255,255,255,0.025) 20px),
     repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255,255,255,0.025) 19px, rgba(255,255,255,0.025) 20px);
   user-select: none;
+  touch-action: none; /* Disable browser scroll/zoom so JS handlers take full control */
 }
 
 /* ── Infinite canvas world ───────────────────────── */
