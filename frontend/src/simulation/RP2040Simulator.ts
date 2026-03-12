@@ -53,6 +53,13 @@ export class RP2040Simulator {
   /** Serial output callback — fires for each byte the Pico sends on UART0 */
   public onSerialData: ((char: string) => void) | null = null;
 
+  /**
+   * Fires for every GPIO pin transition with a millisecond timestamp.
+   * Used by the oscilloscope / logic analyzer.
+   * timeMs is derived from the RP2040 cycle counter (cycles / F_CPU * 1000).
+   */
+  public onPinChangeWithTime: ((pin: number, state: boolean, timeMs: number) => void) | null = null;
+
   /** I2C virtual devices on each bus */
   private i2cDevices: [Map<number, RP2040I2CDevice>, Map<number, RP2040I2CDevice>] = [new Map(), new Map()];
   private activeI2CDevice: [RP2040I2CDevice | null, RP2040I2CDevice | null] = [null, null];
@@ -222,6 +229,13 @@ export class RP2040Simulator {
       const unsub = gpio.addListener((state: GPIOPinState) => {
         const isHigh = state === GPIOPinState.High;
         this.pinManager.triggerPinChange(pin, isHigh);
+        if (this.onPinChangeWithTime && this.rp2040) {
+          // Use clock cycles if available, otherwise 0
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const clk = (this.rp2040 as any).clock;
+          const timeMs = clk ? clk.timeUs / 1000 : 0;
+          this.onPinChangeWithTime(pin, isHigh, timeMs);
+        }
       });
       this.gpioUnsubscribers.push(unsub);
     }

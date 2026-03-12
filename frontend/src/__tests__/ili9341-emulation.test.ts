@@ -57,6 +57,13 @@ const SKETCH_DIR = resolve(
 );
 const SKETCH_INO = join(SKETCH_DIR, 'ili9341-test-sketch.ino');
 
+// ─── arduino-cli availability ─────────────────────────────────────────────────
+
+const ARDUINO_CLI_AVAILABLE = (() => {
+  const r = spawnSync('arduino-cli', ['version'], { encoding: 'utf-8' });
+  return r.error == null && r.status === 0;
+})();
+
 // ─── Hex cache ───────────────────────────────────────────────────────────────
 
 const HEX_CACHE = join(tmpdir(), 'velxio-ili9341-nano.hex');
@@ -88,6 +95,9 @@ function compileSketch(): string {
     { encoding: 'utf-8', timeout: 120_000 },
   );
 
+  if (result.error) {
+    throw new Error(`arduino-cli not available: ${result.error.message}`);
+  }
   if (result.status !== 0) {
     console.error('[compile] stdout:', result.stdout);
     console.error('[compile] stderr:', result.stderr);
@@ -293,7 +303,7 @@ function runCycles(sim: AVRSimulator, cycles: number): void {
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
 
-describe('ILI9341 emulation — full end-to-end', () => {
+describe.skipIf(!ARDUINO_CLI_AVAILABLE)('ILI9341 emulation — full end-to-end', () => {
   let hexContent: string;
   let sim: AVRSimulator;
   let display: VirtualILI9341;

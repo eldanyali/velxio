@@ -1,0 +1,224 @@
+/* ── Oscilloscope panel ─────────────────────────────────────────────────── */
+
+.osc-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #1e1e1e;
+  border-top: 1px solid #333;
+  font-family: 'Consolas', 'Menlo', monospace;
+  font-size: 12px;
+  color: #ccc;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.osc-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: #252526;
+  border-bottom: 1px solid #333;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  min-height: 32px;
+}
+
+.osc-title {
+  color: #cccccc;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.osc-btn {
+  background: transparent;
+  border: 1px solid #555;
+  color: #ccc;
+  padding: 2px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.osc-btn:hover {
+  border-color: #007acc;
+  color: #fff;
+}
+
+.osc-btn-active {
+  background: #0e3a5a;
+  border-color: #007acc;
+  color: #4fc3f7;
+}
+
+.osc-btn-danger {
+  border-color: #7a0000;
+  color: #ff6b6b;
+}
+
+.osc-btn-danger:hover {
+  background: #3a0000;
+  border-color: #ff6b6b;
+}
+
+.osc-label {
+  color: #888;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.osc-select {
+  background: #1e1e1e;
+  border: 1px solid #444;
+  color: #ccc;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-size: 11px;
+  outline: none;
+  cursor: pointer;
+}
+
+.osc-select:focus {
+  border-color: #007acc;
+}
+
+/* ── Channel picker dropdown ── */
+.osc-picker-wrap {
+  position: relative;
+}
+
+.osc-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 200;
+  background: #252526;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 4px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 3px;
+  min-width: 200px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.osc-pin-btn {
+  background: #2d2d2d;
+  border: 1px solid #444;
+  color: #ccc;
+  padding: 3px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  text-align: center;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.osc-pin-btn:hover {
+  background: #0e3a5a;
+  border-color: #007acc;
+  color: #fff;
+}
+
+.osc-pin-btn-active {
+  background: #1a3a1a;
+  border-color: #00ff41;
+  color: #00ff41;
+  cursor: default;
+}
+
+/* ── Waveform area ── */
+.osc-waveforms {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #0a0a0a;
+}
+
+.osc-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #555;
+  font-size: 12px;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.osc-channel-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid #1a1a1a;
+  height: 60px;
+}
+
+.osc-channel-label {
+  width: 56px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background: #141414;
+  border-right: 1px solid #222;
+  gap: 4px;
+}
+
+.osc-channel-name {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.osc-channel-remove {
+  background: transparent;
+  border: none;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.1s;
+}
+
+.osc-channel-remove:hover {
+  color: #ff6b6b;
+}
+
+.osc-channel-canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.osc-channel-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Time ruler ── */
+.osc-ruler {
+  height: 20px;
+  flex-shrink: 0;
+  background: #141414;
+  border-top: 1px solid #222;
+  position: relative;
+}
+
+.osc-ruler-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}

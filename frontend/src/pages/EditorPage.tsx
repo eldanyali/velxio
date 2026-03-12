@@ -10,10 +10,12 @@ import { FileExplorer } from '../components/editor/FileExplorer';
 import { CompilationConsole } from '../components/editor/CompilationConsole';
 import { SimulatorCanvas } from '../components/simulator/SimulatorCanvas';
 import { SerialMonitor } from '../components/simulator/SerialMonitor';
+import { Oscilloscope } from '../components/simulator/Oscilloscope';
 import { AppHeader } from '../components/layout/AppHeader';
 import { SaveProjectModal } from '../components/layout/SaveProjectModal';
 import { LoginPromptModal } from '../components/layout/LoginPromptModal';
 import { useSimulatorStore } from '../store/useSimulatorStore';
+import { useOscilloscopeStore } from '../store/useOscilloscopeStore';
 import { useAuthStore } from '../store/useAuthStore';
 import type { CompilationLog } from '../utils/compilationLogger';
 import '../App.css';
@@ -42,6 +44,7 @@ export const EditorPage: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const resizingRef = useRef(false);
   const serialMonitorOpen = useSimulatorStore((s) => s.serialMonitorOpen);
+  const oscilloscopeOpen = useOscilloscopeStore((s) => s.open);
   const [consoleOpen, setConsoleOpen] = useState(false);
   const [compileLogs, setCompileLogs] = useState<CompilationLog[]>([]);
   const [bottomPanelHeight, setBottomPanelHeight] = useState(BOTTOM_PANEL_DEFAULT);
@@ -273,6 +276,18 @@ export const EditorPage: React.FC = () => {
               />
               <div style={{ height: bottomPanelHeight, flexShrink: 0 }}>
                 <SerialMonitor />
+              </div>
+            </>
+          )}
+          {oscilloscopeOpen && (
+            <>
+              <div
+                onMouseDown={handleBottomPanelResizeMouseDown}
+                style={resizeHandleStyle}
+                title="Drag to resize"
+              />
+              <div style={{ height: bottomPanelHeight, flexShrink: 0 }}>
+                <Oscilloscope />
               </div>
             </>
           )}

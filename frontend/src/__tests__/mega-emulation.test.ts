@@ -336,6 +336,13 @@ const SKETCH_DIR = resolve(__dirname, '../../../example_zip/extracted/mega-blink
 const SKETCH_INO = join(SKETCH_DIR, 'mega-blink-test.ino');
 const HEX_CACHE  = join(tmpdir(), 'velxio-mega-blink-v2.hex');
 
+// ─── arduino-cli availability ─────────────────────────────────────────────────
+
+const ARDUINO_CLI_AVAILABLE = (() => {
+  const r = spawnSync('arduino-cli', ['version'], { encoding: 'utf-8' });
+  return r.error == null && r.status === 0;
+})();
+
 function compileSketch(): string {
   if (existsSync(HEX_CACHE)) {
     console.log('[compile] Using cached hex:', HEX_CACHE);
@@ -366,6 +373,9 @@ function compileSketch(): string {
     { encoding: 'utf-8', timeout: 120_000 },
   );
 
+  if (result.error) {
+    throw new Error(`arduino-cli not available: ${result.error.message}`);
+  }
   if (result.status !== 0) {
     console.error('[compile] stdout:', result.stdout);
     console.error('[compile] stderr:', result.stderr);
@@ -394,7 +404,7 @@ function compileSketch(): string {
   return hex;
 }
 
-describe('Arduino Mega 2560 — end-to-end emulation', () => {
+describe.skipIf(!ARDUINO_CLI_AVAILABLE)('Arduino Mega 2560 — end-to-end emulation', () => {
   let hexContent: string;
   let sim: AVRSimulator;
   let pm: PinManager;

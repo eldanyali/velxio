@@ -15,6 +15,7 @@ import { PinOverlay } from './PinOverlay';
 import { PartSimulationRegistry } from '../../simulation/parts';
 import { isBoardComponent, boardPinToNumber } from '../../utils/boardPinMapping';
 import type { ComponentMetadata } from '../../types/component-metadata';
+import { useOscilloscopeStore } from '../../store/useOscilloscopeStore';
 import './SimulatorCanvas.css';
 
 export const SimulatorCanvas = () => {
@@ -42,6 +43,10 @@ export const SimulatorCanvas = () => {
   const cancelWireCreation = useSimulatorStore((s) => s.cancelWireCreation);
   const wireInProgress = useSimulatorStore((s) => s.wireInProgress);
   const recalculateAllWirePositions = useSimulatorStore((s) => s.recalculateAllWirePositions);
+
+  // Oscilloscope
+  const oscilloscopeOpen = useOscilloscopeStore((s) => s.open);
+  const toggleOscilloscope = useOscilloscopeStore((s) => s.toggleOscilloscope);
 
   // Component picker modal
   const [showComponentPicker, setShowComponentPicker] = useState(false);
@@ -778,6 +783,18 @@ export const SimulatorCanvas = () => {
                 <path d="M8 21h8M12 17v4" />
               </svg>
               Serial
+            </button>
+
+            {/* Oscilloscope toggle */}
+            <button
+              onClick={toggleOscilloscope}
+              className={`canvas-serial-btn${oscilloscopeOpen ? ' canvas-serial-btn-active' : ''}`}
+              title="Toggle Oscilloscope / Logic Analyzer"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="2 14 6 8 10 14 14 6 18 14 22 10" />
+              </svg>
+              Scope
             </button>
           </div>
 

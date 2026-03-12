@@ -135,6 +135,12 @@ export class AVRSimulator {
   public onSerialData: ((char: string) => void) | null = null;
   /** Fires whenever the sketch changes Serial baud rate (Serial.begin) */
   public onBaudRateChange: ((baudRate: number) => void) | null = null;
+  /**
+   * Fires for every digital pin transition with a millisecond timestamp
+   * derived from the CPU cycle counter (cycles / CPU_HZ * 1000).
+   * Used by the oscilloscope / logic analyzer.
+   */
+  public onPinChangeWithTime: ((pin: number, state: boolean, timeMs: number) => void) | null = null;
   private lastPortBValue = 0;
   private lastPortCValue = 0;
   private lastPortDValue = 0;
@@ -232,6 +238,30 @@ export class AVRSimulator {
   }
 
   /**
+   * Fire onPinChangeWithTime for every bit that differs between newVal and oldVal.
+   * @param pinMap  Optional explicit per-bit Arduino pin numbers (Mega).
+   * @param offset  Legacy pin offset (Uno/Nano): PORTB→8, PORTC→14, PORTD→0.
+   */
+  private firePinChangeWithTime(
+    newVal: number,
+    oldVal: number,
+    pinMap: number[] | null,
+    offset = 0,
+  ): void {
+    if (!this.onPinChangeWithTime || !this.cpu) return;
+    const timeMs = this.cpu.cycles / 16_000;
+    const changed = newVal ^ oldVal;
+    for (let bit = 0; bit < 8; bit++) {
+      if (changed & (1 << bit)) {
+        const pin = pinMap ? pinMap[bit] : offset + bit;
+        if (pin < 0) continue;
+        const state = (newVal & (1 << bit)) !== 0;
+        this.onPinChangeWithTime(pin, state, timeMs);
+      }
+    }
+  }
+
+  /**
    * Monitor pin changes and update component states
    */
   private setupPinHooks(): void {
@@ -247,6 +277,7 @@ export class AVRSimulator {
           const old = this.megaPortValues.get(portName) ?? 0;
           if (value !== old) {
             this.pinManager.updatePort(portName, value, old, pinMap);
+            this.firePinChangeWithTime(value, old, pinMap);
             this.megaPortValues.set(portName, value);
           }
         });
@@ -256,18 +287,21 @@ export class AVRSimulator {
       this.portB!.addListener((value) => {
         if (value !== this.lastPortBValue) {
           this.pinManager.updatePort('PORTB', value, this.lastPortBValue);
+          this.firePinChangeWithTime(value, this.lastPortBValue, null, 8);
           this.lastPortBValue = value;
         }
       });
       this.portC!.addListener((value) => {
         if (value !== this.lastPortCValue) {
           this.pinManager.updatePort('PORTC', value, this.lastPortCValue);
+          this.firePinChangeWithTime(value, this.lastPortCValue, null, 14);
           this.lastPortCValue = value;
         }
       });
       this.portD!.addListener((value) => {
         if (value !== this.lastPortDValue) {
           this.pinManager.updatePort('PORTD', value, this.lastPortDValue);
+          this.firePinChangeWithTime(value, this.lastPortDValue, null, 0);
           this.lastPortDValue = value;
         }
       });
@@ -319,14 +353,9 @@ export class AVRSimulator {
     const execute = (timestamp: number) => {
       if (!this.running || !this.cpu) return;
 
-      // First frame: just record the timestamp and yield
-      if (lastTimestamp === 0) {
-        lastTimestamp = timestamp;
-        this.animationFrame = requestAnimationFrame(execute);
-        return;
-      }
-
-      // Clamp delta so we never overshoot after a paused/backgrounded tab
+      // Clamp delta so we never overshoot after a paused/backgrounded tab.
+      // MAX_DELTA_MS already handles large initial deltas (e.g. first frame),
+      // so no separate first-frame guard is needed.
       const rawDelta = timestamp - lastTimestamp;
       const deltaMs  = Math.min(rawDelta, MAX_DELTA_MS);
       lastTimestamp  = timestamp;

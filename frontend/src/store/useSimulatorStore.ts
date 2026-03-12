@@ -6,6 +6,7 @@ import { VirtualDS1307, VirtualTempSensor, I2CMemoryDevice } from '../simulation
 import type { RP2040I2CDevice } from '../simulation/RP2040Simulator';
 import type { Wire, WireInProgress, WireEndpoint } from '../types/wire';
 import { calculatePinPosition } from '../utils/pinPositionCalculator';
+import { useOscilloscopeStore } from './useOscilloscopeStore';
 
 export type BoardType = 'arduino-uno' | 'arduino-nano' | 'arduino-mega' | 'raspberry-pi-pico';
 
@@ -114,6 +115,18 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
   // Create PinManager instance
   const pinManager = new PinManager();
 
+  /** Attach the oscilloscope pin-change-with-time callback to a simulator */
+  function wireOscilloscopeCallback(sim: AVRSimulator | RP2040Simulator): void {
+    sim.onPinChangeWithTime = (pin: number, state: boolean, timeMs: number) => {
+      const { channels, pushSample } = useOscilloscopeStore.getState();
+      for (const ch of channels) {
+        if (ch.pin === pin) {
+          pushSample(ch.id, timeMs, state);
+        }
+      }
+    };
+  }
+
   return {
     boardType: 'arduino-uno' as BoardType,
     boardPosition: { ...DEFAULT_BOARD_POSITION },
@@ -203,6 +216,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       if (simulator instanceof AVRSimulator) {
         simulator.onBaudRateChange = (baudRate: number) => set({ serialBaudRate: baudRate });
       }
+      wireOscilloscopeCallback(simulator);
       set({ boardType: type, simulator, compiledHex: null, serialOutput: '', serialBaudRate: 0 });
       console.log(`Board switched to: ${type}`);
     },
@@ -219,6 +233,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       if (simulator instanceof AVRSimulator) {
         simulator.onBaudRateChange = (baudRate: number) => set({ serialBaudRate: baudRate });
       }
+      wireOscilloscopeCallback(simulator);
       set({ simulator, serialOutput: '', serialBaudRate: 0 });
       console.log(`Simulator initialized: ${boardType}`);
     },
