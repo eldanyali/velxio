@@ -9,9 +9,11 @@ import { WireLayer } from './WireLayer';
 import { BoardOnCanvas } from './BoardOnCanvas';
 import { BoardPickerModal } from './BoardPickerModal';
 import { PartSimulationRegistry } from '../../simulation/parts';
+import { PinOverlay } from './PinOverlay';
 import { isBoardComponent, boardPinToNumber } from '../../utils/boardPinMapping';
 import type { ComponentMetadata } from '../../types/component-metadata';
 import type { BoardKind } from '../../types/board';
+import { BOARD_KIND_LABELS } from '../../types/board';
 import { useOscilloscopeStore } from '../../store/useOscilloscopeStore';
 import { useEditorStore } from '../../store/useEditorStore';
 import './SimulatorCanvas.css';
@@ -434,9 +436,20 @@ export const SimulatorCanvas = () => {
           const otherEndpoint = isStartSelf ? wire.end : wire.start;
 
           if (isBoardComponent(otherEndpoint.componentId)) {
-            const pin = boardPinToNumber(otherEndpoint.componentId, otherEndpoint.pinName);
+            // Use the board's actual boardKind (not just its instance ID) so that
+            // a board whose ID is 'arduino-uno' but whose kind is 'esp32' gets the
+            // correct GPIO mapping ('GPIO4' → 4, not null).
+            const boardInstance = boards.find(b => b.id === otherEndpoint.componentId);
+            const lookupKey = boardInstance ? boardInstance.boardKind : otherEndpoint.componentId;
+            const pin = boardPinToNumber(lookupKey, otherEndpoint.pinName);
+            console.log(
+              `[WirePin] component=${component.id} board=${otherEndpoint.componentId}` +
+              ` kind=${lookupKey} pinName=${otherEndpoint.pinName} → gpioPin=${pin}`
+            );
             if (pin !== null) {
               subscribeComponentToPin(component, pin, selfEndpoint.pinName);
+            } else {
+              console.warn(`[WirePin] Could not resolve pin "${otherEndpoint.pinName}" on ${lookupKey}`);
             }
           }
         });
@@ -820,7 +833,7 @@ export const SimulatorCanvas = () => {
               title="Active board"
             >
               {boards.map((b) => (
-                <option key={b.id} value={b.id}>{b.id}</option>
+                <option key={b.id} value={b.id}>{BOARD_KIND_LABELS[b.boardKind] ?? b.id}</option>
               ))}
             </select>
 

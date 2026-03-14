@@ -58,14 +58,14 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({
         zIndex: 10, // Above wires (1) and components, below modals/dialogs (1000+)
       }}
     >
-      {pins.map((pin) => {
+      {pins.map((pin, index) => {
         // Pin coordinates are already in CSS pixels
         const pinX = pin.x;
         const pinY = pin.y;
 
         return (
           <div
-            key={pin.name}
+            key={`${pin.name}-${index}`}
             onClick={(e) => {
               e.stopPropagation();
               onPinClick(componentId, pin.name, componentX + wrapperOffsetX + pinX, componentY + wrapperOffsetY + pinY);

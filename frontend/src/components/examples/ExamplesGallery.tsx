@@ -218,6 +218,18 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
                     Pico
                   </span>
                 )}
+                {example.boardType === 'esp32' && (
+                  <span className="example-board-badge" style={{
+                    backgroundColor: '#e77d11',
+                    color: '#fff',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    fontSize: '0.7rem',
+                    fontWeight: 600,
+                  }}>
+                    ESP32
+                  </span>
+                )}
               </div>
             </div>
           </div>

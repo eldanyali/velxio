@@ -186,18 +186,19 @@ class EspLibManager:
 
     # ── Public API ────────────────────────────────────────────────────────
 
-    def start_instance(
+    async def start_instance(
         self,
         client_id:    str,
         board_type:   str,
         callback:     EventCallback,
         firmware_b64: str | None = None,
     ) -> None:
+        # If an instance already exists, stop it first and wait for it to clean up
         if client_id in self._instances:
-            logger.warning('start_instance: %s already running', client_id)
-            return
+            logger.info('start_instance: %s already running — stopping old instance first', client_id)
+            await self.stop_instance(client_id)
 
-        loop   = asyncio.get_event_loop()
+        loop   = asyncio.get_running_loop()
         bridge = Esp32LibBridge(LIB_PATH, loop)
         state  = _InstanceState(bridge, callback, board_type)
         self._instances[client_id] = state
@@ -295,21 +296,24 @@ class EspLibManager:
         bridge.register_spi_handler(_spi_sync)
         bridge.register_rmt_listener(_async_wrap(_on_rmt))
 
-        asyncio.ensure_future(callback('system', {'event': 'booting'}))
+        await callback('system', {'event': 'booting'})
 
         machine = _MACHINE.get(board_type, 'esp32-picsimlab')
         if firmware_b64:
             try:
-                bridge.start(firmware_b64, machine)
-                asyncio.ensure_future(callback('system', {'event': 'booted'}))
+                # bridge.start() blocks for up to 30 s waiting for qemu_init —
+                # run it in a thread-pool executor so the asyncio event loop
+                # stays responsive during QEMU startup.
+                await loop.run_in_executor(None, bridge.start, firmware_b64, machine)
+                await callback('system', {'event': 'booted'})
             except Exception as exc:
                 logger.error('start_instance %s: bridge.start failed: %s', client_id, exc)
                 self._instances.pop(client_id, None)
-                asyncio.ensure_future(callback('error', {'message': str(exc)}))
+                await callback('error', {'message': str(exc)})
         else:
             logger.info('start_instance %s: no firmware, waiting for load_firmware()', client_id)
 
-    def stop_instance(self, client_id: str) -> None:
+    async def stop_instance(self, client_id: str) -> None:
         state = self._instances.pop(client_id, None)
         if not state:
             return
@@ -320,7 +324,10 @@ class EspLibManager:
                     state.callback('serial_output', {'data': remaining, 'uart': buf.uart_id})
                 )
         try:
-            state.bridge.stop()
+            # bridge.stop() calls qemu_cleanup() + thread.join(5 s) — blocking.
+            # Run in executor so we don't stall the asyncio event loop.
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, state.bridge.stop)
         except Exception as exc:
             logger.warning('stop_instance %s: %s', client_id, exc)
 
@@ -332,11 +339,11 @@ class EspLibManager:
             return
         board_type = state.board_type
         callback   = state.callback
-        self.stop_instance(client_id)
 
         async def _restart() -> None:
-            await asyncio.sleep(0.3)
-            self.start_instance(client_id, board_type, callback, firmware_b64)
+            await self.stop_instance(client_id)
+            await asyncio.sleep(0.1)
+            await self.start_instance(client_id, board_type, callback, firmware_b64)
 
         asyncio.create_task(_restart())
 

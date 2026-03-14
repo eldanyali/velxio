@@ -524,41 +524,82 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       const boardId = activeBoardId ?? INITIAL_BOARD_ID;
       const pm = getBoardPinManager(boardId) ?? legacyPinManager;
 
-      // Stop and remove old simulator
+      // Stop and remove old simulator / bridge
       getBoardSimulator(boardId)?.stop();
       simulatorMap.delete(boardId);
+      getEsp32Bridge(boardId)?.disconnect();
+      esp32BridgeMap.delete(boardId);
 
-      const sim = createSimulator(
-        type as BoardKind,
-        pm,
-        (ch) => set((s) => {
-          const boards = s.boards.map((b) =>
-            b.id === boardId ? { ...b, serialOutput: b.serialOutput + ch } : b
-          );
-          return { boards, serialOutput: s.serialOutput + ch };
-        }),
-        (baud) => set((s) => {
-          const boards = s.boards.map((b) =>
-            b.id === boardId ? { ...b, serialBaudRate: baud } : b
-          );
-          return { boards, serialBaudRate: baud };
-        }),
-        getOscilloscopeCallback(),
-      );
-      simulatorMap.set(boardId, sim);
+      const serialCallback = (ch: string) => set((s) => {
+        const boards = s.boards.map((b) =>
+          b.id === boardId ? { ...b, serialOutput: b.serialOutput + ch } : b
+        );
+        return { boards, serialOutput: s.serialOutput + ch };
+      });
 
-      set((s) => ({
-        boardType: type,
-        simulator: sim,
-        compiledHex: null,
-        serialOutput: '',
-        serialBaudRate: 0,
-        boards: s.boards.map((b) =>
-          b.id === boardId
-            ? { ...b, boardKind: type as BoardKind, compiledProgram: null, serialOutput: '', serialBaudRate: 0 }
-            : b
-        ),
-      }));
+      if (isEsp32Kind(type as BoardKind)) {
+        // ESP32: use bridge, not AVR simulator
+        const bridge = new Esp32Bridge(boardId, type as BoardKind);
+        bridge.onSerialData = serialCallback;
+        bridge.onPinChange = (gpioPin, state) => {
+          const boardPm = pinManagerMap.get(boardId);
+          if (boardPm) boardPm.triggerPinChange(gpioPin, state);
+        };
+        bridge.onCrash = () => { set({ esp32CrashBoardId: boardId }); };
+        bridge.onLedcUpdate = (update) => {
+          const boardPm = pinManagerMap.get(boardId);
+          if (boardPm && typeof boardPm.updatePwm === 'function') {
+            boardPm.updatePwm(update.channel, update.duty_pct);
+          }
+        };
+        bridge.onWs2812Update = (channel, pixels) => {
+          const eventTarget = document.getElementById(`ws2812-${boardId}-${channel}`);
+          if (eventTarget) {
+            eventTarget.dispatchEvent(new CustomEvent('ws2812-pixels', { detail: { pixels } }));
+          }
+        };
+        esp32BridgeMap.set(boardId, bridge);
+
+        set((s) => ({
+          boardType: type,
+          simulator: null,
+          compiledHex: null,
+          serialOutput: '',
+          serialBaudRate: 0,
+          boards: s.boards.map((b) =>
+            b.id === boardId
+              ? { ...b, boardKind: type as BoardKind, compiledProgram: null, serialOutput: '', serialBaudRate: 0 }
+              : b
+          ),
+        }));
+      } else {
+        const sim = createSimulator(
+          type as BoardKind,
+          pm,
+          serialCallback,
+          (baud) => set((s) => {
+            const boards = s.boards.map((b) =>
+              b.id === boardId ? { ...b, serialBaudRate: baud } : b
+            );
+            return { boards, serialBaudRate: baud };
+          }),
+          getOscilloscopeCallback(),
+        );
+        simulatorMap.set(boardId, sim);
+
+        set((s) => ({
+          boardType: type,
+          simulator: sim,
+          compiledHex: null,
+          serialOutput: '',
+          serialBaudRate: 0,
+          boards: s.boards.map((b) =>
+            b.id === boardId
+              ? { ...b, boardKind: type as BoardKind, compiledProgram: null, serialOutput: '', serialBaudRate: 0 }
+              : b
+          ),
+        }));
+      }
       console.log(`Board switched to: ${type}`);
     },
 

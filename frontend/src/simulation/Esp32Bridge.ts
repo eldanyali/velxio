@@ -79,6 +79,7 @@ export class Esp32Bridge {
 
     socket.onopen = () => {
       this._connected = true;
+      console.log(`[Esp32Bridge:${this.boardId}] WebSocket connected → sending start_esp32 (firmware: ${this._pendingFirmware ? `${Math.round(this._pendingFirmware.length * 0.75 / 1024)}KB` : 'none'})`);
       this.onConnected?.();
       this._send({
         type: 'start_esp32',
@@ -109,6 +110,7 @@ export class Esp32Bridge {
         case 'gpio_change': {
           const pin   = msg.data.pin as number;
           const state = (msg.data.state as number) === 1;
+          console.log(`[Esp32Bridge:${this.boardId}] gpio_change pin=${pin} state=${state ? 'HIGH' : 'LOW'}`);
           this.onPinChange?.(pin, state);
           break;
         }
@@ -142,6 +144,7 @@ export class Esp32Bridge {
         }
         case 'system': {
           const evt = msg.data.event as string;
+          console.log(`[Esp32Bridge:${this.boardId}] system event: ${evt}`, msg.data);
           if (evt === 'crash') {
             this.onCrash?.(msg.data);
           }
@@ -149,18 +152,21 @@ export class Esp32Bridge {
           break;
         }
         case 'error':
+          console.error(`[Esp32Bridge:${this.boardId}] error: ${msg.data.message as string}`);
           this.onError?.(msg.data.message as string);
           break;
       }
     };
 
-    socket.onclose = () => {
+    socket.onclose = (ev) => {
+      console.log(`[Esp32Bridge:${this.boardId}] WebSocket closed (code=${ev.code})`);
       this._connected = false;
       this.socket = null;
       this.onDisconnected?.();
     };
 
-    socket.onerror = () => {
+    socket.onerror = (ev) => {
+      console.error(`[Esp32Bridge:${this.boardId}] WebSocket error`, ev);
       this.onError?.('WebSocket error');
     };
   }

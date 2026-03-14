@@ -34,6 +34,12 @@ async def simulation_websocket(websocket: WebSocket, client_id: str):
     await manager.connect(websocket, client_id)
 
     async def qemu_callback(event_type: str, data: dict) -> None:
+        if event_type == 'gpio_change':
+            logger.info('[%s] gpio_change pin=%s state=%s', client_id, data.get('pin'), data.get('state'))
+        elif event_type == 'system':
+            logger.info('[%s] system event: %s', client_id, data.get('event'))
+        elif event_type == 'error':
+            logger.error('[%s] error: %s', client_id, data.get('message'))
         payload = json.dumps({'type': event_type, 'data': data})
         await manager.send(client_id, payload)
 
@@ -69,13 +75,18 @@ async def simulation_websocket(websocket: WebSocket, client_id: str):
             elif msg_type == 'start_esp32':
                 board        = msg_data.get('board', 'esp32')
                 firmware_b64 = msg_data.get('firmware_b64')
-                if _use_lib():
-                    esp_lib_manager.start_instance(client_id, board, qemu_callback, firmware_b64)
+                fw_size_kb   = round(len(firmware_b64) * 0.75 / 1024) if firmware_b64 else 0
+                lib_available = _use_lib()
+                logger.info('[%s] start_esp32 board=%s firmware=%dKB lib_available=%s',
+                            client_id, board, fw_size_kb, lib_available)
+                if lib_available:
+                    await esp_lib_manager.start_instance(client_id, board, qemu_callback, firmware_b64)
                 else:
+                    logger.warning('[%s] libqemu-xtensa not available — using subprocess fallback', client_id)
                     esp_qemu_manager.start_instance(client_id, board, qemu_callback, firmware_b64)
 
             elif msg_type == 'stop_esp32':
-                esp_lib_manager.stop_instance(client_id)
+                await esp_lib_manager.stop_instance(client_id)
                 esp_qemu_manager.stop_instance(client_id)
 
             elif msg_type == 'load_firmware':
@@ -168,11 +179,11 @@ async def simulation_websocket(websocket: WebSocket, client_id: str):
     except WebSocketDisconnect:
         manager.disconnect(client_id)
         qemu_manager.stop_instance(client_id)
-        esp_lib_manager.stop_instance(client_id)
+        await esp_lib_manager.stop_instance(client_id)
         esp_qemu_manager.stop_instance(client_id)
     except Exception as exc:
         logger.error('WebSocket error for %s: %s', client_id, exc)
         manager.disconnect(client_id)
         qemu_manager.stop_instance(client_id)
-        esp_lib_manager.stop_instance(client_id)
+        await esp_lib_manager.stop_instance(client_id)
         esp_qemu_manager.stop_instance(client_id)

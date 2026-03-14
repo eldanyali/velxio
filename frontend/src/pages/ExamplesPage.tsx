@@ -10,12 +10,13 @@ import { ExamplesGallery } from '../components/examples/ExamplesGallery';
 import { AppHeader } from '../components/layout/AppHeader';
 import { useEditorStore } from '../store/useEditorStore';
 import { useSimulatorStore } from '../store/useSimulatorStore';
+import { isBoardComponent } from '../utils/boardPinMapping';
 import type { ExampleProject } from '../data/examples';
 
 export const ExamplesPage: React.FC = () => {
   const navigate = useNavigate();
   const { setCode } = useEditorStore();
-  const { setComponents, setWires, setBoardType } = useSimulatorStore();
+  const { setComponents, setWires, setBoardType, activeBoardId } = useSimulatorStore();
 
   const handleLoadExample = (example: ExampleProject) => {
     console.log('Loading example:', example.title);
@@ -29,7 +30,10 @@ export const ExamplesPage: React.FC = () => {
 
     // Filter out board components from examples (board is rendered separately in SimulatorCanvas)
     const componentsWithoutBoard = example.components.filter(
-      (comp) => !comp.type.includes('arduino') && !comp.type.includes('pico')
+      (comp) =>
+        !comp.type.includes('arduino') &&
+        !comp.type.includes('pico') &&
+        !comp.type.includes('esp32')
     );
 
     // Load components into the simulator
@@ -44,18 +48,23 @@ export const ExamplesPage: React.FC = () => {
       }))
     );
 
-    // Load wires (need to convert to full wire format with positions)
-    // For now, just set empty wires - wire positions will be calculated when components are loaded
+    // The active board's instance ID (DOM id of the board element).
+    // setBoardType changes boardKind but not the instance ID, so wires that
+    // reference any known board component ID must be remapped to this ID.
+    const boardInstanceId = activeBoardId ?? 'arduino-uno';
+    const remapBoardId = (id: string) => isBoardComponent(id) ? boardInstanceId : id;
+
+    // Load wires — positions are calculated by SimulatorCanvas after mount
     const wiresWithPositions = example.wires.map((wire) => ({
       id: wire.id,
       start: {
-        componentId: wire.start.componentId,
+        componentId: remapBoardId(wire.start.componentId),
         pinName: wire.start.pinName,
-        x: 0, // Will be calculated by SimulatorCanvas
+        x: 0,
         y: 0,
       },
       end: {
-        componentId: wire.end.componentId,
+        componentId: remapBoardId(wire.end.componentId),
         pinName: wire.end.pinName,
         x: 0,
         y: 0,

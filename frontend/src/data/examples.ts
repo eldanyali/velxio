@@ -11,7 +11,7 @@ export interface ExampleProject {
   category: 'basics' | 'sensors' | 'displays' | 'communication' | 'games' | 'robotics';
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   /** Target board — defaults to 'arduino-uno' if omitted */
-  boardType?: 'arduino-uno' | 'arduino-nano' | 'raspberry-pi-pico';
+  boardType?: 'arduino-uno' | 'arduino-nano' | 'raspberry-pi-pico' | 'esp32';
   code: string;
   components: Array<{
     type: string;
@@ -1956,6 +1956,80 @@ void loop() {
       { id: 'w-adc', start: { componentId: 'nano-rp2040', pinName: 'A0' }, end: { componentId: 'pot-adc', pinName: 'SIG' }, color: '#cc44cc' },
       { id: 'w-gpio', start: { componentId: 'nano-rp2040', pinName: 'D2' }, end: { componentId: 'led-gpio', pinName: 'A' }, color: '#00cc00' },
     ],
+  },
+  // ─── ESP32 Examples ───────────────────────────────────────────────────────
+  {
+    id: 'esp32-blink-led',
+    title: 'ESP32 Blink LED',
+    description: 'Blink the built-in LED on GPIO2 and an external red LED on GPIO4. Verifies ESP32 emulation is working.',
+    category: 'basics',
+    difficulty: 'beginner',
+    boardType: 'esp32',
+    code: `// ESP32 Blink LED
+// Blinks the built-in LED (GPIO2) and an external LED (GPIO4)
+// Requires arduino-esp32 2.0.17 (IDF 4.4.x) — see docs/ESP32_EMULATION.md
+
+#define LED_BUILTIN_PIN 2   // Built-in blue LED on ESP32 DevKit
+#define LED_EXT_PIN     4   // External red LED
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LED_BUILTIN_PIN, OUTPUT);
+  pinMode(LED_EXT_PIN, OUTPUT);
+  Serial.println("ESP32 Blink ready!");
+}
+
+void loop() {
+  digitalWrite(LED_BUILTIN_PIN, HIGH);
+  digitalWrite(LED_EXT_PIN, HIGH);
+  Serial.println("LED ON");
+  delay(500);
+
+  digitalWrite(LED_BUILTIN_PIN, LOW);
+  digitalWrite(LED_EXT_PIN, LOW);
+  Serial.println("LED OFF");
+  delay(500);
+}`,
+    components: [
+      { type: 'wokwi-led', id: 'led-ext', x: 460, y: 190, properties: { color: 'red' } },
+    ],
+    wires: [
+      // GPIO4 → LED anode (direct — subscription system needs board→component wire)
+      { id: 'w-gpio4-led', start: { componentId: 'arduino-uno', pinName: 'GPIO4' }, end: { componentId: 'led-ext', pinName: 'A' }, color: '#e74c3c' },
+      // LED cathode → GND
+      { id: 'w-gnd',       start: { componentId: 'led-ext', pinName: 'C' },         end: { componentId: 'arduino-uno', pinName: 'GND' }, color: '#2c3e50' },
+    ],
+  },
+  {
+    id: 'esp32-serial-echo',
+    title: 'ESP32 Serial Echo',
+    description: 'ESP32 reads from Serial and echoes back. Demonstrates multi-UART and Serial Monitor integration.',
+    category: 'communication',
+    difficulty: 'beginner',
+    boardType: 'esp32',
+    code: `// ESP32 Serial Echo
+// Echoes anything received on Serial (UART0) back to the sender.
+// Open the Serial Monitor, type something, and see it echoed back.
+
+void setup() {
+  Serial.begin(115200);
+  delay(500);
+  Serial.println("ESP32 Serial Echo ready!");
+  Serial.println("Type anything in the Serial Monitor...");
+}
+
+void loop() {
+  if (Serial.available()) {
+    String input = Serial.readStringUntil('\\n');
+    input.trim();
+    if (input.length() > 0) {
+      Serial.print("Echo: ");
+      Serial.println(input);
+    }
+  }
+}`,
+    components: [],
+    wires: [],
   },
 ];
 

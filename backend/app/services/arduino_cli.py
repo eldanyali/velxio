@@ -335,11 +335,35 @@ class ArduinoCLIService:
                                 "stderr": result.stderr
                             }
                     elif self._is_esp32_board(board_fqbn):
-                        # ESP32 outputs a merged flash .bin file
-                        # arduino-cli places it as sketch.ino.bin
-                        bin_file = build_dir / "sketch.ino.bin"
-                        # Some versions use a merged-flash variant
-                        merged_file = build_dir / "sketch.ino.merged.bin"
+                        # ESP32 outputs individual .bin files that must be merged into a
+                        # single 4MB flash image for QEMU lcgamboa to boot correctly.
+                        bin_file        = build_dir / "sketch.ino.bin"
+                        bootloader_file = build_dir / "sketch.ino.bootloader.bin"
+                        partitions_file = build_dir / "sketch.ino.partitions.bin"
+                        merged_file     = build_dir / "sketch.ino.merged.bin"
+
+                        print(f"[ESP32] Build dir contents: {[f.name for f in build_dir.iterdir()]}")
+
+                        # Merge individual .bin files into a single 4MB flash image in pure Python.
+                        # ESP32 default flash layout:  0x1000 bootloader | 0x8000 partitions | 0x10000 app
+                        # QEMU lcgamboa requires exactly 2/4/8/16 MB flash — raw app binary won't boot.
+                        if not merged_file.exists() and bin_file.exists() and bootloader_file.exists() and partitions_file.exists():
+                            print("[ESP32] Merging binaries into 4MB flash image (pure Python)...")
+                            try:
+                                FLASH_SIZE = 4 * 1024 * 1024  # 4 MB
+                                flash = bytearray(b'\xff' * FLASH_SIZE)
+                                for offset, path in [
+                                    (0x1000,  bootloader_file),
+                                    (0x8000,  partitions_file),
+                                    (0x10000, bin_file),
+                                ]:
+                                    data = path.read_bytes()
+                                    flash[offset:offset + len(data)] = data
+                                merged_file.write_bytes(bytes(flash))
+                                print(f"[ESP32] Merged image: {merged_file.stat().st_size} bytes")
+                            except Exception as e:
+                                print(f"[ESP32] Merge failed: {e} — falling back to raw app binary")
+
                         target_file = merged_file if merged_file.exists() else (bin_file if bin_file.exists() else None)
 
                         if target_file:

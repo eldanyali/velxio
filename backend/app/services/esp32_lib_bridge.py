@@ -115,6 +115,7 @@ class Esp32LibBridge:
         self._thread:        threading.Thread | None = None
         self._callbacks_ref: _CallbacksT | None = None   # GC guard
         self._firmware_path: str | None = None
+        self._stopped:       bool = False  # set on stop(); silences callbacks
 
         # ── Listener/handler lists ────────────────────────────────────────
         self._gpio_listeners: list = []   # fn(gpio_num: int, value: int)
@@ -217,12 +218,28 @@ class Esp32LibBridge:
         logger.info('lcgamboa QEMU started: machine=%s firmware=%s', machine, self._firmware_path)
 
     def stop(self) -> None:
-        """Terminate the QEMU instance and clean up."""
+        """
+        Terminate the QEMU instance and block until the thread exits (≤5 s).
+
+        qemu_cleanup() is called here to request QEMU shutdown; the assertion
+        it raises on some platforms is non-fatal (glib prints "Bail out!" but
+        does not abort the process on Windows).  We swallow all exceptions.
+
+        This method is intentionally synchronous/blocking so that callers can
+        run it in a thread-pool executor and await it from async code without
+        stalling the asyncio event loop.
+        """
+        self._stopped = True
+        self._callbacks_ref = None   # allow GC of ctypes callbacks early
         try:
             self._lib.qemu_cleanup()
         except Exception as exc:
-            logger.debug('qemu_cleanup: %s', exc)
-        self._callbacks_ref = None
+            logger.debug('qemu_cleanup exception (expected): %s', exc)
+        # Wait for QEMU thread so the DLL global state is clean before re-init
+        if self._thread and self._thread.is_alive():
+            self._thread.join(timeout=5.0)
+            if self._thread.is_alive():
+                logger.warning('QEMU thread still alive after 5 s — proceeding anyway')
         if self._firmware_path and os.path.exists(self._firmware_path):
             try:
                 os.unlink(self._firmware_path)
@@ -314,12 +331,16 @@ class Esp32LibBridge:
 
     def _on_pin_change(self, slot: int, value: int) -> None:
         """GPIO output changed — translate slot→GPIO, dispatch to async listeners."""
+        if self._stopped:
+            return
         gpio = self._slot_to_gpio(slot)
         for fn in self._gpio_listeners:
             self._loop.call_soon_threadsafe(fn, gpio, value)
 
     def _on_dir_change(self, slot: int, direction: int) -> None:
         """GPIO direction changed (0=input, 1=output)."""
+        if self._stopped:
+            return
         gpio = self._slot_to_gpio(slot)
         self._gpio_dir[gpio] = direction
         for fn in self._dir_listeners:
@@ -357,10 +378,14 @@ class Esp32LibBridge:
 
     def _on_uart_tx(self, uart_id: int, byte_val: int) -> None:
         """UART TX byte transmitted by ESP32 firmware."""
+        if self._stopped:
+            return
         for fn in self._uart_listeners:
             self._loop.call_soon_threadsafe(fn, uart_id, byte_val)
 
     def _on_rmt_event(self, channel: int, config0: int, value: int) -> None:
         """RMT pulse event — used for NeoPixel/WS2812, IR remotes, etc."""
+        if self._stopped:
+            return
         for fn in self._rmt_listeners:
             self._loop.call_soon_threadsafe(fn, channel, config0, value)

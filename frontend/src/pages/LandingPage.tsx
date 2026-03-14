@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
+import { AppHeader } from '../components/layout/AppHeader';
 import './LandingPage.css';
 
 const GITHUB_URL = 'https://github.com/davidmonterocrespo24/velxio';
