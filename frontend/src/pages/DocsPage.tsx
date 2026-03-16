@@ -21,6 +21,8 @@ type SectionId =
   | 'emulator'
   | 'riscv-emulation'
   | 'esp32-emulation'
+  | 'rp2040-emulation'
+  | 'raspberry-pi3-emulation'
   | 'components'
   | 'roadmap'
   | 'architecture'
@@ -34,6 +36,8 @@ const VALID_SECTIONS: SectionId[] = [
   'emulator',
   'riscv-emulation',
   'esp32-emulation',
+  'rp2040-emulation',
+  'raspberry-pi3-emulation',
   'components',
   'roadmap',
   'architecture',
@@ -53,6 +57,8 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'emulator', label: 'Emulator Architecture' },
   { id: 'riscv-emulation', label: 'RISC-V Emulation (ESP32-C3)' },
   { id: 'esp32-emulation', label: 'ESP32 Emulation (Xtensa)' },
+  { id: 'rp2040-emulation', label: 'RP2040 Emulation (Raspberry Pi Pico)' },
+  { id: 'raspberry-pi3-emulation', label: 'Raspberry Pi 3 Emulation (QEMU)' },
   { id: 'components', label: 'Components Reference' },
   { id: 'architecture', label: 'Project Architecture' },
   { id: 'wokwi-libs', label: 'Wokwi Libraries' },
@@ -107,6 +113,14 @@ const SECTION_META: Record<SectionId, SectionMeta> = {
   'setup': {
     title: 'Project Status — Velxio Documentation',
     description: 'Complete status of all implemented Velxio features: AVR emulation, component system, wire system, code editor, example projects, and next steps.',
+  },
+  'rp2040-emulation': {
+    title: 'RP2040 Emulation (Raspberry Pi Pico) — Velxio Documentation',
+    description: 'How Velxio emulates the Raspberry Pi Pico and Pico W using rp2040js: ARM Cortex-M0+ at 133 MHz, GPIO, UART, ADC, I2C, SPI, PWM and WFI optimization.',
+  },
+  'raspberry-pi3-emulation': {
+    title: 'Raspberry Pi 3 Emulation (QEMU) — Velxio Documentation',
+    description: 'How Velxio emulates a full Raspberry Pi 3B using QEMU raspi3b: real Raspberry Pi OS, Python + RPi.GPIO shim, dual-channel UART, VFS, and multi-board serial bridge.',
   },
 };
 
@@ -1194,12 +1208,180 @@ const Esp32EmulationSection: React.FC = () => (
   </div>
 );
 
+/* ── RP2040 Emulation Section ─────────────────────────── */
+const Rp2040EmulationSection: React.FC = () => (
+  <div className="docs-section">
+    <span className="docs-label">// arm cortex-m0+</span>
+    <h1>RP2040 Emulation (Raspberry Pi Pico)</h1>
+    <p>
+      The Raspberry Pi Pico and Pico W are emulated entirely in the browser using{' '}
+      <a href="https://github.com/wokwi/rp2040js" target="_blank" rel="noopener noreferrer">rp2040js</a>,
+      an open-source ARM Cortex-M0+ emulator. No QEMU or backend process is required — the binary runs at full speed inside a Web Worker.
+    </p>
+
+    <h2>Supported Boards</h2>
+    <div className="docs-board-gallery">
+      <div className="docs-board-card">
+        <img src="/boards/pi-pico.svg" alt="Raspberry Pi Pico" />
+        <span>Raspberry Pi Pico</span>
+      </div>
+      <div className="docs-board-card">
+        <img src="/boards/pi-pico-w.svg" alt="Raspberry Pi Pico W" />
+        <span>Raspberry Pi Pico W</span>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Board</th><th>FQBN</th><th>Built-in LED</th></tr></thead>
+      <tbody>
+        <tr><td>Raspberry Pi Pico</td><td><code>rp2040:rp2040:rpipico</code></td><td>GPIO 25</td></tr>
+        <tr><td>Raspberry Pi Pico W</td><td><code>rp2040:rp2040:rpipicow</code></td><td>GPIO 25 (via CYW43)</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Binary Format</h2>
+    <p>
+      The backend compiles the sketch with <code>arduino-cli</code> targeting <code>rp2040:rp2040:rpipico</code> and returns
+      a raw ARM binary (<code>.bin</code>) encoded in base64. Unlike AVR, there is no Intel HEX — the binary is loaded
+      directly into the RP2040 flash at offset 0.
+    </p>
+    <p>
+      The backend also prepends <code>#define Serial Serial1</code> to the sketch so that Arduino <code>Serial</code> calls
+      are redirected to UART0 (the virtual serial port streamed to the Serial Monitor).
+    </p>
+
+    <h2>Peripherals</h2>
+    <table>
+      <thead><tr><th>Peripheral</th><th>Support</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>GPIO (30 pins)</td><td>Full</td><td>Digital read/write, pull-up/down</td></tr>
+        <tr><td>UART0 / UART1</td><td>Full</td><td>Serial Monitor via UART0</td></tr>
+        <tr><td>ADC (ch 0–3)</td><td>Full</td><td>GPIO 26–29; ch 4 = temperature sensor</td></tr>
+        <tr><td>I2C0 / I2C1</td><td>Partial</td><td>DS1307 RTC, TempSensor, EEPROM virtual devices</td></tr>
+        <tr><td>SPI0 / SPI1</td><td>Loopback</td><td>TX looped back to RX</td></tr>
+        <tr><td>PWM</td><td>Frequency only</td><td>No waveform output to components</td></tr>
+        <tr><td>Timer / Alarm</td><td>Full</td><td>Used by <code>delay()</code> and <code>millis()</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>WFI Optimisation</h2>
+    <p>
+      When the CPU executes a <strong>WFI</strong> (Wait For Interrupt) instruction, the emulator fast-forwards
+      the system clock to the next scheduled alarm instead of spinning through idle cycles. This dramatically
+      reduces CPU usage during <code>delay()</code> calls.
+    </p>
+
+    <h2>Simulation Loop</h2>
+    <p>
+      The simulation runs inside <code>requestAnimationFrame</code> at ~60 FPS.
+      Each frame executes approximately <strong>2,200,000</strong> CPU cycles (133 MHz / 60 fps).
+      GPIO listeners fire whenever a pin state changes and update the visual components on the canvas.
+    </p>
+
+    <h2>Known Limitations</h2>
+    <ul>
+      <li>Pico W wireless chip (CYW43439) is not emulated — WiFi/Bluetooth will not work</li>
+      <li>SPI loopback only — no real SPI device emulation</li>
+      <li>PWM produces correct frequency but no visual waveform on components</li>
+      <li>DMA not emulated</li>
+      <li>Second CPU core (core 1) not emulated — <code>multicore_launch_core1()</code> has no effect</li>
+    </ul>
+
+    <h2>Full Documentation</h2>
+    <p>
+      See the complete technical reference:{' '}
+      <a href="https://github.com/davidmonterocrespo24/velxio/blob/master/docs/RP2040_EMULATION.md" target="_blank" rel="noopener noreferrer">
+        RP2040_EMULATION.md
+      </a>
+    </p>
+  </div>
+);
+
+/* ── Raspberry Pi 3 Emulation Section ─────────────────── */
+const RaspberryPi3EmulationSection: React.FC = () => (
+  <div className="docs-section">
+    <span className="docs-label">// qemu raspi3b</span>
+    <h1>Raspberry Pi 3 Emulation (QEMU)</h1>
+    <p>
+      The Raspberry Pi 3B is emulated using <strong>QEMU 8.1.3</strong> with <code>-M raspi3b</code>.
+      This is the only board in Velxio that runs a full operating system — a real{' '}
+      <strong>Raspberry Pi OS (Trixie)</strong> image booted inside the emulator.
+      Users write Python scripts (not C++), which are executed by the real Python 3 interpreter inside the VM.
+    </p>
+
+    <h2>Supported Boards</h2>
+    <table>
+      <thead><tr><th>Board</th><th>QEMU Machine</th><th>CPU</th></tr></thead>
+      <tbody>
+        <tr><td>Raspberry Pi 3B</td><td><code>raspi3b</code></td><td>BCM2837, 4× Cortex-A53 @ 1.2 GHz</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Dual-Channel Serial Architecture</h2>
+    <p>
+      QEMU exposes two UART channels to the backend:
+    </p>
+    <ul>
+      <li><strong>ttyAMA0</strong> — User serial: interactive terminal (Serial Monitor). The user's <code>print()</code> output appears here.</li>
+      <li><strong>ttyAMA1</strong> — GPIO shim: carries a text protocol between the GPIO shim inside the VM and the backend.</li>
+    </ul>
+
+    <h2>RPi.GPIO Shim</h2>
+    <p>
+      A custom <code>RPi.GPIO</code> shim is injected at <code>/usr/local/lib/python3.11/dist-packages/RPi/GPIO.py</code>
+      inside the VM. When user code calls <code>GPIO.output(pin, value)</code>, the shim writes
+      a line like <code>GPIO 17 1</code> to <strong>ttyAMA1</strong>.
+      The backend reads this, fires a <code>gpio_change</code> WebSocket event, and the frontend
+      updates the visual component on the canvas.
+    </p>
+    <p>
+      The reverse also works: the frontend can send <code>SET 17 1</code> via WebSocket → backend → ttyAMA1 → shim → user code reads it via <code>GPIO.input(17)</code>.
+    </p>
+
+    <h2>Virtual File System (VFS)</h2>
+    <p>
+      Each Raspberry Pi board instance has its own VFS that maps to files inside the running VM.
+      The default tree is:
+    </p>
+    <pre><code>{`/home/pi/
+├── script.py     ← user's main Python script
+└── lib/
+    └── helper.py ← optional helper library`}</code></pre>
+
+    <h2>Overlay Images</h2>
+    <p>
+      The base Raspberry Pi OS SD image is never modified. Each session creates a fresh
+      <strong> qcow2 overlay</strong> on top of the base image, so all runtime changes are
+      isolated and discarded when the session ends.
+    </p>
+
+    <h2>Known Limitations</h2>
+    <ul>
+      <li>No I2C or SPI device emulation</li>
+      <li>No PWM waveform output to components</li>
+      <li>No networking (WiFi/Ethernet not emulated)</li>
+      <li>Session state is not persisted — overlay is discarded on stop</li>
+      <li>Boot time is slow (~10–20 s) as a full OS must start</li>
+      <li>Requires the ~5.67 GB base SD image to be present on the server</li>
+    </ul>
+
+    <h2>Full Documentation</h2>
+    <p>
+      See the complete technical reference:{' '}
+      <a href="https://github.com/davidmonterocrespo24/velxio/blob/master/docs/RASPBERRYPI3_EMULATION.md" target="_blank" rel="noopener noreferrer">
+        RASPBERRYPI3_EMULATION.md
+      </a>
+    </p>
+  </div>
+);
+
 const SECTION_MAP: Record<SectionId, React.FC> = {
   intro: IntroSection,
   'getting-started': GettingStartedSection,
   emulator: EmulatorSection,
   'riscv-emulation': RiscVEmulationSection,
   'esp32-emulation': Esp32EmulationSection,
+  'rp2040-emulation': Rp2040EmulationSection,
+  'raspberry-pi3-emulation': RaspberryPi3EmulationSection,
   components: ComponentsSection,
   roadmap: RoadmapSection,
   architecture: ArchitectureSection,
