@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { AppHeader } from '../components/layout/AppHeader';
+import { CodeBlock } from '../components/layout/CodeBlock';
 import './DocsPage.css';
 
 const GITHUB_URL = 'https://github.com/davidmonterocrespo24/velxio';
