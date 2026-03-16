@@ -183,40 +183,40 @@ const GettingStartedSection: React.FC = () => (
 
     <h2>Option 2: Self-Host with Docker</h2>
     <p>Run a single Docker command to start a fully local instance:</p>
-    <pre><code>{`docker run -d \\
+    <CodeBlock language="bash">{`docker run -d \\
   --name velxio \\
   -p 3080:80 \\
   -v $(pwd)/data:/app/data \\
-  ghcr.io/davidmonterocrespo24/velxio:master`}</code></pre>
+  ghcr.io/davidmonterocrespo24/velxio:master`}</CodeBlock>
     <p>Then open <strong>http://localhost:3080</strong> in your browser.</p>
 
     <h2>Option 3: Manual Setup (Development)</h2>
     <p><strong>Prerequisites:</strong> Node.js 18+, Python 3.12+, <code>arduino-cli</code></p>
 
     <h3>1. Clone the repository</h3>
-    <pre><code>{`git clone https://github.com/davidmonterocrespo24/velxio.git
-cd velxio`}</code></pre>
+    <CodeBlock language="bash">{`git clone https://github.com/davidmonterocrespo24/velxio.git
+cd velxio`}</CodeBlock>
 
     <h3>2. Start the backend</h3>
-    <pre><code>{`cd backend
+    <CodeBlock language="bash">{`cd backend
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8001`}</code></pre>
+uvicorn app.main:app --reload --port 8001`}</CodeBlock>
 
     <h3>3. Start the frontend</h3>
-    <pre><code>{`cd frontend
+    <CodeBlock language="bash">{`cd frontend
 npm install
-npm run dev`}</code></pre>
+npm run dev`}</CodeBlock>
     <p>Open <strong>http://localhost:5173</strong>.</p>
 
     <h3>4. Set up arduino-cli (first time)</h3>
-    <pre><code>{`arduino-cli core update-index
+    <CodeBlock language="bash">{`arduino-cli core update-index
 arduino-cli core install arduino:avr
 
 # For Raspberry Pi Pico support:
 arduino-cli config add board_manager.additional_urls \\
   https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
-arduino-cli core install rp2040:rp2040`}</code></pre>
+arduino-cli core install rp2040:rp2040`}</CodeBlock>
 
     <h2>Your First Simulation</h2>
     <ol>
@@ -224,7 +224,7 @@ arduino-cli core install rp2040:rp2040`}</code></pre>
       <li><strong>Select a board</strong> from the toolbar (e.g., <em>Arduino Uno</em>).</li>
       <li><strong>Write Arduino code</strong> in the Monaco editor, for example:</li>
     </ol>
-    <pre><code>{`void setup() {
+    <CodeBlock language="cpp">{`void setup() {
   pinMode(13, OUTPUT);
 }
 
@@ -233,7 +233,7 @@ void loop() {
   delay(500);
   digitalWrite(13, LOW);
   delay(500);
-}`}</code></pre>
+}`}</CodeBlock>
     <ol start={4}>
       <li><strong>Click Compile</strong> — the backend calls <code>arduino-cli</code> and returns a <code>.hex</code> file.</li>
       <li><strong>Click Run</strong> — the AVR8 emulator executes the compiled program.</li>
@@ -278,7 +278,7 @@ const EmulatorSection: React.FC = () => (
     </p>
 
     <h2>High-Level Data Flow</h2>
-    <pre><code>{`User Code (Monaco Editor)
+    <CodeBlock language="text">{`User Code (Monaco Editor)
         │
         ▼
    Zustand Store (useEditorStore)
@@ -296,7 +296,7 @@ const EmulatorSection: React.FC = () => (
   Port listeners (PORTB / PORTC / PORTD)
         │
         ▼
-  PinManager ──► Component state ──► React re-renders`}</code></pre>
+  PinManager ──► Component state ──► React re-renders`}</CodeBlock>
 
     <h2>AVR8 Emulation (Arduino Uno / Nano / Mega)</h2>
     <p>
@@ -306,8 +306,8 @@ const EmulatorSection: React.FC = () => (
 
     <h3>Execution Loop</h3>
     <p>Each animation frame executes approximately 267,000 CPU cycles (16 MHz ÷ 60 FPS):</p>
-    <pre><code>{`avrInstruction(cpu);  // decode and execute one AVR instruction
-cpu.tick();           // advance peripheral timers and counters`}</code></pre>
+    <CodeBlock language="typescript">{`avrInstruction(cpu);  // decode and execute one AVR instruction
+cpu.tick();           // advance peripheral timers and counters`}</CodeBlock>
 
     <h3>Supported Peripherals</h3>
     <table>
@@ -554,7 +554,7 @@ const ArchitectureSection: React.FC = () => (
     </p>
 
     <h2>High-Level Overview</h2>
-    <pre><code>{`Browser (React + Vite)
+    <CodeBlock language="text">{`Browser (React + Vite)
   ├── Monaco Editor ──► useEditorStore (Zustand)
   ├── SimulatorCanvas ──► useSimulatorStore (Zustand)
   │     ├── AVRSimulator (avr8js)   16 MHz AVR8 CPU
@@ -563,21 +563,21 @@ const ArchitectureSection: React.FC = () => (
   │     ├── PartSimulationRegistry  16 interactive parts
   │     └── 48+ wokwi-elements      Lit Web Components
   └── HTTP (Axios) ──► FastAPI Backend (port 8001)
-        └── ArduinoCLIService ──► arduino-cli subprocess`}</code></pre>
+        └── ArduinoCLIService ──► arduino-cli subprocess`}</CodeBlock>
 
     <h2>Data Flows</h2>
 
     <h3>1. Compilation</h3>
-    <pre><code>{`Click "Compile"
+    <CodeBlock language="text">{`Click "Compile"
   → EditorToolbar reads all workspace files
   → POST /api/compile/  { files, board_fqbn }
   → Backend: ArduinoCLIService writes temp dir
   → arduino-cli compile --fqbn <board> --output-dir build/
   → Returns hex_content (Intel HEX string)
-  → useSimulatorStore.setCompiledHex() → loadHex()`}</code></pre>
+  → useSimulatorStore.setCompiledHex() → loadHex()`}</CodeBlock>
 
     <h3>2. Simulation Loop</h3>
-    <pre><code>{`Click "Run"
+    <CodeBlock language="text">{`Click "Run"
   → AVRSimulator.start()
   → requestAnimationFrame loop @ ~60 FPS
   → Each frame: Math.floor(267 000 × speed) cycles
@@ -586,16 +586,16 @@ const ArchitectureSection: React.FC = () => (
   → PORTB/C/D write listeners fire
   → PinManager.updatePort() → per-pin callbacks
   → PartSimulationRegistry.onPinStateChange()
-  → wokwi-elements update visually`}</code></pre>
+  → wokwi-elements update visually`}</CodeBlock>
 
     <h3>3. Input Components</h3>
-    <pre><code>{`User presses button on canvas
+    <CodeBlock language="text">{`User presses button on canvas
   → wokwi web component fires 'button-press' event
   → DynamicComponent catches event
   → PartSimulationRegistry.attachEvents() handler
   → AVRSimulator.setPinState(arduinoPin, LOW)
   → AVRIOPort.setPin() injects external pin state
-  → CPU reads pin in next instruction`}</code></pre>
+  → CPU reads pin in next instruction`}</CodeBlock>
 
     <h2>Key Frontend Stores (Zustand)</h2>
     <table>
@@ -627,13 +627,13 @@ const ArchitectureSection: React.FC = () => (
 
     <h2>Wire System</h2>
     <p>Wires are stored as objects with start/end endpoints tied to component pin positions:</p>
-    <pre><code>{`{
+    <CodeBlock language="typescript">{`{
   id: string
   start: { componentId, pinName, x, y }
   end:   { componentId, pinName, x, y }
   color: string
   signalType: 'digital' | 'analog' | 'power-vcc' | 'power-gnd'
-}`}</code></pre>
+}`}</CodeBlock>
     <ul>
       <li>Orthogonal routing — no diagonal segments</li>
       <li>Segment drag — drag perpendicular to segment orientation</li>
@@ -689,20 +689,20 @@ const WokwiLibsSection: React.FC = () => (
 
     <h2>Vite Configuration</h2>
     <p><code>frontend/vite.config.ts</code> uses path aliases so imports resolve to the local builds:</p>
-    <pre><code>{`resolve: {
+    <CodeBlock language="typescript">{`resolve: {
   alias: {
     'avr8js':          '../wokwi-libs/avr8js/dist/esm',
     '@wokwi/elements': '../wokwi-libs/wokwi-elements/dist/esm',
   },
-}`}</code></pre>
+}`}</CodeBlock>
 
     <h2>Updating the Libraries</h2>
     <h3>All at once (recommended)</h3>
-    <pre><code>{`# Windows
-update-wokwi-libs.bat`}</code></pre>
+    <CodeBlock language="bash">{`# Windows
+update-wokwi-libs.bat`}</CodeBlock>
 
     <h3>Manually</h3>
-    <pre><code>{`cd wokwi-libs/wokwi-elements
+    <CodeBlock language="bash">{`cd wokwi-libs/wokwi-elements
 git pull origin main
 npm install && npm run build
 
@@ -712,12 +712,12 @@ npm install && npm run build
 
 cd ../rp2040js
 git pull origin main
-npm install && npm run build`}</code></pre>
+npm install && npm run build`}</CodeBlock>
 
     <h3>After updating wokwi-elements</h3>
     <p>Regenerate component metadata so new components appear in the picker:</p>
-    <pre><code>{`cd frontend
-npx tsx ../scripts/generate-component-metadata.ts`}</code></pre>
+    <CodeBlock language="bash">{`cd frontend
+npx tsx ../scripts/generate-component-metadata.ts`}</CodeBlock>
 
     <h2>Available Wokwi Components (48)</h2>
     <table>
@@ -737,7 +737,7 @@ npx tsx ../scripts/generate-component-metadata.ts`}</code></pre>
     </table>
 
     <h2>How avr8js Powers the Simulation</h2>
-    <pre><code>{`import { CPU, avrInstruction, AVRTimer, AVRUSART, AVRADC, AVRIOPort } from 'avr8js';
+    <CodeBlock language="typescript">{`import { CPU, avrInstruction, AVRTimer, AVRUSART, AVRADC, AVRIOPort } from 'avr8js';
 
 const cpu   = new CPU(programMemory);          // ATmega328p at 16 MHz
 const portB = new AVRIOPort(cpu, portBConfig); // digital pins 8-13
@@ -751,7 +751,7 @@ function runFrame() {
     cpu.tick();          // advance timers + peripherals
   }
   requestAnimationFrame(runFrame);
-}`}</code></pre>
+}`}</CodeBlock>
 
     <div className="docs-callout">
       <strong>Full details:</strong>{' '}
@@ -797,31 +797,31 @@ const McpSection: React.FC = () => (
     <h2>Transport Options</h2>
 
     <h3>1. stdio — Claude Desktop / CLI agents</h3>
-    <pre><code>{`cd backend
-python mcp_server.py`}</code></pre>
+    <CodeBlock language="bash">{`cd backend
+python mcp_server.py`}</CodeBlock>
     <p>Claude Desktop config (<code>~/.claude/claude_desktop_config.json</code>):</p>
-    <pre><code>{`{
+    <CodeBlock language="json">{`{
   "mcpServers": {
     "velxio": {
       "command": "python",
       "args": ["/absolute/path/to/velxio/backend/mcp_server.py"]
     }
   }
-}`}</code></pre>
+}`}</CodeBlock>
 
     <h3>2. SSE / HTTP — Cursor IDE / web agents</h3>
-    <pre><code>{`cd backend
-python mcp_sse_server.py --port 8002`}</code></pre>
+    <CodeBlock language="bash">{`cd backend
+python mcp_sse_server.py --port 8002`}</CodeBlock>
     <p>MCP client config:</p>
-    <pre><code>{`{
+    <CodeBlock language="json">{`{
   "mcpServers": {
     "velxio": { "url": "http://localhost:8002/sse" }
   }
-}`}</code></pre>
+}`}</CodeBlock>
 
     <h2>Circuit Data Format</h2>
     <p>Velxio circuits are plain JSON objects:</p>
-    <pre><code>{`{
+    <CodeBlock language="json">{`{
   "board_fqbn": "arduino:avr:uno",
   "version": 1,
   "components": [
@@ -832,7 +832,7 @@ python mcp_sse_server.py --port 8002`}</code></pre>
     { "from_part": "uno", "from_pin": "13",
       "to_part": "led1", "to_pin": "A", "color": "green" }
   ]
-}`}</code></pre>
+}`}</CodeBlock>
 
     <h3>Supported Board FQBNs</h3>
     <table>
@@ -848,7 +848,7 @@ python mcp_sse_server.py --port 8002`}</code></pre>
     </table>
 
     <h2>Example — Blink LED from Scratch</h2>
-    <pre><code>{`// Step 1 — Create a circuit
+    <CodeBlock language="json">{`// Step 1 — Create a circuit
 {
   "tool": "create_circuit",
   "arguments": {
@@ -892,10 +892,10 @@ python mcp_sse_server.py --port 8002`}</code></pre>
     ],
     "board": "arduino:avr:uno"
   }
-}`}</code></pre>
+}`}</CodeBlock>
 
     <h2>Setup</h2>
-    <pre><code>{`cd backend
+    <CodeBlock language="bash">{`cd backend
 pip install -r requirements.txt
 
 # Ensure arduino-cli is installed
@@ -904,7 +904,7 @@ arduino-cli core update-index
 arduino-cli core install arduino:avr
 
 # Run tests
-python -m pytest tests/test_mcp_tools.py -v`}</code></pre>
+python -m pytest tests/test_mcp_tools.py -v`}</CodeBlock>
 
     <div className="docs-callout">
       <strong>Full reference:</strong>{' '}
@@ -1385,10 +1385,10 @@ const RaspberryPi3EmulationSection: React.FC = () => (
       Each Raspberry Pi board instance has its own VFS that maps to files inside the running VM.
       The default tree is:
     </p>
-    <pre><code>{`/home/pi/
+    <CodeBlock language="text">{`/home/pi/
 ├── script.py     ← user's main Python script
 └── lib/
-    └── helper.py ← optional helper library`}</code></pre>
+    └── helper.py ← optional helper library`}</CodeBlock>
 
     <h2>Overlay Images</h2>
     <p>
