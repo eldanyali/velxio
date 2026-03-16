@@ -1,74 +1,74 @@
 # RISC-V Emulation (ESP32-C3 / XIAO-C3 / C3 SuperMini)
 
-> Estado: **Funcional** · Emulación en el navegador · Sin dependencias de backend
-> Motor: **RiscVCore (RV32IMC)** — implementado en TypeScript
-> Plataforma: **ESP32-C3 @ 160 MHz** — arquitectura RISC-V de 32 bits
+> Status: **Functional** · In-browser emulation · No backend dependencies
+> Engine: **RiscVCore (RV32IMC)** — implemented in TypeScript
+> Platform: **ESP32-C3 @ 160 MHz** — 32-bit RISC-V architecture
 
 ---
 
-## Índice
+## Table of Contents
 
-1. [Visión general](#1-visión-general)
-2. [Boards soportadas](#2-boards-soportadas)
-3. [Arquitectura del emulador](#3-arquitectura-del-emulador)
-4. [Memoria y periféricos emulados](#4-memoria-y-periféricos-emulados)
-5. [Flujo completo: compilar y ejecutar](#5-flujo-completo-compilar-y-ejecutar)
-6. [Formato de imagen ESP32](#6-formato-de-imagen-esp32)
-7. [ISA soportada — RV32IMC](#7-isa-soportada--rv32imc)
+1. [Overview](#1-overview)
+2. [Supported Boards](#2-supported-boards)
+3. [Emulator Architecture](#3-emulator-architecture)
+4. [Emulated Memory and Peripherals](#4-emulated-memory-and-peripherals)
+5. [Full Flow: Compile and Run](#5-full-flow-compile-and-run)
+6. [ESP32 Image Format](#6-esp32-image-format)
+7. [Supported ISA — RV32IMC](#7-supported-isa--rv32imc)
 8. [GPIO](#8-gpio)
 9. [UART0 — Serial Monitor](#9-uart0--serial-monitor)
-10. [Limitaciones](#10-limitaciones)
+10. [Limitations](#10-limitations)
 11. [Tests](#11-tests)
-12. [Diferencias vs emulación Xtensa (ESP32 / ESP32-S3)](#12-diferencias-vs-emulación-xtensa-esp32--esp32-s3)
-13. [Archivos clave](#13-archivos-clave)
+12. [Differences vs Xtensa Emulation (ESP32 / ESP32-S3)](#12-differences-vs-xtensa-emulation-esp32--esp32-s3)
+13. [Key Files](#13-key-files)
 
 ---
 
-## 1. Visión general
+## 1. Overview
 
-Los boards basados en **ESP32-C3** usan el procesador **ESP32-C3** de Espressif, que implementa la arquitectura **RISC-V RV32IMC** (32 bits, Multiply, Compressed instructions). A diferencia del ESP32 y ESP32-S3 (Xtensa LX6/LX7), el C3 **no requiere QEMU ni backend** para emularse.
+Boards based on **ESP32-C3** use Espressif's **ESP32-C3** processor, which implements the **RISC-V RV32IMC** architecture (32-bit, Multiply, Compressed instructions). Unlike the ESP32 and ESP32-S3 (Xtensa LX6/LX7), the C3 **does not require QEMU or a backend** to be emulated.
 
-### Comparación de motores de emulación
+### Emulation Engine Comparison
 
-| Board | CPU | Motor |
-|-------|-----|-------|
+| Board | CPU | Engine |
+| ----- | --- | ------ |
 | ESP32, ESP32-S3 | Xtensa LX6/LX7 | QEMU lcgamboa (backend WebSocket) |
-| **ESP32-C3, XIAO-C3, C3 SuperMini** | **RV32IMC @ 160 MHz** | **RiscVCore.ts (navegador, sin backend)** |
-| Arduino Uno/Nano/Mega | AVR ATmega | avr8js (navegador) |
-| Raspberry Pi Pico | RP2040 | rp2040js (navegador) |
+| **ESP32-C3, XIAO-C3, C3 SuperMini** | **RV32IMC @ 160 MHz** | **RiscVCore.ts (browser, no backend)** |
+| Arduino Uno/Nano/Mega | AVR ATmega | avr8js (browser) |
+| Raspberry Pi Pico | RP2040 | rp2040js (browser) |
 
-### Ventajas del emulador JS
+### Advantages of the JS Emulator
 
-- **Sin dependencias de red** — funciona offline, sin conexión WebSocket al backend
-- **Arranque instantáneo** — no hay proceso QEMU que arrancar (0 ms de latencia)
-- **Testable con Vitest** — el mismo código TypeScript que se ejecuta en producción se puede probar en CI
-- **Multiplataforma** — funciona igual en Windows, macOS, Linux y Docker
+- **No network dependencies** — works offline, no WebSocket connection to the backend
+- **Instant startup** — no QEMU process to launch (0 ms latency)
+- **Testable with Vitest** — the same TypeScript code that runs in production can be tested in CI
+- **Cross-platform** — works the same on Windows, macOS, Linux, and Docker
 
 ---
 
-## 2. Boards soportadas
+## 2. Supported Boards
 
-| Board | FQBN arduino-cli | LED built-in |
-|-------|-----------------|--------------|
+| Board | arduino-cli FQBN | Built-in LED |
+| ----- | ---------------- | ------------ |
 | ESP32-C3 DevKit | `esp32:esp32:esp32c3` | GPIO 8 |
 | Seeed XIAO ESP32-C3 | `esp32:esp32:XIAO_ESP32C3` | GPIO 10 (active-low) |
 | ESP32-C3 SuperMini | `esp32:esp32:esp32c3` | GPIO 8 |
 
 ---
 
-## 3. Arquitectura del emulador
+## 3. Emulator Architecture
 
 ```
 Arduino Sketch (.ino)
         │
         ▼ arduino-cli (backend)
-  sketch.ino.bin  ←  ESP32 image format (segmentos IROM/DRAM/IRAM)
+  sketch.ino.bin  ←  ESP32 image format (IROM/DRAM/IRAM segments)
         │
         ▼ base64 → frontend
   compileBoardProgram(boardId, base64)
         │
         ▼ Esp32C3Simulator.loadFlashImage(base64)
-  parseMergedFlashImage()  ←  lee segmentos de la imagen 4MB
+  parseMergedFlashImage()  ←  reads segments from the 4MB image
         │
         ├── IROM segment → flash buffer  (0x42000000)
         ├── DROM segment → flash buffer  (0x3C000000, alias)
@@ -77,56 +77,56 @@ Arduino Sketch (.ino)
         │
         ▼ core.reset(entryPoint)
   RiscVCore.step()  ←  requestAnimationFrame @ 60 FPS
-        │             2.666.667 ciclos/frame (160 MHz ÷ 60)
-        ├── MMIO GPIO_W1TS/W1TC → onPinChangeWithTime → componentes visuales
+        │             2,666,667 cycles/frame (160 MHz ÷ 60)
+        ├── MMIO GPIO_W1TS/W1TC → onPinChangeWithTime → visual components
         └── MMIO UART0 FIFO    → onSerialData → Serial Monitor
 ```
 
-### Clases principales
+### Main Classes
 
-| Clase | Archivo | Responsabilidad |
-|-------|---------|----------------|
-| `RiscVCore` | `simulation/RiscVCore.ts` | Decodificador/ejecutor RV32IMC, MMIO genérico |
-| `Esp32C3Simulator` | `simulation/Esp32C3Simulator.ts` | Mapa de memoria ESP32-C3, GPIO, UART0, ciclo RAF |
-| `parseMergedFlashImage` | `utils/esp32ImageParser.ts` | Parseo formato imagen ESP32 (segmentos, entry point) |
+| Class | File | Responsibility |
+| ----- | ---- | -------------- |
+| `RiscVCore` | `simulation/RiscVCore.ts` | RV32IMC decoder/executor, generic MMIO |
+| `Esp32C3Simulator` | `simulation/Esp32C3Simulator.ts` | ESP32-C3 memory map, GPIO, UART0, RAF loop |
+| `parseMergedFlashImage` | `utils/esp32ImageParser.ts` | ESP32 image format parsing (segments, entry point) |
 
 ---
 
-## 4. Memoria y periféricos emulados
+## 4. Emulated Memory and Peripherals
 
-### Mapa de memoria
+### Memory Map
 
-| Región | Dirección base | Tamaño | Descripción |
-|--------|---------------|--------|-------------|
-| Flash IROM | `0x42000000` | 4 MB | Código ejecutable (buffer principal del core) |
-| Flash DROM | `0x3C000000` | 4 MB | Datos de solo lectura (alias del mismo buffer) |
-| DRAM | `0x3FC80000` | 384 KB | RAM de datos (stack, variables globales) |
-| IRAM | `0x4037C000` | 384 KB | RAM de instrucciones (ISR, código time-critical) |
+| Region | Base Address | Size | Description |
+| ------ | ------------ | ---- | ----------- |
+| Flash IROM | `0x42000000` | 4 MB | Executable code (core's main buffer) |
+| Flash DROM | `0x3C000000` | 4 MB | Read-only data (alias of the same buffer) |
+| DRAM | `0x3FC80000` | 384 KB | Data RAM (stack, global variables) |
+| IRAM | `0x4037C000` | 384 KB | Instruction RAM (ISR, time-critical code) |
 | UART0 | `0x60000000` | 1 KB | Serial port 0 |
-| GPIO | `0x60004000` | 512 B | Registros GPIO |
+| GPIO | `0x60004000` | 512 B | GPIO registers |
 
-### GPIO — registros implementados
+### GPIO — Implemented Registers
 
-| Registro | Offset | Función |
-|----------|--------|---------|
-| `GPIO_OUT_REG` | `+0x04` | Leer/escribir estado de salida de todos los pines |
-| `GPIO_OUT_W1TS_REG` | `+0x08` | **Set bits** — poner pines a HIGH (write-only) |
-| `GPIO_OUT_W1TC_REG` | `+0x0C` | **Clear bits** — poner pines a LOW (write-only) |
-| `GPIO_IN_REG` | `+0x3C` | Leer estado de entrada de pines |
-| `GPIO_ENABLE_REG` | `+0x20` | Dirección de pines (siempre devuelve `0xFF`) |
+| Register | Offset | Function |
+| -------- | ------ | -------- |
+| `GPIO_OUT_REG` | `+0x04` | Read/write output state of all pins |
+| `GPIO_OUT_W1TS_REG` | `+0x08` | **Set bits** — drive pins HIGH (write-only) |
+| `GPIO_OUT_W1TC_REG` | `+0x0C` | **Clear bits** — drive pins LOW (write-only) |
+| `GPIO_IN_REG` | `+0x3C` | Read input state of pins |
+| `GPIO_ENABLE_REG` | `+0x20` | Pin direction (always returns `0xFF`) |
 
-Cubre **GPIO 0–21** (todos los disponibles en ESP32-C3).
+Covers **GPIO 0–21** (all available on ESP32-C3).
 
-### UART0 — registros implementados
+### UART0 — Implemented Registers
 
-| Registro | Offset | Función |
-|----------|--------|---------|
-| `UART_FIFO_REG` | `+0x00` | Escribir byte TX / leer byte RX |
-| `UART_STATUS_REG` | `+0x1C` | Estado FIFO (siempre devuelve `0` = listo) |
+| Register | Offset | Function |
+| -------- | ------ | -------- |
+| `UART_FIFO_REG` | `+0x00` | Write TX byte / read RX byte |
+| `UART_STATUS_REG` | `+0x1C` | FIFO status (always returns `0` = ready) |
 
-Lectura de byte de RX disponible para simular input desde Serial Monitor.
+RX byte reading is available to simulate input from the Serial Monitor.
 
-### Periféricos NO emulados (retornan 0 en lectura)
+### Peripherals NOT Emulated (return 0 on read)
 
 - Interrupt Matrix (`0x600C2000`)
 - System / Clock (`0x600C0000`, `0x60008000`)
@@ -136,40 +136,40 @@ Lectura de byte de RX disponible para simular input desde Serial Monitor.
 - BLE / WiFi MAC
 - ADC / DAC
 
-> Estos periféricos retornan `0` por defecto. El código que los requiere puede no funcionar correctamente (ver [Limitaciones](#10-limitaciones)).
+> These peripherals return `0` by default. Code that depends on them may not function correctly (see [Limitations](#10-limitations)).
 
 ---
 
-## 5. Flujo completo: compilar y ejecutar
+## 5. Full Flow: Compile and Run
 
-### 5.1 Compilar el sketch
+### 5.1 Compile the Sketch
 
 ```bash
-# arduino-cli compila para ESP32-C3:
+# arduino-cli compiles for ESP32-C3:
 arduino-cli compile \
   --fqbn esp32:esp32:esp32c3 \
   --output-dir build/ \
   mi_sketch/
 
-# El backend crea automáticamente la imagen fusionada (merged):
+# The backend automatically creates the merged image:
 #   build/mi_sketch.ino.bootloader.bin  → 0x01000
 #   build/mi_sketch.ino.partitions.bin  → 0x08000
 #   build/mi_sketch.ino.bin             → 0x10000 (app)
 #   → merged: sketch.ino.merged.bin (4 MB)
 ```
 
-El backend de Velxio produce esta imagen automáticamente y la envía al frontend como base64.
+The Velxio backend produces this image automatically and sends it to the frontend as base64.
 
-### 5.2 Sketch mínimo para ESP32-C3
+### 5.2 Minimal Sketch for ESP32-C3
 
 ```cpp
-// LED en GPIO 8 (ESP32-C3 DevKit)
+// LED on GPIO 8 (ESP32-C3 DevKit)
 #define LED_PIN 8
 
 void setup() {
   pinMode(LED_PIN, OUTPUT);
   Serial.begin(115200);
-  Serial.println("ESP32-C3 iniciado");
+  Serial.println("ESP32-C3 started");
 }
 
 void loop() {
@@ -182,12 +182,12 @@ void loop() {
 }
 ```
 
-### 5.3 Sketch bare-metal (para tests de emulación directos)
+### 5.3 Bare-Metal Sketch (for direct emulation tests)
 
-Para verificar la emulación sin el framework Arduino, se puede compilar con el toolchain RISC-V directamente:
+To verify the emulation without the Arduino framework, you can compile directly with the RISC-V toolchain:
 
 ```c
-/* blink.c — bare-metal, sin ESP-IDF */
+/* blink.c — bare-metal, no ESP-IDF */
 #define GPIO_W1TS  (*(volatile unsigned int *)0x60004008u)
 #define GPIO_W1TC  (*(volatile unsigned int *)0x6000400Cu)
 #define LED_BIT    (1u << 8)
@@ -204,10 +204,10 @@ void _start(void) {
 }
 ```
 
-Compilar con el toolchain bundled en arduino-cli:
+Compile with the toolchain bundled in arduino-cli:
 
 ```bash
-# Toolchain instalado con: arduino-cli core install esp32:esp32
+# Toolchain installed with: arduino-cli core install esp32:esp32
 TOOLCHAIN="$LOCALAPPDATA/Arduino15/packages/esp32/tools/riscv32-esp-elf-gcc/esp-2021r2-patch5-8.4.0/bin"
 
 "$TOOLCHAIN/riscv32-esp-elf-gcc" \
@@ -217,156 +217,156 @@ TOOLCHAIN="$LOCALAPPDATA/Arduino15/packages/esp32/tools/riscv32-esp-elf-gcc/esp-
 "$TOOLCHAIN/riscv32-esp-elf-objcopy" -O binary blink.elf blink.bin
 ```
 
-Ver script completo: `frontend/src/__tests__/fixtures/esp32c3-blink/build.sh`
+See full script: `frontend/src/__tests__/fixtures/esp32c3-blink/build.sh`
 
 ---
 
-## 6. Formato de imagen ESP32
+## 6. ESP32 Image Format
 
-El backend produce una imagen fusionada de **4 MB**:
+The backend produces a merged **4 MB** image:
 
 ```
-Offset 0x00000: 0xFF (vacío)
-Offset 0x01000: bootloader   (imagen ESP32 format, magic 0xE9)
+Offset 0x00000: 0xFF (empty)
+Offset 0x01000: bootloader   (ESP32 format image, magic 0xE9)
 Offset 0x08000: partition table
-Offset 0x10000: app binary   (imagen ESP32 format, magic 0xE9) ← parseamos aquí
+Offset 0x10000: app binary   (ESP32 format image, magic 0xE9) ← parsed here
 ```
 
-### Cabecera de imagen ESP32 (24 bytes)
+### ESP32 Image Header (24 bytes)
 
 ```
 +0x00  magic (0xE9)
 +0x01  segment_count
 +0x02  spi_mode
 +0x03  spi_speed_size
-+0x04  entry_addr       ← uint32 LE — PC de entrada del firmware
++0x04  entry_addr       ← uint32 LE — firmware entry point PC
 +0x08  extended fields (16 bytes)
 ```
 
-### Cabecera de segmento (8 bytes)
+### Segment Header (8 bytes)
 
 ```
-+0x00  load_addr   ← dirección virtual destino (e.g. 0x42000000)
++0x00  load_addr   ← destination virtual address (e.g. 0x42000000)
 +0x04  data_len
 +0x08  data[data_len]
 ```
 
-El parser `parseMergedFlashImage()` en `utils/esp32ImageParser.ts` extrae todos los segmentos y el entry point, que se usa para el reset del core (`core.reset(entryPoint)`).
+The `parseMergedFlashImage()` parser in `utils/esp32ImageParser.ts` extracts all segments and the entry point, which is used for the core reset (`core.reset(entryPoint)`).
 
 ---
 
-## 7. ISA soportada — RV32IMC
+## 7. Supported ISA — RV32IMC
 
-`RiscVCore.ts` implementa las tres extensiones necesarias para ejecutar código compilado para ESP32-C3:
+`RiscVCore.ts` implements the three extensions required to run code compiled for ESP32-C3:
 
-### RV32I — Base integer (40 instrucciones)
+### RV32I — Base Integer (40 instructions)
 
-Incluye: LUI, AUIPC, JAL, JALR, BEQ/BNE/BLT/BGE/BLTU/BGEU, LB/LH/LW/LBU/LHU, SB/SH/SW, ADDI/SLTI/SLTIU/XORI/ORI/ANDI/SLLI/SRLI/SRAI, ADD/SUB/SLL/SLT/SLTU/XOR/SRL/SRA/OR/AND, FENCE, ECALL/EBREAK, CSR (lectura devuelve 0)
+Includes: LUI, AUIPC, JAL, JALR, BEQ/BNE/BLT/BGE/BLTU/BGEU, LB/LH/LW/LBU/LHU, SB/SH/SW, ADDI/SLTI/SLTIU/XORI/ORI/ANDI/SLLI/SRLI/SRAI, ADD/SUB/SLL/SLT/SLTU/XOR/SRL/SRA/OR/AND, FENCE, ECALL/EBREAK, CSR (reads return 0)
 
-### RV32M — Multiplicación y división (8 instrucciones)
+### RV32M — Multiply and Divide (8 instructions)
 
-| Instrucción | Operación |
-|-------------|-----------|
-| `MUL` | Producto entero (32 bits bajos) |
-| `MULH` | Producto con signo (32 bits altos) |
-| `MULHSU` | Producto mixto firmado×sin firma (altos) |
-| `MULHU` | Producto sin firma (32 bits altos) |
-| `DIV` | División entera con signo |
-| `DIVU` | División entera sin firma |
-| `REM` | Resto con signo |
-| `REMU` | Resto sin firma |
+| Instruction | Operation |
+| ----------- | --------- |
+| `MUL` | Integer product (low 32 bits) |
+| `MULH` | Signed product (high 32 bits) |
+| `MULHSU` | Mixed signed×unsigned product (high bits) |
+| `MULHU` | Unsigned product (high 32 bits) |
+| `DIV` | Signed integer division |
+| `DIVU` | Unsigned integer division |
+| `REM` | Signed remainder |
+| `REMU` | Unsigned remainder |
 
-### RV32C — Instrucciones comprimidas (16 bits)
+### RV32C — Compressed Instructions (16-bit)
 
-Todas las instrucciones de 16 bits del estándar C son soportadas. Se detectan por `(halfword & 3) !== 3` y se descomprimen a su equivalente RV32I antes de ejecutar. Esto es crítico: el compilador GCC para ESP32-C3 genera intensamente instrucciones C (`c.addi`, `c.sw`, `c.lw`, `c.j`, `c.beqz`, `c.bnez`, etc.) que representan ~30-40% de todas las instrucciones en el binario final.
+All 16-bit instructions from the standard C extension are supported. They are detected by `(halfword & 3) !== 3` and decompressed to their RV32I equivalent before execution. This is critical: the GCC compiler for ESP32-C3 heavily generates C instructions (`c.addi`, `c.sw`, `c.lw`, `c.j`, `c.beqz`, `c.bnez`, etc.) which represent ~30-40% of all instructions in the final binary.
 
 ---
 
 ## 8. GPIO
 
-El manejo de GPIO sigue el modelo de registros W1TS/W1TC del ESP32-C3:
+GPIO handling follows the W1TS/W1TC register model of the ESP32-C3:
 
 ```typescript
-// Sketch Arduino:
-digitalWrite(8, HIGH);  // → internamente escribe 1<<8 a GPIO_OUT_W1TS_REG
+// Arduino sketch:
+digitalWrite(8, HIGH);  // → internally writes 1<<8 to GPIO_OUT_W1TS_REG
 
-// En el simulador:
-// SW x10, 0(x12)  donde x10=256 (1<<8), x12=0x60004008 (W1TS)
-// → escribe 4 bytes a 0x60004008..0x6000400B
+// In the simulator:
+// SW x10, 0(x12)  where x10=256 (1<<8), x12=0x60004008 (W1TS)
+// → writes 4 bytes to 0x60004008..0x6000400B
 // → byteIdx=1 (offset 0x09): val=0x01, shift=8 → gpioOut |= 0x100
-// → changed = prev ^ gpioOut ≠ 0 → dispara onPinChangeWithTime(8, true, timeMs)
+// → changed = prev ^ gpioOut ≠ 0 → fires onPinChangeWithTime(8, true, timeMs)
 ```
 
-El callback `onPinChangeWithTime(pin, state, timeMs)` es el punto de integración con los componentes visuales. `timeMs` es el tiempo simulado en milisegundos (calculado como `core.cycles / CPU_HZ * 1000`).
+The callback `onPinChangeWithTime(pin, state, timeMs)` is the integration point with the visual components. `timeMs` is the simulated time in milliseconds (calculated as `core.cycles / CPU_HZ * 1000`).
 
 ---
 
 ## 9. UART0 — Serial Monitor
 
-Cualquier byte escrito a `UART0_FIFO_REG` (0x60000000) llama al callback `onSerialData(char)`:
+Any byte written to `UART0_FIFO_REG` (0x60000000) calls the `onSerialData(char)` callback:
 
 ```cpp
-// Sketch Arduino:
-Serial.println("Hola!");
-// → Arduino framework escribe los bytes de "Hola!\r\n" a UART0_FIFO_REG
-// → simulador llama onSerialData("H"), onSerialData("o"), ...
-// → Serial Monitor muestra "Hola!"
+// Arduino sketch:
+Serial.println("Hello!");
+// → Arduino framework writes the bytes of "Hello!\r\n" to UART0_FIFO_REG
+// → simulator calls onSerialData("H"), onSerialData("e"), ...
+// → Serial Monitor displays "Hello!"
 ```
 
-Para enviar datos al sketch desde el Serial Monitor:
+To send data to the sketch from the Serial Monitor:
 
 ```typescript
-sim.serialWrite("COMANDO\n");
-// → bytes se añaden a rxFifo
-// → lectura de UART0_FIFO_REG dequeue un byte del rxFifo
+sim.serialWrite("COMMAND\n");
+// → bytes are added to rxFifo
+// → reading UART0_FIFO_REG dequeues one byte from rxFifo
 ```
 
 ---
 
-## 10. Limitaciones
+## 10. Limitations
 
-### Framework ESP-IDF / Arduino
+### ESP-IDF / Arduino Framework
 
-El framework Arduino para ESP32-C3 (basado en ESP-IDF 4.4.x) tiene una secuencia de inicialización compleja que accede a periféricos no emulados:
+The Arduino framework for ESP32-C3 (based on ESP-IDF 4.4.x) has a complex initialization sequence that accesses non-emulated peripherals:
 
-| Periférico | Por qué lo accede ESP-IDF | Efecto en emulador |
-|------------|--------------------------|-------------------|
-| Cache controller | Configura MMU para mapeo flash/DRAM | Lee 0, puede que no loop |
-| Interrupt Matrix | Registra vectores ISR | Sin efecto (silenciado) |
-| System registers | Configura PLLs y clocks | Lee 0 (asume velocidad por defecto) |
-| FreeRTOS tick timer | Timer 0 → interrupción periódica | Sin interrupción = tareas no se planifican |
+| Peripheral | Why ESP-IDF accesses it | Effect in emulator |
+| ---------- | ----------------------- | ------------------ |
+| Cache controller | Configures MMU for flash/DRAM mapping | Reads 0, may not loop |
+| Interrupt Matrix | Registers ISR vectors | No effect (silenced) |
+| System registers | Configures PLLs and clocks | Reads 0 (assumes default speed) |
+| FreeRTOS tick timer | Timer 0 → periodic interrupt | No interrupt = tasks not scheduled |
 
-Como resultado, un sketch Arduino compilado con el framework completo puede ejecutarse parcialmente — el código anterior a la inicialización de FreeRTOS puede funcionar, pero `setup()` y `loop()` dependen de que FreeRTOS esté corriendo.
+As a result, an Arduino sketch compiled with the full framework may execute partially — code prior to FreeRTOS initialization may work, but `setup()` and `loop()` depend on FreeRTOS running.
 
-**Escenarios que SÍ funcionan:**
+**Scenarios that DO work:**
 
-- Código bare-metal (sin framework, acceso directo a GPIO MMIO)
-- Fragmentos de código que no usen FreeRTOS (`delay()`, `millis()`, `digitalWrite()` requieren FreeRTOS)
-- Programas de prueba de ISA (operaciones aritméticas, branches, loads/stores a DRAM)
+- Bare-metal code (no framework, direct GPIO MMIO access)
+- Code fragments that do not use FreeRTOS (`delay()`, `millis()`, `digitalWrite()` require FreeRTOS)
+- ISA test programs (arithmetic operations, branches, loads/stores to DRAM)
 
-**Roadmap para soporte completo:**
+**Roadmap for full support:**
 
-1. Stub del cache controller (devolver valores que indiquen "cache ya configurada")
-2. Stub del interrupt matrix (aceptar writes, ignorar)
-3. Timer peripheral básico (generar tick FreeRTOS periódicamente)
-4. Una vez activo FreeRTOS: sketches Arduino normales deberían funcionar
+1. Cache controller stub (return values indicating "cache already configured")
+2. Interrupt matrix stub (accept writes, ignore)
+3. Basic timer peripheral (generate FreeRTOS tick periodically)
+4. Once FreeRTOS is active: normal Arduino sketches should work
 
-### Otras limitaciones
+### Other Limitations
 
-| Limitación | Detalle |
-|------------|---------|
-| Sin WiFi | El ESP32-C3 tiene radio BLE/WiFi; no emulada |
-| Sin ADC | GPIO 0-5 como ADC no implementado |
-| Sin SPI/I2C hardware | Los periféricos hardware SPI/I2C retornan 0 |
-| Sin interrupciones | `attachInterrupt()` no funciona |
-| Sin RTC | `esp_sleep_*`, `rtc_*` no implementados |
-| Sin NVS/Flash writes | `Preferences`, `SPIFFS` no implementados |
+| Limitation | Detail |
+| ---------- | ------ |
+| No WiFi | ESP32-C3 has BLE/WiFi radio; not emulated |
+| No ADC | GPIO 0-5 as ADC not implemented |
+| No hardware SPI/I2C | Hardware SPI/I2C peripherals return 0 |
+| No interrupts | `attachInterrupt()` does not work |
+| No RTC | `esp_sleep_*`, `rtc_*` not implemented |
+| No NVS/Flash writes | `Preferences`, `SPIFFS` not implemented |
 
 ---
 
 ## 11. Tests
 
-Los tests de la emulación RISC-V están en `frontend/src/__tests__/`:
+RISC-V emulation tests are in `frontend/src/__tests__/`:
 
 ```bash
 cd frontend
@@ -375,76 +375,76 @@ npm test -- esp32c3
 
 ### `esp32c3-simulation.test.ts` — 30 tests (ISA unit tests)
 
-Verifica directamente el decodificador de instrucciones de `RiscVCore`:
+Directly verifies the instruction decoder in `RiscVCore`:
 
-| Grupo | Tests | Qué verifica |
-|-------|-------|--------------|
+| Group | Tests | What it verifies |
+| ----- | ----- | ---------------- |
 | RV32M | 8 | MUL, MULH, MULHSU, MULHU, DIV, DIVU, REM, REMU |
 | RV32C | 7 | C.ADDI, C.LI, C.LWSP, C.SWSP, C.MV, C.ADD, C.J, C.BEQZ |
-| UART | 3 | Escritura a FIFO → onSerialData, lectura de RX, múltiples bytes |
-| GPIO | 8 | W1TS set bit, W1TC clear bit, toggle, timestamp, múltiples pines |
-| Lifecycle | 4 | reset(), start/stop, loadHex básico |
+| UART | 3 | Write to FIFO → onSerialData, RX read, multiple bytes |
+| GPIO | 8 | W1TS set bit, W1TC clear bit, toggle, timestamp, multiple pins |
+| Lifecycle | 4 | reset(), start/stop, basic loadHex |
 
-### `esp32c3-blink.test.ts` — 8 tests (integración end-to-end)
+### `esp32c3-blink.test.ts` — 8 tests (end-to-end integration)
 
-Compila `blink.c` con `riscv32-esp-elf-gcc` (el toolchain de arduino-cli) y verifica la ejecución en el simulador:
+Compiles `blink.c` with `riscv32-esp-elf-gcc` (the arduino-cli toolchain) and verifies execution in the simulator:
 
-| Test | Qué verifica |
-|------|-------------|
-| `build.sh produces blink.bin` | El toolchain compila correctamente |
-| `binary starts with valid RV32 instruction` | El entry point es código RISC-V válido |
-| `loadBin() resets PC to 0x42000000` | Carga correcta en flash |
-| `GPIO 8 goes HIGH after first SW` | Primer toggle correcto |
-| `GPIO 8 toggles ON and OFF` | 7 toggles en 2000 pasos (4 ON, 3 OFF) |
-| `PinManager.setPinState called` | Integración con el sistema de componentes |
-| `timestamps increase monotonically` | El tiempo simulado es consistente |
-| `reset() clears GPIO state` | Reset funcional |
+| Test | What it verifies |
+| ---- | ---------------- |
+| `build.sh produces blink.bin` | Toolchain compiles correctly |
+| `binary starts with valid RV32 instruction` | Entry point is valid RISC-V code |
+| `loadBin() resets PC to 0x42000000` | Correct loading into flash |
+| `GPIO 8 goes HIGH after first SW` | First toggle correct |
+| `GPIO 8 toggles ON and OFF` | 7 toggles in 2000 steps (4 ON, 3 OFF) |
+| `PinManager.setPinState called` | Integration with the component system |
+| `timestamps increase monotonically` | Simulated time is consistent |
+| `reset() clears GPIO state` | Functional reset |
 
-**Resultado esperado:**
+**Expected result:**
 ```
 ✓ esp32c3-simulation.test.ts  (30 tests)  ~500ms
 ✓ esp32c3-blink.test.ts        (8 tests)  ~300ms
 ```
 
-### Binario de prueba bare-metal
+### Bare-Metal Test Binary
 
 ```
 frontend/src/__tests__/fixtures/esp32c3-blink/
-├── blink.c       ← código fuente bare-metal
+├── blink.c       ← bare-metal source code
 ├── link.ld       ← linker script (IROM @ 0x42000000, DRAM @ 0x3FC80000)
-├── build.sh      ← script de compilación (usa toolchain de arduino-cli)
-├── blink.elf     ← (generado) ELF con debug info
-├── blink.bin     ← (generado) binario raw de 58 bytes
-└── blink.dis     ← (generado) desensamblado para inspección
+├── build.sh      ← build script (uses arduino-cli toolchain)
+├── blink.elf     ← (generated) ELF with debug info
+├── blink.bin     ← (generated) raw 58-byte binary
+└── blink.dis     ← (generated) disassembly for inspection
 ```
 
 ---
 
-## 12. Diferencias vs emulación Xtensa (ESP32 / ESP32-S3)
+## 12. Differences vs Xtensa Emulation (ESP32 / ESP32-S3)
 
-| Aspecto | ESP32-C3 (RISC-V) | ESP32 / ESP32-S3 (Xtensa) |
-|---------|-------------------|--------------------------|
-| Motor | `Esp32C3Simulator` (TypeScript, navegador) | `Esp32Bridge` + backend QEMU |
-| Dependencia backend | **No** — 100% en el navegador | Sí — WebSocket a proceso QEMU |
-| Arranque | Instantáneo | ~1-2 segundos |
+| Aspect | ESP32-C3 (RISC-V) | ESP32 / ESP32-S3 (Xtensa) |
+| ------ | ----------------- | ------------------------- |
+| Engine | `Esp32C3Simulator` (TypeScript, browser) | `Esp32Bridge` + backend QEMU |
+| Backend dependency | **No** — 100% in the browser | Yes — WebSocket to QEMU process |
+| Startup | Instant | ~1-2 seconds |
 | GPIO | Via MMIO W1TS/W1TC | Via QEMU callbacks → WebSocket |
-| WiFi | No emulada | Emulada (SSIDs hardcoded) |
-| I2C/SPI hardware | No emulado | Emulado (callbacks síncronos) |
-| LEDC/PWM | No emulado | Emulado (poll periódico) |
-| NeoPixel/RMT | No emulado | Emulado (decodificador RMT) |
-| Arduino framework | Parcial (FreeRTOS no activo) | Completo |
-| Tests CI | Sí (Vitest) | No (requiere lib nativa) |
+| WiFi | Not emulated | Emulated (hardcoded SSIDs) |
+| Hardware I2C/SPI | Not emulated | Emulated (synchronous callbacks) |
+| LEDC/PWM | Not emulated | Emulated (periodic polling) |
+| NeoPixel/RMT | Not emulated | Emulated (RMT decoder) |
+| Arduino framework | Partial (FreeRTOS not active) | Full |
+| CI tests | Yes (Vitest) | No (requires native lib) |
 
 ---
 
-## 13. Archivos clave
+## 13. Key Files
 
-| Archivo | Descripción |
-|---------|-------------|
-| `frontend/src/simulation/RiscVCore.ts` | Núcleo del emulador RV32IMC (I + M + C extensions) |
-| `frontend/src/simulation/Esp32C3Simulator.ts` | Mapa de memoria ESP32-C3, GPIO, UART0, ciclo RAF |
-| `frontend/src/utils/esp32ImageParser.ts` | Parser del formato imagen ESP32 (merged flash → segmentos) |
+| File | Description |
+| ---- | ----------- |
+| `frontend/src/simulation/RiscVCore.ts` | RV32IMC emulator core (I + M + C extensions) |
+| `frontend/src/simulation/Esp32C3Simulator.ts` | ESP32-C3 memory map, GPIO, UART0, RAF loop |
+| `frontend/src/utils/esp32ImageParser.ts` | ESP32 image format parser (merged flash → segments) |
 | `frontend/src/store/useSimulatorStore.ts` | `ESP32_RISCV_KINDS`, `createSimulator()`, `compileBoardProgram()` |
-| `frontend/src/__tests__/esp32c3-simulation.test.ts` | Unit tests ISA (30 tests) |
-| `frontend/src/__tests__/esp32c3-blink.test.ts` | Integration test end-to-end (8 tests) |
-| `frontend/src/__tests__/fixtures/esp32c3-blink/` | Firmware bare-metal de prueba + toolchain script |
+| `frontend/src/__tests__/esp32c3-simulation.test.ts` | ISA unit tests (30 tests) |
+| `frontend/src/__tests__/esp32c3-blink.test.ts` | End-to-end integration test (8 tests) |
+| `frontend/src/__tests__/fixtures/esp32c3-blink/` | Bare-metal test firmware + toolchain script |
