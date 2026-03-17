@@ -212,10 +212,44 @@ export class AVRSimulator {
       this.peripherals = [new ATtinyTimer1(this.cpu, attinyTimer1Config)];
       // usart stays null — ATtiny85 has no hardware USART
     } else {
-      this.spi = new AVRSPI(this.cpu, spiConfig, 16000000);
+      // ATmega2560 has more vectors before the timers/USART (8 external INTs, etc.),
+      // so the interrupt WORD addresses differ from ATmega328P.
+      //
+      // avr8js config values are WORD addresses = _VECTOR(N) * 2
+      // (each JMP vector = 4 bytes = 2 words; cpu.pc * 2 == byte address).
+      //
+      // ATmega2560 word addresses (_VECTOR(N) → N * 2):
+      //   TIMER2_COMPA=_V(13)→0x1A  TIMER2_COMPB=_V(14)→0x1C  TIMER2_OVF=_V(15)→0x1E
+      //   TIMER1_CAPT=_V(16)→0x20   TIMER1_COMPA=_V(17)→0x22  TIMER1_COMPB=_V(18)→0x24
+      //   TIMER1_COMPC=_V(19)→0x26  TIMER1_OVF=_V(20)→0x28
+      //   TIMER0_COMPA=_V(21)→0x2A  TIMER0_COMPB=_V(22)→0x2C  TIMER0_OVF=_V(23)→0x2E
+      //   SPI_STC=_V(24)→0x30       USART0_RX=_V(25)→0x32
+      //   USART0_UDRE=_V(26)→0x34   USART0_TX=_V(27)→0x36
+      //   TWI=_V(39)→0x4E
+      const isMega = this.boardVariant === 'mega';
+      const activeTimer0Config = isMega
+        ? { ...timer0Config, compAInterrupt: 0x2A, compBInterrupt: 0x2C, ovfInterrupt: 0x2E }
+        : timer0Config;
+      const activeTimer1Config = isMega
+        ? { ...timer1Config, captureInterrupt: 0x20, compAInterrupt: 0x22, compBInterrupt: 0x24, ovfInterrupt: 0x28 }
+        : timer1Config;
+      const activeTimer2Config = isMega
+        ? { ...timer2Config, compAInterrupt: 0x1A, compBInterrupt: 0x1C, ovfInterrupt: 0x1E }
+        : timer2Config;
+      const activeUsart0Config = isMega
+        ? { ...usart0Config, rxCompleteInterrupt: 0x32, dataRegisterEmptyInterrupt: 0x34, txCompleteInterrupt: 0x36 }
+        : usart0Config;
+      const activeSpiConfig = isMega
+        ? { ...spiConfig, spiInterrupt: 0x30 }
+        : spiConfig;
+      const activeTwiConfig = isMega
+        ? { ...twiConfig, twiInterrupt: 0x4E }
+        : twiConfig;
+
+      this.spi = new AVRSPI(this.cpu, activeSpiConfig, 16000000);
       this.spi.onByte = (value) => { this.spi!.completeTransfer(value); };
 
-      this.usart = new AVRUSART(this.cpu, usart0Config, 16000000);
+      this.usart = new AVRUSART(this.cpu, activeUsart0Config, 16000000);
       this.usart.onByteTransmit = (value: number) => {
         if (this.onSerialData) this.onSerialData(String.fromCharCode(value));
       };
@@ -223,13 +257,13 @@ export class AVRSimulator {
         if (this.onBaudRateChange && this.usart) this.onBaudRateChange(this.usart.baudRate);
       };
 
-      this.twi = new AVRTWI(this.cpu, twiConfig, 16000000);
+      this.twi = new AVRTWI(this.cpu, activeTwiConfig, 16000000);
       this.i2cBus = new I2CBusManager(this.twi);
 
       this.peripherals = [
-        new AVRTimer(this.cpu, timer0Config),
-        new AVRTimer(this.cpu, timer1Config),
-        new AVRTimer(this.cpu, timer2Config),
+        new AVRTimer(this.cpu, activeTimer0Config),
+        new AVRTimer(this.cpu, activeTimer1Config),
+        new AVRTimer(this.cpu, activeTimer2Config),
         this.usart,
         this.spi,
         this.twi,
