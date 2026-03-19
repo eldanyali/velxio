@@ -152,21 +152,8 @@ export class Esp32C3Simulator {
    */
   private _periRegs = new Map<number, number>();
 
-  // ── Diagnostic state ─────────────────────────────────────────────────────
-  private _dbgFrameCount = 0;
-  private _dbgTickCount  = 0;
-  private _dbgLastMtvec  = 0;
-  private _dbgMieEnabled = false;
-  /** Track PC at the start of each tick for stuck-loop detection. */
-  private _dbgPrevTickPc = -1;
-  private _dbgSamePcCount = 0;
-  private _dbgStuckDumped = false;
-  /** Ring buffer of sampled PCs — dumped when stuck detector fires. */
-  private _pcTrace = new Uint32Array(128);
-  private _pcTraceIdx = 0;
-  private _pcTraceStep = 0;
-  /** Count of ROM function calls (for logging first N). */
-  private _romCallCount = 0;
+  /** CPU ticks per µs — updated by ets_update_cpu_frequency(). */
+  private _ticksPerUs = 160;
 
   public pinManager: PinManager;
   public onSerialData: ((ch: string) => void) | null = null;
@@ -382,7 +369,6 @@ export class Esp32C3Simulator {
   private _registerIntMatrix(): void {
     const peri = this._periRegs;
     const BASE = INTMATRIX_BASE;
-    let logCount = 0;
 
     this.core.addMmio(BASE, INTMATRIX_SIZE,
       (addr) => {
@@ -428,28 +414,15 @@ export class Esp32C3Simulator {
         if (off <= 0x0F8) {
           const src = off >> 2;
           if (src < 62) {
-            const oldLine = this._intSrcMap[src];
             this._intSrcMap[src] = newWord & 0x1F;
-            if ((newWord & 0x1F) !== oldLine && logCount < 30) {
-              logCount++;
-              console.log(`[INTMATRIX] src ${src} → CPU line ${newWord & 0x1F}`);
-            }
           }
         } else if (off === 0x104) {
           this._intLineEnable = newWord;
-          if (logCount < 30) {
-            logCount++;
-            console.log(`[INTMATRIX] ENABLE = 0x${newWord.toString(16)}`);
-          }
         } else if (off >= 0x114 && off <= 0x190) {
           const line = (off - 0x114) >> 2;
           if (line < 32) this._intLinePrio[line] = newWord & 0xF;
         } else if (off === 0x194) {
           this._intThreshold = newWord & 0xF;
-          if (logCount < 30) {
-            logCount++;
-            console.log(`[INTMATRIX] THRESH = ${newWord & 0xF}`);
-          }
         }
       },
     );
@@ -614,15 +587,6 @@ export class Esp32C3Simulator {
   private _emulateRomFunction(addr: number): void {
     const r = this.core.regs;
     const c = this.core;
-
-    if (++this._romCallCount <= 50) {
-      console.log(
-        `[ROM] #${this._romCallCount} 0x${addr.toString(16)}` +
-        ` ra=0x${(r[1]>>>0).toString(16)}` +
-        ` a0=0x${(r[10]>>>0).toString(16)} a1=0x${(r[11]>>>0).toString(16)}` +
-        ` a2=0x${(r[12]>>>0).toString(16)} a3=0x${(r[13]>>>0).toString(16)}`
-      );
-    }
 
     switch (addr) {
       // ── C library functions ──────────────────────────────────────────
@@ -805,6 +769,116 @@ export class Esp32C3Simulator {
         break;
       }
 
+      // ── libgcc shift / bit operations ────────────────────────────────
+      case 0x4000077c: { // __ashldi3(a, shift) → a << shift (64-bit)
+        const aLo = r[10] >>> 0, aHi = r[11] >>> 0;
+        const shift = r[12] & 63;
+        const val = BigInt(aLo) | (BigInt(aHi) << 32n);
+        const res = BigInt.asUintN(64, val << BigInt(shift));
+        r[10] = Number(res & 0xFFFFFFFFn) | 0;
+        r[11] = Number((res >> 32n) & 0xFFFFFFFFn) | 0;
+        break;
+      }
+      case 0x40000780: { // __ashrdi3(a, shift) → a >> shift (signed/arithmetic 64-bit)
+        const aLo = r[10] >>> 0, aHi = r[11] >>> 0;
+        const shift = r[12] & 63;
+        const val = BigInt.asIntN(64, BigInt(aLo) | (BigInt(aHi) << 32n));
+        const res = BigInt.asUintN(64, val >> BigInt(shift));
+        r[10] = Number(res & 0xFFFFFFFFn) | 0;
+        r[11] = Number((res >> 32n) & 0xFFFFFFFFn) | 0;
+        break;
+      }
+      case 0x40000830: { // __lshrdi3(a, shift) → a >>> shift (unsigned/logical 64-bit)
+        const aLo = r[10] >>> 0, aHi = r[11] >>> 0;
+        const shift = r[12] & 63;
+        const val = BigInt(aLo) | (BigInt(aHi) << 32n);
+        const res = val >> BigInt(shift); // positive BigInt → logical shift
+        r[10] = Number(res & 0xFFFFFFFFn) | 0;
+        r[11] = Number((res >> 32n) & 0xFFFFFFFFn) | 0;
+        break;
+      }
+      case 0x4000079c: { // __clzsi2(a) → count leading zeros (32-bit)
+        r[10] = Math.clz32(r[10] >>> 0);
+        break;
+      }
+      case 0x40000798: { // __clzdi2(a) → count leading zeros (64-bit)
+        const lo = r[10] >>> 0, hi = r[11] >>> 0;
+        r[10] = hi !== 0 ? Math.clz32(hi) : 32 + Math.clz32(lo);
+        break;
+      }
+      case 0x400007a8: { // __ctzsi2(a) → count trailing zeros (32-bit)
+        const v = r[10] >>> 0;
+        r[10] = v === 0 ? 32 : 31 - Math.clz32(v & -v);
+        break;
+      }
+      case 0x400007a4: { // __ctzdi2(a) → count trailing zeros (64-bit)
+        const lo = r[10] >>> 0, hi = r[11] >>> 0;
+        if (lo !== 0) {
+          r[10] = 31 - Math.clz32(lo & -lo);
+        } else if (hi !== 0) {
+          r[10] = 32 + (31 - Math.clz32(hi & -hi));
+        } else {
+          r[10] = 64;
+        }
+        break;
+      }
+      case 0x4000086c: { // __negdi2(a) → -a (64-bit)
+        const lo = r[10] >>> 0, hi = r[11] >>> 0;
+        const val = BigInt(lo) | (BigInt(hi) << 32n);
+        const neg = BigInt.asUintN(64, -val);
+        r[10] = Number(neg & 0xFFFFFFFFn) | 0;
+        r[11] = Number((neg >> 32n) & 0xFFFFFFFFn) | 0;
+        break;
+      }
+      case 0x400007d0: { // __ffsdi2(a) → find first set bit (64-bit), 0 if none
+        const lo = r[10] >>> 0, hi = r[11] >>> 0;
+        if (lo !== 0) {
+          r[10] = (31 - Math.clz32(lo & -lo)) + 1;
+        } else if (hi !== 0) {
+          r[10] = 32 + (31 - Math.clz32(hi & -hi)) + 1;
+        } else {
+          r[10] = 0;
+        }
+        break;
+      }
+      case 0x400007d4: { // __ffssi2(a) → find first set bit (32-bit), 0 if none
+        const v = r[10] >>> 0;
+        r[10] = v === 0 ? 0 : (31 - Math.clz32(v & -v)) + 1;
+        break;
+      }
+      case 0x40000784: { // __bswapdi2(a) → byte-swap 64-bit
+        const lo = r[10] >>> 0, hi = r[11] >>> 0;
+        const swapLo = ((lo >>> 24) | ((lo >>> 8) & 0xFF00) | ((lo << 8) & 0xFF0000) | (lo << 24)) >>> 0;
+        const swapHi = ((hi >>> 24) | ((hi >>> 8) & 0xFF00) | ((hi << 8) & 0xFF0000) | (hi << 24)) >>> 0;
+        r[10] = swapHi | 0; // swapped hi becomes new lo
+        r[11] = swapLo | 0; // swapped lo becomes new hi
+        break;
+      }
+      case 0x40000788: { // __bswapsi2(a) → byte-swap 32-bit
+        const v = r[10] >>> 0;
+        r[10] = ((v >>> 24) | ((v >>> 8) & 0xFF00) | ((v << 8) & 0xFF0000) | (v << 24)) | 0;
+        break;
+      }
+      case 0x400007a0: { // __cmpdi2(a, b) → 0 if a<b, 1 if a==b, 2 if a>b (signed 64-bit)
+        const a = BigInt.asIntN(64, BigInt(r[10] >>> 0) | (BigInt(r[11]) << 32n));
+        const b = BigInt.asIntN(64, BigInt(r[12] >>> 0) | (BigInt(r[13]) << 32n));
+        r[10] = a < b ? 0 : a === b ? 1 : 2;
+        break;
+      }
+      case 0x400008a8: { // __ucmpdi2(a, b) → 0 if a<b, 1 if a==b, 2 if a>b (unsigned 64-bit)
+        const a = BigInt(r[10] >>> 0) | (BigInt(r[11] >>> 0) << 32n);
+        const b = BigInt(r[12] >>> 0) | (BigInt(r[13] >>> 0) << 32n);
+        r[10] = a < b ? 0 : a === b ? 1 : 2;
+        break;
+      }
+      case 0x40000764: { // __absvdi2(a) → |a| (signed 64-bit, aborts on overflow)
+        const val = BigInt.asIntN(64, BigInt(r[10] >>> 0) | (BigInt(r[11]) << 32n));
+        const abs = val < 0n ? BigInt.asUintN(64, -val) : BigInt.asUintN(64, val);
+        r[10] = Number(abs & 0xFFFFFFFFn) | 0;
+        r[11] = Number((abs >> 32n) & 0xFFFFFFFFn) | 0;
+        break;
+      }
+
       // ── ESP-IDF ROM helpers ──────────────────────────────────────────
       case 0x40000018: { // rtc_get_reset_reason() → 1 (POWERON_RESET)
         r[10] = 1;
@@ -813,7 +887,7 @@ export class Esp32C3Simulator {
       case 0x40000050: { // ets_delay_us(us) → void
         // Burn the equivalent number of CPU cycles so timers advance
         const us = r[10] >>> 0;
-        const burnCycles = Math.min(us * (CPU_HZ / 1_000_000), 1_000_000);
+        const burnCycles = Math.min(us * this._ticksPerUs, 1_000_000);
         this.core.cycles += burnCycles;
         r[10] = 0;
         break;
@@ -824,6 +898,33 @@ export class Esp32C3Simulator {
       }
       case 0x40001960: { // rom_i2c_writeReg_Mask(...) → 0 (success)
         r[10] = 0;
+        break;
+      }
+      case 0x4000195c: { // rom_i2c_writeReg(...) → 0 (success)
+        r[10] = 0;
+        break;
+      }
+      case 0x40000588: { // ets_update_cpu_frequency(ticks_per_us)
+        // Store value so our ets_delay_us can use the right multiplier.
+        // Firmware calls this with e.g. 40 or 160.
+        this._ticksPerUs = r[10] >>> 0;
+        r[10] = 0;
+        break;
+      }
+      case 0x40000084: { // uart_tx_wait_idle(uart_num) — no-op
+        r[10] = 0;
+        break;
+      }
+      case 0x400005f4: { // intr_matrix_set(cpu_no, model_num, intr_num)
+        // Maps peripheral interrupt source a1 to CPU interrupt line a2.
+        // This directly programs the interrupt matrix hardware.
+        const source = r[11] >>> 0;
+        const line   = r[12] & 0x1F;
+        if (source < 62) {
+          this._intSrcMap[source] = line;
+          // Also store in the MMIO echo-back register so firmware reads work
+          this._periRegs.set(INTMATRIX_BASE + source * 4, line);
+        }
         break;
       }
 
@@ -848,16 +949,11 @@ export class Esp32C3Simulator {
    * Called for all known TIMG0/TIMG1 base addresses across ESP-IDF versions.
    */
   private _registerTimerGroup(base: number): void {
-    const seen = new Set<number>();
     const peri = this._periRegs;
     this.core.addMmio(base, 0x100,
       (addr) => {
         const off  = addr - base;
         const wOff = off & ~3;
-        if (!seen.has(wOff)) {
-          seen.add(wOff);
-          console.log(`[TIMG@0x${base.toString(16)}] 1st read wOff=0x${wOff.toString(16)} pc=0x${this.core.pc.toString(16)}`);
-        }
         if (wOff === 0x68) {
           // TIMG_RTCCALICFG: bit15=TIMG_RTC_CALI_RDY=1 — calibration instantly done
           // Also set bit31 (start bit echo) which some versions check
@@ -1153,17 +1249,7 @@ export class Esp32C3Simulator {
 
   start(): void {
     if (this.running) return;
-    this._dbgFrameCount = 0;
-    this._dbgTickCount  = 0;
-    this._dbgLastMtvec  = 0;
-    this._dbgMieEnabled = false;
-    this._dbgPrevTickPc = -1;
-    this._dbgSamePcCount = 0;
-    this._dbgStuckDumped = false;
-    this._pcTrace.fill(0);
-    this._pcTraceIdx = 0;
-    this._pcTraceStep = 0;
-    this._romCallCount = 0;
+    this._ticksPerUs = 160;
     console.log(`[ESP32-C3] Simulation started, entry=0x${this.core.pc.toString(16)}`);
     this.running = true;
     this._loop();
@@ -1182,17 +1268,7 @@ export class Esp32C3Simulator {
     this._stIntEna      = 0;
     this._stIntRaw      = 0;
     this._periRegs.clear();
-    this._dbgFrameCount = 0;
-    this._dbgTickCount  = 0;
-    this._dbgLastMtvec  = 0;
-    this._dbgMieEnabled = false;
-    this._dbgPrevTickPc = -1;
-    this._dbgSamePcCount = 0;
-    this._dbgStuckDumped = false;
-    this._pcTrace.fill(0);
-    this._pcTraceIdx = 0;
-    this._pcTraceStep = 0;
-    this._romCallCount = 0;
+    this._ticksPerUs = 160;
     this.dram.fill(0);
     this.iram.fill(0);
     this.core.reset(IROM_BASE);
@@ -1219,162 +1295,14 @@ export class Esp32C3Simulator {
   private _loop(): void {
     if (!this.running) return;
 
-    this._dbgFrameCount++;
-
-    // ── Per-frame diagnostics (check once, before heavy execution) ─────────
-    // Detect mtvec being set — FreeRTOS writes this during startup.
-    const mtvec = this.core.mtvecVal;
-    if (mtvec !== this._dbgLastMtvec) {
-      if (mtvec !== 0) {
-        console.log(
-          `[ESP32-C3] mtvec set → 0x${mtvec.toString(16)}` +
-          ` (mode=${mtvec & 3}) @ frame ${this._dbgFrameCount}`
-        );
-      }
-      this._dbgLastMtvec = mtvec;
-    }
-
-    // Detect MIE 0→1 transition — FreeRTOS enables this when scheduler starts.
-    const mie = (this.core.mstatusVal & 0x8) !== 0;
-    if (mie && !this._dbgMieEnabled) {
-      console.log(
-        `[ESP32-C3] MIE enabled (interrupts ON) @ frame ${this._dbgFrameCount}` +
-        `, pc=0x${this.core.pc.toString(16)}`
-      );
-      this._dbgMieEnabled = true;
-    }
-
-    // Log PC + key state every ~1 second (60 frames).
-    if (this._dbgFrameCount % 60 === 0) {
-      console.log(
-        `[ESP32-C3] frame=${this._dbgFrameCount}` +
-        ` pc=0x${this.core.pc.toString(16)}` +
-        ` cycles=${this.core.cycles}` +
-        ` ticks=${this._dbgTickCount}` +
-        ` mtvec=0x${mtvec.toString(16)}` +
-        ` MIE=${mie}` +
-        ` GPIO=0x${this.gpioOut.toString(16)}`
-      );
-    }
-
     // Execute in 1 ms chunks so FreeRTOS tick interrupts fire at ~1 kHz.
     let rem = CYCLES_PER_FRAME;
     while (rem > 0) {
       const n = rem < CYCLES_PER_TICK ? rem : CYCLES_PER_TICK;
       for (let i = 0; i < n; i++) {
         this.core.step();
-        // Sample PC every 500 steps into a ring buffer for post-mortem analysis
-        if (++this._pcTraceStep >= 500) {
-          this._pcTraceStep = 0;
-          this._pcTrace[this._pcTraceIdx] = this.core.pc >>> 0;
-          this._pcTraceIdx = (this._pcTraceIdx + 1) & 127;
-        }
       }
       rem -= n;
-
-      this._dbgTickCount++;
-      // Log frequently early in boot (every 10 ticks for first 50, then every 100)
-      const shouldLog = this._dbgTickCount <= 50
-        ? this._dbgTickCount % 10 === 0
-        : this._dbgTickCount <= 1000 && this._dbgTickCount % 100 === 0;
-      if (shouldLog) {
-        const spc = this.core.pc;
-        let instrInfo = '';
-        const iramOff = spc - IRAM_BASE;
-        const flashOff = spc - IROM_BASE;
-        const romOff = spc - ROM_BASE;
-        let ib0 = 0, ib1 = 0, ib2 = 0, ib3 = 0;
-        if (iramOff >= 0 && iramOff + 4 <= this.iram.length) {
-          [ib0, ib1, ib2, ib3] = [this.iram[iramOff], this.iram[iramOff+1], this.iram[iramOff+2], this.iram[iramOff+3]];
-        } else if (flashOff >= 0 && flashOff + 4 <= this.flash.length) {
-          [ib0, ib1, ib2, ib3] = [this.flash[flashOff], this.flash[flashOff+1], this.flash[flashOff+2], this.flash[flashOff+3]];
-        } else if (romOff >= 0 && romOff < ROM_SIZE) {
-          // PC is in ROM stub region — show 0x8082 (C.RET)
-          ib0 = 0x82; ib1 = 0x80;
-        }
-        const instr16 = ib0 | (ib1 << 8);
-        const instr32 = ((ib0 | (ib1<<8) | (ib2<<16) | (ib3<<24)) >>> 0);
-        const isC = (instr16 & 3) !== 3;
-        const hex = isC ? instr16.toString(16).padStart(4,'0') : instr32.toString(16).padStart(8,'0');
-        if (!isC) {
-          const op = instr32 & 0x7F;
-          const f3 = (instr32 >> 12) & 7;
-          const rs1 = (instr32 >> 15) & 31;
-          if (op === 0x73) {
-            const csr = (instr32 >> 20) & 0xFFF;
-            instrInfo = ` [SYSTEM csr=0x${csr.toString(16)} f3=${f3}]`;
-          } else if (op === 0x03) {
-            const imm = (instr32 >> 20) << 0 >> 0;
-            instrInfo = ` [LOAD x${rs1}+${imm} f3=${f3}]`;
-          } else if (op === 0x63) {
-            instrInfo = ` [BRANCH f3=${f3}]`;
-          } else if (op === 0x23) {
-            instrInfo = ` [STORE f3=${f3}]`;
-          }
-        }
-        console.log(
-          `[ESP32-C3] tick #${this._dbgTickCount}` +
-          ` pc=0x${spc.toString(16)} instr=0x${hex}${instrInfo}` +
-          ` MIE=${(this.core.mstatusVal & 0x8) !== 0}`
-        );
-      }
-
-      // ── Stuck-loop detector ────────────────────────────────────────────
-      // If the PC hasn't changed across consecutive ticks (160 000 cycles),
-      // the CPU is stuck in a tight spin.  Dump all registers once for
-      // post-mortem analysis so we can identify which peripheral or stub
-      // needs attention.
-      {
-        const curPc = this.core.pc;
-        if (curPc === this._dbgPrevTickPc) {
-          this._dbgSamePcCount++;
-          if (this._dbgSamePcCount >= 3 && !this._dbgStuckDumped) {
-            this._dbgStuckDumped = true;
-            console.warn(
-              `[ESP32-C3] ⚠ CPU stuck at pc=0x${curPc.toString(16)} for ${this._dbgSamePcCount} ticks — register dump:`
-            );
-            const regNames = [
-              'zero','ra','sp','gp','tp','t0','t1','t2',
-              's0','s1','a0','a1','a2','a3','a4','a5',
-              'a6','a7','s2','s3','s4','s5','s6','s7',
-              's8','s9','s10','s11','t3','t4','t5','t6',
-            ];
-            for (let i = 0; i < 32; i++) {
-              console.warn(`  x${i.toString().padStart(2)}(${regNames[i].padEnd(4)}) = 0x${(this.core.regs[i] >>> 0).toString(16).padStart(8, '0')}`);
-            }
-            console.warn(`  mstatus=0x${(this.core.mstatusVal >>> 0).toString(16)} mtvec=0x${(this.core.mtvecVal >>> 0).toString(16)}`);
-            // Dump sampled PC trace (oldest → newest)
-            const traceEntries: string[] = [];
-            for (let j = 0; j < 128; j++) {
-              const idx = (this._pcTraceIdx + j) & 127;
-              const tpc = this._pcTrace[idx];
-              if (tpc !== 0) traceEntries.push(`0x${tpc.toString(16).padStart(8,'0')}`);
-            }
-            if (traceEntries.length > 0) {
-              // Deduplicate consecutive entries for readability
-              const deduped: string[] = [];
-              let prev = '';
-              let count = 0;
-              for (const e of traceEntries) {
-                if (e === prev) { count++; }
-                else {
-                  if (count > 1) deduped.push(`  (×${count})`);
-                  deduped.push(e);
-                  prev = e;
-                  count = 1;
-                }
-              }
-              if (count > 1) deduped.push(`  (×${count})`);
-              console.warn(`  PC trace (sampled every 500 steps, ${deduped.length} entries):`);
-              console.warn('    ' + deduped.join(', '));
-            }
-          }
-        } else {
-          this._dbgSamePcCount = 0;
-          this._dbgStuckDumped = false;
-        }
-        this._dbgPrevTickPc = curPc;
-      }
 
       // Raise SYSTIMER TARGET0 alarm → routed through interrupt matrix.
       this._stIntRaw |= 1;

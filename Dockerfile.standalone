@@ -75,13 +75,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.sh \
     | BINDIR=/usr/local/bin sh
 
-# Initialize arduino-cli config, add RP2040 board manager URL, then install cores
+# Initialize arduino-cli config, add board manager URLs, then install cores
+# - RP2040: earlephilhower fork for Raspberry Pi Pico
+# - ESP32:  Espressif official (covers ESP32, ESP32-S3, ESP32-C3, etc.)
 RUN arduino-cli config init \
     && arduino-cli config add board_manager.additional_urls \
        https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json \
+    && arduino-cli config add board_manager.additional_urls \
+       https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json \
     && arduino-cli core update-index \
     && arduino-cli core install arduino:avr \
-    && arduino-cli core install rp2040:rp2040
+    && arduino-cli core install rp2040:rp2040 \
+    && arduino-cli core install esp32:esp32
 
 WORKDIR /app
 
@@ -106,17 +111,24 @@ COPY deploy/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 # ── ESP32 emulation: lcgamboa QEMU .so + ROM binaries ────────────────────────
-# libqemu-xtensa.so  → ESP32 / ESP32-S3 (Xtensa LX6/LX7)
-# libqemu-riscv32.so → ESP32-C3 (RISC-V)
-# esp32-v3-rom*.bin  → boot/app ROM images required by esp32-picsimlab machine
+# libqemu-xtensa.so    → ESP32 / ESP32-S3 (Xtensa LX6/LX7)
+# libqemu-riscv32.so   → ESP32-C3 (RISC-V RV32IMC)
+# esp32-v3-rom*.bin    → boot/app ROM images required by esp32-picsimlab machine
+# esp32c3-rom.bin      → ROM image required by esp32c3-picsimlab machine
+# NOTE: ROM files must live in the same directory as the .so (worker passes -L
+#       to QEMU pointing at os.path.dirname(lib_path))
 RUN mkdir -p /app/lib
 COPY --from=qemu-builder /qemu-lcgamboa/build/libqemu-xtensa.so /app/lib/
 COPY --from=qemu-builder /qemu-lcgamboa/build/libqemu-riscv32.so /app/lib/
 COPY --from=qemu-builder /qemu-lcgamboa/pc-bios/esp32-v3-rom.bin /app/lib/
 COPY --from=qemu-builder /qemu-lcgamboa/pc-bios/esp32-v3-rom-app.bin /app/lib/
+COPY --from=qemu-builder /qemu-lcgamboa/pc-bios/esp32c3-rom.bin /app/lib/
 
-# Activate full ESP32 emulation (GPIO + ADC + UART + PWM + NeoPixel + WiFi)
+# Activate ESP32 emulation
+# QEMU_ESP32_LIB    → Xtensa library (ESP32, ESP32-S3)
+# QEMU_RISCV32_LIB  → RISC-V library (ESP32-C3 and variants)
 ENV QEMU_ESP32_LIB=/app/lib/libqemu-xtensa.so
+ENV QEMU_RISCV32_LIB=/app/lib/libqemu-riscv32.so
 
 EXPOSE 80
 

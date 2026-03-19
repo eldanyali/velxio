@@ -47,23 +47,37 @@ from typing import Callable, Awaitable
 logger = logging.getLogger(__name__)
 
 # ── Library path detection ────────────────────────────────────────────────────
-_LIB_NAME    = 'libqemu-xtensa.dll' if sys.platform == 'win32' else 'libqemu-xtensa.so'
-_DEFAULT_LIB = str(pathlib.Path(__file__).parent / _LIB_NAME)
+_SERVICES_DIR = pathlib.Path(__file__).parent
 
+# Xtensa library (ESP32, ESP32-S3)
+_LIB_XTENSA_NAME = 'libqemu-xtensa.dll' if sys.platform == 'win32' else 'libqemu-xtensa.so'
+_DEFAULT_LIB_XTENSA = str(_SERVICES_DIR / _LIB_XTENSA_NAME)
 LIB_PATH: str = os.environ.get('QEMU_ESP32_LIB', '') or (
-    _DEFAULT_LIB if os.path.isfile(_DEFAULT_LIB) else ''
+    _DEFAULT_LIB_XTENSA if os.path.isfile(_DEFAULT_LIB_XTENSA) else ''
 )
 
-_WORKER_SCRIPT = pathlib.Path(__file__).parent / 'esp32_worker.py'
+# RISC-V library (ESP32-C3)
+_LIB_RISCV_NAME = 'libqemu-riscv32.dll' if sys.platform == 'win32' else 'libqemu-riscv32.so'
+_DEFAULT_LIB_RISCV = str(_SERVICES_DIR / _LIB_RISCV_NAME)
+LIB_RISCV_PATH: str = os.environ.get('QEMU_RISCV32_LIB', '') or (
+    _DEFAULT_LIB_RISCV if os.path.isfile(_DEFAULT_LIB_RISCV) else ''
+)
+
+_WORKER_SCRIPT = _SERVICES_DIR / 'esp32_worker.py'
 
 EventCallback = Callable[[str, dict], Awaitable[None]]
 
-# lcgamboa machine names
+# lcgamboa machine names and which DLL each board requires
 _MACHINE: dict[str, str] = {
-    'esp32':    'esp32-picsimlab',
-    'esp32-s3': 'esp32s3-picsimlab',
-    'esp32-c3': 'esp32c3-picsimlab',
+    'esp32':                          'esp32-picsimlab',
+    'esp32-s3':                       'esp32s3-picsimlab',
+    'esp32-c3':                       'esp32c3-picsimlab',
+    'xiao-esp32-c3':                  'esp32c3-picsimlab',
+    'aitewinrobot-esp32c3-supermini': 'esp32c3-picsimlab',
 }
+
+# Board types that require the RISC-V library instead of the Xtensa one
+_RISCV_BOARDS = {'esp32-c3', 'xiao-esp32-c3', 'aitewinrobot-esp32c3-supermini'}
 
 
 # ── UART buffer ───────────────────────────────────────────────────────────────
@@ -127,11 +141,17 @@ class EspLibManager:
 
     @staticmethod
     def is_available() -> bool:
+        """Returns True if the Xtensa DLL is present (minimum for ESP32/ESP32-S3)."""
         return (
             bool(LIB_PATH)
             and os.path.isfile(LIB_PATH)
             and _WORKER_SCRIPT.exists()
         )
+
+    @staticmethod
+    def is_riscv_available() -> bool:
+        """Returns True if the RISC-V DLL is present (required for ESP32-C3)."""
+        return bool(LIB_RISCV_PATH) and os.path.isfile(LIB_RISCV_PATH)
 
     # ── Public API ────────────────────────────────────────────────────────────
 
@@ -151,9 +171,10 @@ class EspLibManager:
             logger.info('start_instance %s: no firmware — skipping worker launch', client_id)
             return
 
-        machine = _MACHINE.get(board_type, 'esp32-picsimlab')
-        config  = json.dumps({
-            'lib_path':     LIB_PATH,
+        machine  = _MACHINE.get(board_type, 'esp32-picsimlab')
+        lib_path = LIB_RISCV_PATH if board_type in _RISCV_BOARDS else LIB_PATH
+        config   = json.dumps({
+            'lib_path':     lib_path,
             'firmware_b64': firmware_b64,
             'machine':      machine,
         })

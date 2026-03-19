@@ -209,6 +209,14 @@ class ArduinoCLIService:
         """Return True if the FQBN targets an ESP32 family board."""
         return fqbn.startswith("esp32:")
 
+    def _is_esp32c3_board(self, fqbn: str) -> bool:
+        """Return True if the FQBN targets an ESP32-C3 (RISC-V) board.
+
+        ESP32-C3 places the bootloader at flash offset 0x0000, unlike Xtensa
+        boards (ESP32, ESP32-S3) which use 0x1000.
+        """
+        return "esp32c3" in fqbn or "xiao-esp32-c3" in fqbn or "aitewinrobot-esp32c3-supermini" in fqbn
+
     async def compile(self, files: list[dict], board_fqbn: str = "arduino:avr:uno") -> dict:
         """
         Compile Arduino sketch using arduino-cli.
@@ -345,22 +353,25 @@ class ArduinoCLIService:
                         print(f"[ESP32] Build dir contents: {[f.name for f in build_dir.iterdir()]}")
 
                         # Merge individual .bin files into a single 4MB flash image in pure Python.
-                        # ESP32 default flash layout:  0x1000 bootloader | 0x8000 partitions | 0x10000 app
+                        # Flash layout differs by chip:
+                        #   ESP32 / ESP32-S3 (Xtensa): 0x1000 bootloader | 0x8000 partitions | 0x10000 app
+                        #   ESP32-C3 (RISC-V):         0x0000 bootloader | 0x8000 partitions | 0x10000 app
                         # QEMU lcgamboa requires exactly 2/4/8/16 MB flash — raw app binary won't boot.
                         if not merged_file.exists() and bin_file.exists() and bootloader_file.exists() and partitions_file.exists():
                             print("[ESP32] Merging binaries into 4MB flash image (pure Python)...")
                             try:
                                 FLASH_SIZE = 4 * 1024 * 1024  # 4 MB
                                 flash = bytearray(b'\xff' * FLASH_SIZE)
+                                bootloader_offset = 0x0000 if self._is_esp32c3_board(board_fqbn) else 0x1000
                                 for offset, path in [
-                                    (0x1000,  bootloader_file),
-                                    (0x8000,  partitions_file),
-                                    (0x10000, bin_file),
+                                    (bootloader_offset, bootloader_file),
+                                    (0x8000,            partitions_file),
+                                    (0x10000,           bin_file),
                                 ]:
                                     data = path.read_bytes()
                                     flash[offset:offset + len(data)] = data
                                 merged_file.write_bytes(bytes(flash))
-                                print(f"[ESP32] Merged image: {merged_file.stat().st_size} bytes")
+                                print(f"[ESP32] Merged image: {merged_file.stat().st_size} bytes (bootloader @ 0x{bootloader_offset:04X})")
                             except Exception as e:
                                 print(f"[ESP32] Merge failed: {e} — falling back to raw app binary")
 

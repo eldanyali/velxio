@@ -5,7 +5,7 @@
 > Available on: **Windows** (`.dll`) · **Linux / Docker** (`.so`, included in the official image)
 > Applies to: **ESP32, ESP32-S3** (Xtensa LX6/LX7 architecture)
 
-> **Note on ESP32-C3:** The ESP32-C3, XIAO ESP32-C3, and ESP32-C3 SuperMini boards use the **RISC-V RV32IMC** architecture and have their own in-browser emulator. See → [RISCV_EMULATION.md](./RISCV_EMULATION.md)
+> **Note on ESP32-C3:** The ESP32-C3, XIAO ESP32-C3, and ESP32-C3 SuperMini boards use the **RISC-V RV32IMC** architecture and are emulated via `libqemu-riscv32` (same backend pattern as Xtensa, different library and machine). See → [RISCV_EMULATION.md](./RISCV_EMULATION.md)
 
 ## Supported Boards
 
@@ -376,15 +376,18 @@ libglib2.0-0, libgcrypt20, libslirp0, libpixman-1-0
 **Required ROM binaries** (in the same folder as the lib):
 ```
 # Windows (backend/app/services/):
-  libqemu-xtensa.dll        ← main engine (not in git — 43 MB)
+  libqemu-xtensa.dll        ← Xtensa engine for ESP32/S3 (not in git — 43 MB)
+  libqemu-riscv32.dll       ← RISC-V engine for ESP32-C3 (not in git — 58 MB)
   esp32-v3-rom.bin          ← ESP32 boot ROM (not in git — 446 KB)
-  esp32-v3-rom-app.bin      ← application ROM  (not in git — 446 KB)
+  esp32-v3-rom-app.bin      ← application ROM (not in git — 446 KB)
+  esp32c3-rom.bin           ← ESP32-C3 boot ROM (not in git — 384 KB)
 
 # Docker (/app/lib/):
   libqemu-xtensa.so         ← compiled in Stage 0 of the Dockerfile
-  libqemu-riscv32.so        ← ESP32-C3 (RISC-V)
+  libqemu-riscv32.so        ← ESP32-C3 (RISC-V) — same build stage
   esp32-v3-rom.bin          ← copied from the lcgamboa repo's pc-bios/
   esp32-v3-rom-app.bin
+  esp32c3-rom.bin           ← ESP32-C3 ROM
 ```
 
 > On Windows these files are in `.gitignore` due to their size. Each developer generates them locally.
@@ -791,13 +794,15 @@ The original problem was that `ledc_update {channel: N}` arrived at the frontend
 
 ### 10.1 Windows (MSYS2 MINGW64)
 
+#### Xtensa (ESP32 / ESP32-S3)
+
 The `build_libqemu-esp32-win.sh` script in `wokwi-libs/qemu-lcgamboa/` automates the process:
 
 ```bash
 # In MSYS2 MINGW64:
 cd wokwi-libs/qemu-lcgamboa
 bash build_libqemu-esp32-win.sh
-# Produces: build/libqemu-xtensa.dll and build/libqemu-riscv32.dll
+# Produces: build/libqemu-xtensa.dll
 ```
 
 The script configures QEMU with `--extra-cflags=-fPIC` (required for Windows/PE with ASLR), compiles the full binary, and then relinks removing `softmmu_main.c.obj` (which contains `main()`):
@@ -809,6 +814,41 @@ cc -m64 -mcx16 -shared \
    -o libqemu-xtensa.dll \
    @dll_link.rsp      # all .obj files except softmmu_main
 ```
+
+#### RISC-V (ESP32-C3)
+
+Building `libqemu-riscv32.dll` requires a **separate build directory** because the configure flags differ from Xtensa (notably `--disable-slirp`, which is required because GCC 15.x rejects incompatible pointer types in `net/slirp.c` for the riscv32 target):
+
+```bash
+# In MSYS2 MINGW64:
+cd wokwi-libs/qemu-lcgamboa
+mkdir build-riscv && cd build-riscv
+
+../configure \
+  --target-list=riscv32-softmmu \
+  --disable-werror \
+  --enable-gcrypt \
+  --disable-slirp \
+  --without-default-features \
+  --disable-docs
+
+ninja          # ~15-30 min first time
+
+# Once built, create the DLL using the keeprsp technique:
+# 1. Build the full executable first
+ninja qemu-system-riscv32.exe
+# 2. Edit build/riscv32-softmmu/dll_link.rsp:
+#      - Change -o qemu-system-riscv32.exe → -o libqemu-riscv32.dll
+#      - Add -shared flag
+#      - Remove softmmu_main.c.obj from the object list
+gcc -shared -o libqemu-riscv32.dll @dll_link.rsp
+
+# Deploy to backend:
+cp libqemu-riscv32.dll /e/Hardware/wokwi_clon/backend/app/services/
+cp ../pc-bios/esp32c3-rom.bin /e/Hardware/wokwi_clon/backend/app/services/
+```
+
+See [RISCV_EMULATION.md §4](./RISCV_EMULATION.md) for full step-by-step instructions.
 
 ### 10.2 Linux
 
@@ -1050,7 +1090,8 @@ The connection logic lives in `SimulatorCanvas.tsx`: it detects the tag of the w
 
 | Variable | Example Value | Effect |
 |----------|--------------|--------|
-| `QEMU_ESP32_LIB` | `/app/lib/libqemu-xtensa.so` | Force lib path (overrides auto-detect) |
+| `QEMU_ESP32_LIB` | `/app/lib/libqemu-xtensa.so` | Force Xtensa lib path (ESP32/S3) |
+| `QEMU_RISCV32_LIB` | `/app/lib/libqemu-riscv32.so` | Force RISC-V lib path (ESP32-C3) |
 | `QEMU_ESP32_BINARY` | `/usr/bin/qemu-system-xtensa` | Subprocess fallback (without lib) |
 | `SKIP_LIB_INTEGRATION` | `1` | Skip QEMU integration tests in pytest |
 
@@ -1058,9 +1099,10 @@ The connection logic lives in `SimulatorCanvas.tsx`: it detects the tag of the w
 
 | Platform | Library auto-searched |
 |----------|-----------------------|
-| Docker / Linux | `/app/lib/libqemu-xtensa.so` (via `QEMU_ESP32_LIB`) |
-| Windows | `backend/app/services/libqemu-xtensa.dll` |
-| Custom | `$QEMU_ESP32_LIB` (if set, takes priority) |
+| Docker / Linux | `/app/lib/libqemu-xtensa.so` (Xtensa) + `/app/lib/libqemu-riscv32.so` (RISC-V) |
+| Windows | `backend/app/services/libqemu-xtensa.dll` + `backend/app/services/libqemu-riscv32.dll` |
+| Custom Xtensa | `$QEMU_ESP32_LIB` (if set, takes priority) |
+| Custom RISC-V | `$QEMU_RISCV32_LIB` (if set, takes priority) |
 
 **Startup examples:**
 

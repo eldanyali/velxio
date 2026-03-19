@@ -46,19 +46,20 @@ export const getBoardPinManager = (id: string) => pinManagerMap.get(id);
 export const getBoardBridge = (id: string) => bridgeMap.get(id);
 export const getEsp32Bridge = (id: string) => esp32BridgeMap.get(id);
 
-// Xtensa-based ESP32 boards — still use QEMU bridge (backend)
+// Xtensa-based ESP32 boards — use QEMU bridge (backend)
 const ESP32_KINDS = new Set<BoardKind>([
   'esp32', 'esp32-devkit-c-v4', 'esp32-cam', 'wemos-lolin32-lite',
   'esp32-s3', 'xiao-esp32-s3', 'arduino-nano-esp32',
 ]);
 
-// RISC-V ESP32 boards — use the browser-side Esp32C3Simulator (no backend needed)
+// RISC-V ESP32 boards — also use QEMU bridge (qemu-system-riscv32 -M esp32c3)
+// The browser-side Esp32C3Simulator cannot handle the 150+ ROM functions ESP-IDF needs.
 const ESP32_RISCV_KINDS = new Set<BoardKind>([
   'esp32-c3', 'xiao-esp32-c3', 'aitewinrobot-esp32c3-supermini',
 ]);
 
 function isEsp32Kind(kind: BoardKind): boolean {
-  return ESP32_KINDS.has(kind);
+  return ESP32_KINDS.has(kind) || ESP32_RISCV_KINDS.has(kind);
 }
 
 function isRiscVEsp32Kind(kind: BoardKind): boolean {

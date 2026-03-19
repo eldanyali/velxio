@@ -35,14 +35,14 @@ async def simulation_websocket(websocket: WebSocket, client_id: str):
 
     async def qemu_callback(event_type: str, data: dict) -> None:
         if event_type == 'gpio_change':
-            logger.info('[%s] gpio_change pin=%s state=%s', client_id, data.get('pin'), data.get('state'))
+            logger.debug('[%s] gpio_change pin=%s state=%s', client_id, data.get('pin'), data.get('state'))
         elif event_type == 'system':
-            logger.info('[%s] system event: %s', client_id, data.get('event'))
+            logger.debug('[%s] system event: %s', client_id, data.get('event'))
         elif event_type == 'error':
             logger.error('[%s] error: %s', client_id, data.get('message'))
         elif event_type == 'serial_output':
             text = data.get('data', '')
-            logger.info('[%s] serial_output uart=%s len=%d: %r', client_id, data.get('uart', 0), len(text), text[:80])
+            logger.debug('[%s] serial_output uart=%s len=%d: %r', client_id, data.get('uart', 0), len(text), text[:80])
         payload = json.dumps({'type': event_type, 'data': data})
         try:
             await manager.send(client_id, payload)

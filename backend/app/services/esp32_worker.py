@@ -60,12 +60,24 @@ def _log(msg: str) -> None:
 
 
 # ─── GPIO pinmap (identity: slot i → GPIO i-1) ──────────────────────────────
+# ESP32 has 40 GPIOs (0-39), ESP32-C3 only has 22 (0-21).
+# The pinmap is rebuilt after reading config (see main()), defaulting to ESP32.
 
 _GPIO_COUNT = 40
 _PINMAP = (ctypes.c_int16 * (_GPIO_COUNT + 1))(
     _GPIO_COUNT,
     *range(_GPIO_COUNT),
 )
+
+
+def _build_pinmap(gpio_count: int):
+    """Build a pinmap array for the given GPIO count."""
+    global _GPIO_COUNT, _PINMAP
+    _GPIO_COUNT = gpio_count
+    _PINMAP = (ctypes.c_int16 * (gpio_count + 1))(
+        gpio_count,
+        *range(gpio_count),
+    )
 
 # ─── ctypes callback types ───────────────────────────────────────────────────
 
@@ -164,6 +176,10 @@ def main() -> None:  # noqa: C901  (complexity OK for inline worker)
     lib_path     = cfg['lib_path']
     firmware_b64 = cfg['firmware_b64']
     machine      = cfg.get('machine', 'esp32-picsimlab')
+
+    # Adjust GPIO pinmap based on chip: ESP32-C3 has only 22 GPIOs
+    if 'c3' in machine:
+        _build_pinmap(22)
 
     # ── 2. Load DLL ───────────────────────────────────────────────────────────
     _MINGW64_BIN = r'C:\msys64\mingw64\bin'
