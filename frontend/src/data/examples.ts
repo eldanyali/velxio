@@ -3123,6 +3123,1043 @@ void loop() {
       { id: 'pr-gnd', start: { componentId: 'pico-rgb1', pinName: 'COM' }, end: { componentId: 'nano-rp2040', pinName: 'GND.1' }, color: '#000000' },
     ],
   },
+
+  // ─── Arduino Uno — Sensor Examples ───────────────────────────────────────
+  {
+    id: 'uno-dht22',
+    title: 'Uno: DHT22 Temperature & Humidity',
+    description: 'Read temperature and humidity using a DHT22 sensor on pin 7. Requires the Adafruit DHT sensor library.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardFilter: 'arduino-uno',
+    code: `// Arduino Uno — DHT22 Temperature & Humidity Sensor
+// Requires: Adafruit DHT sensor library (install via Library Manager)
+// Wiring: DATA → pin 7  |  VCC → 5V  |  GND → GND
+
+#include <DHT.h>
+
+#define DHT_PIN  7
+#define DHT_TYPE DHT22
+
+DHT dht(DHT_PIN, DHT_TYPE);
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+  Serial.println("DHT22 Sensor ready!");
+}
+
+void loop() {
+  delay(2000);
+  float humidity = dht.readHumidity();
+  float tempC    = dht.readTemperature();
+  float tempF    = dht.readTemperature(true);
+
+  if (isnan(humidity) || isnan(tempC)) {
+    Serial.println("ERROR: Failed to read from DHT22!");
+    return;
+  }
+
+  Serial.print("Humidity   : "); Serial.print(humidity, 1); Serial.println(" %");
+  Serial.print("Temperature: "); Serial.print(tempC, 1);  Serial.print(" C  /  ");
+  Serial.print(tempF, 1); Serial.println(" F");
+  float heatIdx = dht.computeHeatIndex(tempF, humidity);
+  Serial.print("Heat Index : "); Serial.print(heatIdx, 1); Serial.println(" F");
+  Serial.println("---");
+}`,
+    components: [
+      { type: 'wokwi-dht22', id: 'uno-dht1', x: 430, y: 150, properties: { temperature: '25', humidity: '60' } },
+    ],
+    wires: [
+      { id: 'ud-vcc', start: { componentId: 'arduino-uno', pinName: '5V'  }, end: { componentId: 'uno-dht1', pinName: 'VCC' }, color: '#ff0000' },
+      { id: 'ud-gnd', start: { componentId: 'arduino-uno', pinName: 'GND' }, end: { componentId: 'uno-dht1', pinName: 'GND' }, color: '#000000' },
+      { id: 'ud-sda', start: { componentId: 'arduino-uno', pinName: '7'   }, end: { componentId: 'uno-dht1', pinName: 'SDA' }, color: '#22aaff' },
+    ],
+  },
+  {
+    id: 'uno-hcsr04',
+    title: 'Uno: HC-SR04 Ultrasonic Distance',
+    description: 'Measure distance with an HC-SR04 ultrasonic sensor. TRIG on pin 9, ECHO on pin 10.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardFilter: 'arduino-uno',
+    code: `// Arduino Uno — HC-SR04 Ultrasonic Distance Sensor
+// Wiring: TRIG → pin 9  |  ECHO → pin 10  |  VCC → 5V  |  GND → GND
+
+#define TRIG_PIN 9
+#define ECHO_PIN 10
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  Serial.println("HC-SR04 Ultrasonic Sensor ready");
+}
+
+long measureCm() {
+  // Send 10 µs trigger pulse
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+  // Read echo duration (30 ms timeout ≈ 5 m max)
+  long duration = pulseIn(ECHO_PIN, HIGH, 30000UL);
+  return (duration == 0) ? -1 : (long)(duration * 0.0343 / 2.0);
+}
+
+void loop() {
+  long cm = measureCm();
+  if (cm < 0) {
+    Serial.println("Out of range (> 4 m)");
+  } else {
+    Serial.print("Distance: "); Serial.print(cm); Serial.println(" cm");
+  }
+  delay(500);
+}`,
+    components: [
+      { type: 'wokwi-hc-sr04', id: 'uno-sr1', x: 420, y: 150, properties: { distance: '30' } },
+    ],
+    wires: [
+      { id: 'us-vcc',  start: { componentId: 'arduino-uno', pinName: '5V'  }, end: { componentId: 'uno-sr1', pinName: 'VCC'  }, color: '#ff0000' },
+      { id: 'us-gnd',  start: { componentId: 'arduino-uno', pinName: 'GND' }, end: { componentId: 'uno-sr1', pinName: 'GND'  }, color: '#000000' },
+      { id: 'us-trig', start: { componentId: 'arduino-uno', pinName: '9'   }, end: { componentId: 'uno-sr1', pinName: 'TRIG' }, color: '#ff8800' },
+      { id: 'us-echo', start: { componentId: 'arduino-uno', pinName: '10'  }, end: { componentId: 'uno-sr1', pinName: 'ECHO' }, color: '#22cc22' },
+    ],
+  },
+  {
+    id: 'uno-pir',
+    title: 'Uno: PIR Motion Detector',
+    description: 'Detect movement with a PIR infrared sensor on pin 4. The built-in LED on pin 13 lights up when motion is detected.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardFilter: 'arduino-uno',
+    code: `// Arduino Uno — PIR Passive Infrared Motion Sensor
+// Wiring: OUT → pin 4  |  VCC → 5V  |  GND → GND
+
+#define PIR_PIN 4
+#define LED_PIN 13  // built-in LED
+
+bool prevMotion = false;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(PIR_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.println("PIR Motion Sensor ready — waiting for motion...");
+  delay(2000); // sensor warm-up
+}
+
+void loop() {
+  bool motion = (digitalRead(PIR_PIN) == HIGH);
+  if (motion && !prevMotion) {
+    Serial.println(">>> MOTION DETECTED! <<<");
+    digitalWrite(LED_PIN, HIGH);
+  } else if (!motion && prevMotion) {
+    Serial.println("No motion.");
+    digitalWrite(LED_PIN, LOW);
+  }
+  prevMotion = motion;
+  delay(200);
+}`,
+    components: [
+      { type: 'wokwi-pir-motion-sensor', id: 'uno-pir1', x: 430, y: 150, properties: {} },
+    ],
+    wires: [
+      { id: 'pir-vcc', start: { componentId: 'arduino-uno', pinName: '5V'  }, end: { componentId: 'uno-pir1', pinName: 'VCC' }, color: '#ff0000' },
+      { id: 'pir-gnd', start: { componentId: 'arduino-uno', pinName: 'GND' }, end: { componentId: 'uno-pir1', pinName: 'GND' }, color: '#000000' },
+      { id: 'pir-out', start: { componentId: 'arduino-uno', pinName: '4'   }, end: { componentId: 'uno-pir1', pinName: 'OUT' }, color: '#ffcc00' },
+    ],
+  },
+  {
+    id: 'uno-servo',
+    title: 'Uno: Servo Motor Sweep',
+    description: 'Sweep a servo motor smoothly from 0° to 180° and back using pin 9 (PWM). Uses the built-in Servo library.',
+    category: 'robotics',
+    difficulty: 'beginner',
+    boardFilter: 'arduino-uno',
+    code: `// Arduino Uno — Servo Motor Sweep
+// Wiring: PWM → pin 9  |  V+ → 5V  |  GND → GND
+// Uses the built-in Servo library (no install needed)
+
+#include <Servo.h>
+
+#define SERVO_PIN 9
+
+Servo myServo;
+
+void setup() {
+  myServo.attach(SERVO_PIN);
+  Serial.begin(9600);
+  Serial.println("Servo Sweep demo");
+}
+
+void loop() {
+  // Sweep 0 → 180
+  for (int angle = 0; angle <= 180; angle += 2) {
+    myServo.write(angle);
+    delay(15);
+  }
+  Serial.println("180 deg reached");
+  delay(400);
+
+  // Sweep 180 → 0
+  for (int angle = 180; angle >= 0; angle -= 2) {
+    myServo.write(angle);
+    delay(15);
+  }
+  Serial.println("0 deg reached");
+  delay(400);
+}`,
+    components: [
+      { type: 'wokwi-servo', id: 'uno-sv1', x: 420, y: 150, properties: {} },
+    ],
+    wires: [
+      { id: 'sv-vcc', start: { componentId: 'arduino-uno', pinName: '5V'  }, end: { componentId: 'uno-sv1', pinName: 'V+' }, color: '#ff0000' },
+      { id: 'sv-gnd', start: { componentId: 'arduino-uno', pinName: 'GND' }, end: { componentId: 'uno-sv1', pinName: 'GND' }, color: '#000000' },
+      { id: 'sv-pwm', start: { componentId: 'arduino-uno', pinName: '9'   }, end: { componentId: 'uno-sv1', pinName: 'PWM' }, color: '#ff8800' },
+    ],
+  },
+  {
+    id: 'uno-photoresistor',
+    title: 'Uno: Photoresistor Light Sensor',
+    description: 'Read analog light level from a photoresistor module on A0. An LED on pin 9 dims proportionally to compensate for darkness.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardFilter: 'arduino-uno',
+    code: `// Arduino Uno — Photoresistor Light Sensor + PWM LED
+// Sensor : AO → A0  |  VCC → 5V  |  GND → GND
+// LED    : pin 9 (PWM), current-limiting resistor 220 Ω
+
+#define PHOTO_PIN A0
+#define LED_PIN   9
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.println("Photoresistor demo — try covering the sensor!");
+}
+
+void loop() {
+  int raw     = analogRead(PHOTO_PIN);          // 0–1023
+  int percent = map(raw, 0, 1023, 0, 100);
+  // Invert: brighter environment → lower LED brightness
+  int ledPWM  = map(raw, 0, 1023, 255, 0);
+  analogWrite(LED_PIN, ledPWM);
+
+  Serial.print("Light: "); Serial.print(percent);
+  Serial.print("%  ADC="); Serial.print(raw);
+  Serial.print("  LED="); Serial.println(ledPWM);
+  delay(200);
+}`,
+    components: [
+      { type: 'wokwi-photoresistor-sensor', id: 'uno-photo1', x: 430, y: 140, properties: {} },
+      { type: 'wokwi-led',      id: 'uno-photo-led', x: 430, y: 280, properties: { color: 'yellow' } },
+      { type: 'wokwi-resistor', id: 'uno-photo-r',   x: 430, y: 340, properties: { resistance: '220' } },
+    ],
+    wires: [
+      { id: 'ph-vcc',   start: { componentId: 'arduino-uno',  pinName: '5V'  }, end: { componentId: 'uno-photo1',   pinName: 'VCC' }, color: '#ff0000' },
+      { id: 'ph-gnd',   start: { componentId: 'arduino-uno',  pinName: 'GND' }, end: { componentId: 'uno-photo1',   pinName: 'GND' }, color: '#000000' },
+      { id: 'ph-ao',    start: { componentId: 'arduino-uno',  pinName: 'A0'  }, end: { componentId: 'uno-photo1',   pinName: 'AO'  }, color: '#aa44ff' },
+      { id: 'ph-led-a', start: { componentId: 'arduino-uno',  pinName: '9'   }, end: { componentId: 'uno-photo-led', pinName: 'A'  }, color: '#ffcc00' },
+      { id: 'ph-led-c', start: { componentId: 'uno-photo-led', pinName: 'C'  }, end: { componentId: 'uno-photo-r',  pinName: '1'  }, color: '#888888' },
+      { id: 'ph-r-gnd', start: { componentId: 'uno-photo-r',  pinName: '2'   }, end: { componentId: 'arduino-uno',  pinName: 'GND' }, color: '#000000' },
+    ],
+  },
+  {
+    id: 'uno-ntc',
+    title: 'Uno: NTC Thermistor Temperature',
+    description: 'Calculate temperature from an NTC 10k thermistor sensor on A1 using the Steinhart–Hart equation.',
+    category: 'sensors',
+    difficulty: 'intermediate',
+    boardFilter: 'arduino-uno',
+    code: `// Arduino Uno — NTC Thermistor Temperature Sensor
+// Wiring: OUT → A1  |  VCC → 5V  |  GND → GND
+
+#define NTC_PIN A1
+
+// Thermistor parameters for a 10 kΩ NTC (B = 3950)
+const float VCC         = 5.0;
+const float SERIES_R    = 10000.0;  // series resistor (10 kΩ)
+const float NOM_R       = 10000.0;  // nominal resistance at 25 °C
+const float B_COEFF     = 3950.0;   // Beta coefficient
+const float NOM_TEMP_K  = 298.15;   // 25 °C in Kelvin
+
+float readTempC() {
+  int   raw  = analogRead(NTC_PIN);
+  float v    = raw * (VCC / 1023.0);
+  float r    = SERIES_R * v / (VCC - v);  // voltage divider
+  // Steinhart–Hart simplified equation
+  float st   = log(r / NOM_R) / B_COEFF + 1.0 / NOM_TEMP_K;
+  return (1.0 / st) - 273.15;
+}
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("NTC Thermistor Temperature Sensor");
+}
+
+void loop() {
+  float tc = readTempC();
+  float tf = tc * 9.0 / 5.0 + 32.0;
+  Serial.print("Temperature: ");
+  Serial.print(tc, 2); Serial.print(" C  /  ");
+  Serial.print(tf, 2); Serial.println(" F");
+  delay(1000);
+}`,
+    components: [
+      { type: 'wokwi-ntc-temperature-sensor', id: 'uno-ntc1', x: 430, y: 150, properties: { temperature: '25' } },
+    ],
+    wires: [
+      { id: 'ntc-vcc', start: { componentId: 'arduino-uno', pinName: '5V'  }, end: { componentId: 'uno-ntc1', pinName: 'VCC' }, color: '#ff0000' },
+      { id: 'ntc-gnd', start: { componentId: 'arduino-uno', pinName: 'GND' }, end: { componentId: 'uno-ntc1', pinName: 'GND' }, color: '#000000' },
+      { id: 'ntc-out', start: { componentId: 'arduino-uno', pinName: 'A1'  }, end: { componentId: 'uno-ntc1', pinName: 'OUT' }, color: '#aa44ff' },
+    ],
+  },
+
+  // ─── Raspberry Pi Pico — Sensor Examples ─────────────────────────────────
+  {
+    id: 'pico-dht22',
+    title: 'Pico: DHT22 Temperature & Humidity',
+    description: 'Read temperature and humidity from a DHT22 sensor on GP7 using the Raspberry Pi Pico. Requires Adafruit DHT library.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'raspberry-pi-pico',
+    boardFilter: 'raspberry-pi-pico',
+    code: `// Raspberry Pi Pico — DHT22 Temperature & Humidity
+// Requires: Adafruit DHT sensor library (install via Library Manager)
+// Wiring: DATA → GP7  |  VCC → 3.3V  |  GND → GND
+
+#include <DHT.h>
+
+#define DHT_PIN  7   // GPIO 7
+#define DHT_TYPE DHT22
+
+DHT dht(DHT_PIN, DHT_TYPE);
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+  delay(1000);
+  Serial.println("Pico DHT22 ready!");
+}
+
+void loop() {
+  delay(2000);
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  if (isnan(h) || isnan(t)) {
+    Serial.println("DHT22 read error!");
+    return;
+  }
+  Serial.print("Temp: "); Serial.print(t, 1); Serial.print(" C   ");
+  Serial.print("Humidity: "); Serial.print(h, 1); Serial.println(" %");
+}`,
+    components: [
+      { type: 'wokwi-dht22', id: 'pico-dht1', x: 430, y: 150, properties: { temperature: '22', humidity: '55' } },
+    ],
+    wires: [
+      { id: 'pcd-vcc', start: { componentId: 'nano-rp2040', pinName: '3.3V'  }, end: { componentId: 'pico-dht1', pinName: 'VCC' }, color: '#ff4444' },
+      { id: 'pcd-gnd', start: { componentId: 'nano-rp2040', pinName: 'GND.1' }, end: { componentId: 'pico-dht1', pinName: 'GND' }, color: '#000000' },
+      { id: 'pcd-sda', start: { componentId: 'nano-rp2040', pinName: 'GP7'   }, end: { componentId: 'pico-dht1', pinName: 'SDA' }, color: '#22aaff' },
+    ],
+  },
+  {
+    id: 'pico-hcsr04',
+    title: 'Pico: HC-SR04 Ultrasonic Distance',
+    description: 'Measure distance with an HC-SR04 sensor on the Raspberry Pi Pico. TRIG on GP9, ECHO on GP10.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'raspberry-pi-pico',
+    boardFilter: 'raspberry-pi-pico',
+    code: `// Raspberry Pi Pico — HC-SR04 Ultrasonic Distance Sensor
+// Wiring: TRIG → GP9  |  ECHO → GP10  |  VCC → 3.3V  |  GND → GND
+
+#define TRIG_PIN 9   // GPIO 9
+#define ECHO_PIN 10  // GPIO 10
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  Serial.println("Pico HC-SR04 ready");
+}
+
+long measureCm() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+  long d = pulseIn(ECHO_PIN, HIGH, 30000UL);
+  return (d == 0) ? -1 : (long)(d * 0.0343 / 2.0);
+}
+
+void loop() {
+  long cm = measureCm();
+  if (cm < 0) {
+    Serial.println("Out of range");
+  } else {
+    Serial.print("Distance: "); Serial.print(cm); Serial.println(" cm");
+  }
+  delay(500);
+}`,
+    components: [
+      { type: 'wokwi-hc-sr04', id: 'pico-sr1', x: 420, y: 150, properties: { distance: '25' } },
+    ],
+    wires: [
+      { id: 'pcs-vcc',  start: { componentId: 'nano-rp2040', pinName: '3.3V'  }, end: { componentId: 'pico-sr1', pinName: 'VCC'  }, color: '#ff4444' },
+      { id: 'pcs-gnd',  start: { componentId: 'nano-rp2040', pinName: 'GND.1' }, end: { componentId: 'pico-sr1', pinName: 'GND'  }, color: '#000000' },
+      { id: 'pcs-trig', start: { componentId: 'nano-rp2040', pinName: 'GP9'   }, end: { componentId: 'pico-sr1', pinName: 'TRIG' }, color: '#ff8800' },
+      { id: 'pcs-echo', start: { componentId: 'nano-rp2040', pinName: 'GP10'  }, end: { componentId: 'pico-sr1', pinName: 'ECHO' }, color: '#22cc22' },
+    ],
+  },
+  {
+    id: 'pico-pir',
+    title: 'Pico: PIR Motion Detector',
+    description: 'Detect movement with a PIR sensor on GP14. The built-in LED (GP25) activates when motion is detected.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'raspberry-pi-pico',
+    boardFilter: 'raspberry-pi-pico',
+    code: `// Raspberry Pi Pico — PIR Motion Sensor
+// Wiring: OUT → GP14  |  VCC → 3.3V  |  GND → GND
+
+#define PIR_PIN 14  // GPIO 14
+#define LED_PIN 25  // on-board LED (LED_BUILTIN on Pico)
+
+bool prevMotion = false;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(PIR_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.println("Pico PIR Motion Sensor — warming up...");
+  delay(2000);
+  Serial.println("Ready!");
+}
+
+void loop() {
+  bool motion = (digitalRead(PIR_PIN) == HIGH);
+  if (motion && !prevMotion) {
+    Serial.println(">>> MOTION DETECTED! <<<");
+    digitalWrite(LED_PIN, HIGH);
+  } else if (!motion && prevMotion) {
+    Serial.println("Calm.");
+    digitalWrite(LED_PIN, LOW);
+  }
+  prevMotion = motion;
+  delay(100);
+}`,
+    components: [
+      { type: 'wokwi-pir-motion-sensor', id: 'pico-pir1', x: 430, y: 150, properties: {} },
+    ],
+    wires: [
+      { id: 'pp-vcc', start: { componentId: 'nano-rp2040', pinName: '3.3V'  }, end: { componentId: 'pico-pir1', pinName: 'VCC' }, color: '#ff4444' },
+      { id: 'pp-gnd', start: { componentId: 'nano-rp2040', pinName: 'GND.1' }, end: { componentId: 'pico-pir1', pinName: 'GND' }, color: '#000000' },
+      { id: 'pp-out', start: { componentId: 'nano-rp2040', pinName: 'GP14'  }, end: { componentId: 'pico-pir1', pinName: 'OUT' }, color: '#ffcc00' },
+    ],
+  },
+  {
+    id: 'pico-servo',
+    title: 'Pico: Servo Motor Sweep',
+    description: 'Sweep a servo motor from 0° to 180° and back on the Raspberry Pi Pico using GP15 (PWM).',
+    category: 'robotics',
+    difficulty: 'beginner',
+    boardType: 'raspberry-pi-pico',
+    boardFilter: 'raspberry-pi-pico',
+    code: `// Raspberry Pi Pico — Servo Motor Sweep
+// Wiring: PWM → GP15  |  V+ → 3.3V  |  GND → GND
+// Uses built-in Servo library
+
+#include <Servo.h>
+
+#define SERVO_PIN 15  // GPIO 15
+
+Servo myServo;
+
+void setup() {
+  myServo.attach(SERVO_PIN);
+  Serial.begin(115200);
+  Serial.println("Pico Servo Sweep");
+}
+
+void loop() {
+  for (int a = 0; a <= 180; a += 3) { myServo.write(a); delay(20); }
+  Serial.println("180°"); delay(300);
+  for (int a = 180; a >= 0; a -= 3) { myServo.write(a); delay(20); }
+  Serial.println("0°");   delay(300);
+}`,
+    components: [
+      { type: 'wokwi-servo', id: 'pico-sv1', x: 420, y: 150, properties: {} },
+    ],
+    wires: [
+      { id: 'psv-vcc', start: { componentId: 'nano-rp2040', pinName: '3.3V'  }, end: { componentId: 'pico-sv1', pinName: 'V+' }, color: '#ff4444' },
+      { id: 'psv-gnd', start: { componentId: 'nano-rp2040', pinName: 'GND.1' }, end: { componentId: 'pico-sv1', pinName: 'GND' }, color: '#000000' },
+      { id: 'psv-pwm', start: { componentId: 'nano-rp2040', pinName: 'GP15'  }, end: { componentId: 'pico-sv1', pinName: 'PWM' }, color: '#ff8800' },
+    ],
+  },
+  {
+    id: 'pico-ntc',
+    title: 'Pico: NTC Thermistor Temperature',
+    description: 'Read temperature from an NTC 10k thermistor on the Pico ADC pin A0 (GP26) using the Steinhart–Hart equation.',
+    category: 'sensors',
+    difficulty: 'intermediate',
+    boardType: 'raspberry-pi-pico',
+    boardFilter: 'raspberry-pi-pico',
+    code: `// Raspberry Pi Pico — NTC Thermistor Temperature Sensor
+// Wiring: OUT → A0 (GP26)  |  VCC → 3.3V  |  GND → GND
+
+#define NTC_PIN A0  // GP26 on Pico
+
+const float VCC        = 3.3;
+const float SERIES_R   = 10000.0;
+const float NOM_R      = 10000.0;
+const float B_COEFF    = 3950.0;
+const float NOM_TEMP_K = 298.15; // 25 °C
+
+float readTempC() {
+  int   raw = analogRead(NTC_PIN);
+  float v   = raw * (VCC / 1023.0);
+  float r   = SERIES_R * v / (VCC - v);
+  float st  = log(r / NOM_R) / B_COEFF + 1.0 / NOM_TEMP_K;
+  return (1.0 / st) - 273.15;
+}
+
+void setup() {
+  Serial.begin(115200);
+  analogReadResolution(10);
+  Serial.println("Pico NTC Temperature Sensor");
+}
+
+void loop() {
+  float tc = readTempC();
+  Serial.print("Temperature: "); Serial.print(tc, 2); Serial.println(" C");
+  delay(1000);
+}`,
+    components: [
+      { type: 'wokwi-ntc-temperature-sensor', id: 'pico-ntc1', x: 430, y: 150, properties: { temperature: '25' } },
+    ],
+    wires: [
+      { id: 'pnt-vcc', start: { componentId: 'nano-rp2040', pinName: '3.3V'  }, end: { componentId: 'pico-ntc1', pinName: 'VCC' }, color: '#ff4444' },
+      { id: 'pnt-gnd', start: { componentId: 'nano-rp2040', pinName: 'GND.1' }, end: { componentId: 'pico-ntc1', pinName: 'GND' }, color: '#000000' },
+      { id: 'pnt-out', start: { componentId: 'nano-rp2040', pinName: 'A0'    }, end: { componentId: 'pico-ntc1', pinName: 'OUT' }, color: '#aa44ff' },
+    ],
+  },
+  {
+    id: 'pico-joystick',
+    title: 'Pico: Analog Joystick',
+    description: 'Read X/Y axes and button press from an analog joystick. VERT on A0 (GP26), HORZ on A1 (GP27), SEL button on GP14.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'raspberry-pi-pico',
+    boardFilter: 'raspberry-pi-pico',
+    code: `// Raspberry Pi Pico — Analog Joystick
+// Wiring: VERT → A0(GP26)  |  HORZ → A1(GP27)  |  SEL → GP14
+//         VCC → 3.3V  |  GND → GND
+
+#define JOY_VERT A0   // GP26
+#define JOY_HORZ A1   // GP27
+#define JOY_BTN  14   // GP14
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(JOY_BTN, INPUT_PULLUP);
+  analogReadResolution(10);
+  Serial.println("Pico Analog Joystick ready");
+}
+
+void loop() {
+  int x   = analogRead(JOY_HORZ); // 0–1023
+  int y   = analogRead(JOY_VERT); // 0–1023
+  bool btn = (digitalRead(JOY_BTN) == LOW);
+
+  // Map to -100..+100
+  int xP = map(x, 0, 1023, -100, 100);
+  int yP = map(y, 0, 1023, -100, 100);
+
+  Serial.print("X="); Serial.print(xP);
+  Serial.print("  Y="); Serial.print(yP);
+  Serial.print("  BTN="); Serial.println(btn ? "PRESSED" : "---");
+  delay(150);
+}`,
+    components: [
+      { type: 'wokwi-analog-joystick', id: 'pico-joy1', x: 420, y: 140, properties: {} },
+    ],
+    wires: [
+      { id: 'pj-vcc',  start: { componentId: 'nano-rp2040', pinName: '3.3V'  }, end: { componentId: 'pico-joy1', pinName: 'VCC'  }, color: '#ff4444' },
+      { id: 'pj-gnd',  start: { componentId: 'nano-rp2040', pinName: 'GND.1' }, end: { componentId: 'pico-joy1', pinName: 'GND'  }, color: '#000000' },
+      { id: 'pj-vert', start: { componentId: 'nano-rp2040', pinName: 'A0'    }, end: { componentId: 'pico-joy1', pinName: 'VERT' }, color: '#22aaff' },
+      { id: 'pj-horz', start: { componentId: 'nano-rp2040', pinName: 'A1'    }, end: { componentId: 'pico-joy1', pinName: 'HORZ' }, color: '#22cc44' },
+      { id: 'pj-sel',  start: { componentId: 'nano-rp2040', pinName: 'GP14'  }, end: { componentId: 'pico-joy1', pinName: 'SEL'  }, color: '#aa44ff' },
+    ],
+  },
+
+  // ─── ESP32 — Sensor Examples ──────────────────────────────────────────────
+  {
+    id: 'esp32-dht22',
+    title: 'ESP32: DHT22 Temperature & Humidity',
+    description: 'Read temperature and humidity from a DHT22 sensor on GPIO4 of the ESP32. Requires Adafruit DHT library.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'esp32',
+    boardFilter: 'esp32',
+    code: `// ESP32 — DHT22 Temperature & Humidity Sensor
+// Requires: Adafruit DHT sensor library
+// Wiring: DATA → D4  |  VCC → 3V3  |  GND → GND
+
+#include <DHT.h>
+
+#define DHT_PIN  4    // GPIO 4
+#define DHT_TYPE DHT22
+
+DHT dht(DHT_PIN, DHT_TYPE);
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+  delay(1000);
+  Serial.println("ESP32 DHT22 ready!");
+}
+
+void loop() {
+  delay(2000);
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  if (isnan(h) || isnan(t)) {
+    Serial.println("DHT22 read error!");
+    return;
+  }
+  Serial.printf("Temp: %.1f C   Humidity: %.1f %%\\n", t, h);
+}`,
+    components: [
+      { type: 'wokwi-dht22', id: 'e32-dht1', x: 430, y: 150, properties: { temperature: '28', humidity: '65' } },
+    ],
+    wires: [
+      { id: 'e32d-vcc', start: { componentId: 'esp32', pinName: '3V3'  }, end: { componentId: 'e32-dht1', pinName: 'VCC' }, color: '#ff4444' },
+      { id: 'e32d-gnd', start: { componentId: 'esp32', pinName: 'GND.1'}, end: { componentId: 'e32-dht1', pinName: 'GND' }, color: '#000000' },
+      { id: 'e32d-sda', start: { componentId: 'esp32', pinName: 'D4'   }, end: { componentId: 'e32-dht1', pinName: 'SDA' }, color: '#22aaff' },
+    ],
+  },
+  {
+    id: 'esp32-hcsr04',
+    title: 'ESP32: HC-SR04 Ultrasonic Distance',
+    description: 'Measure distance with an HC-SR04 sensor on ESP32. TRIG on GPIO18, ECHO on GPIO19.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'esp32',
+    boardFilter: 'esp32',
+    code: `// ESP32 — HC-SR04 Ultrasonic Distance Sensor
+// Wiring: TRIG → D18  |  ECHO → D19  |  VCC → 3V3  |  GND → GND
+
+#define TRIG_PIN 18
+#define ECHO_PIN 19
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  Serial.println("ESP32 HC-SR04 ready");
+}
+
+long measureCm() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+  long d = pulseIn(ECHO_PIN, HIGH, 30000UL);
+  return (d == 0) ? -1 : (long)(d * 0.0343 / 2.0);
+}
+
+void loop() {
+  long cm = measureCm();
+  if (cm < 0) Serial.println("Out of range");
+  else        Serial.printf("Distance: %ld cm\\n", cm);
+  delay(500);
+}`,
+    components: [
+      { type: 'wokwi-hc-sr04', id: 'e32-sr1', x: 420, y: 150, properties: { distance: '40' } },
+    ],
+    wires: [
+      { id: 'e32s-vcc',  start: { componentId: 'esp32', pinName: '3V3'   }, end: { componentId: 'e32-sr1', pinName: 'VCC'  }, color: '#ff4444' },
+      { id: 'e32s-gnd',  start: { componentId: 'esp32', pinName: 'GND.1' }, end: { componentId: 'e32-sr1', pinName: 'GND'  }, color: '#000000' },
+      { id: 'e32s-trig', start: { componentId: 'esp32', pinName: 'D18'   }, end: { componentId: 'e32-sr1', pinName: 'TRIG' }, color: '#ff8800' },
+      { id: 'e32s-echo', start: { componentId: 'esp32', pinName: 'D19'   }, end: { componentId: 'e32-sr1', pinName: 'ECHO' }, color: '#22cc22' },
+    ],
+  },
+  {
+    id: 'esp32-mpu6050',
+    title: 'ESP32: MPU-6050 Accelerometer',
+    description: 'Read 3-axis acceleration and gyroscope data from an MPU-6050 over I2C (SDA=D21, SCL=D22). Requires the Adafruit MPU6050 library.',
+    category: 'sensors',
+    difficulty: 'intermediate',
+    boardType: 'esp32',
+    boardFilter: 'esp32',
+    code: `// ESP32 — MPU-6050 Accelerometer & Gyroscope (I2C)
+// Requires: Adafruit MPU6050, Adafruit Unified Sensor libraries
+// Wiring: SDA → D21  |  SCL → D22  |  VCC → 3V3  |  GND → GND
+
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
+
+Adafruit_MPU6050 mpu;
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin(21, 22); // SDA=21, SCL=22
+  if (!mpu.begin()) {
+    Serial.println("MPU6050 not found! Check wiring.");
+    while (true) delay(10);
+  }
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+  Serial.println("MPU6050 ready!");
+}
+
+void loop() {
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  Serial.printf("Accel X=%.2f Y=%.2f Z=%.2f m/s²\\n",
+    a.acceleration.x, a.acceleration.y, a.acceleration.z);
+  Serial.printf("Gyro  X=%.2f Y=%.2f Z=%.2f rad/s\\n",
+    g.gyro.x, g.gyro.y, g.gyro.z);
+  Serial.printf("Temp: %.1f C\\n---\\n", temp.temperature);
+  delay(500);
+}`,
+    components: [
+      { type: 'wokwi-mpu6050', id: 'e32-mpu1', x: 420, y: 150, properties: {} },
+    ],
+    wires: [
+      { id: 'e32m-vcc', start: { componentId: 'esp32', pinName: '3V3'   }, end: { componentId: 'e32-mpu1', pinName: 'VCC' }, color: '#ff4444' },
+      { id: 'e32m-gnd', start: { componentId: 'esp32', pinName: 'GND.1' }, end: { componentId: 'e32-mpu1', pinName: 'GND' }, color: '#000000' },
+      { id: 'e32m-sda', start: { componentId: 'esp32', pinName: 'D21'   }, end: { componentId: 'e32-mpu1', pinName: 'SDA' }, color: '#22aaff' },
+      { id: 'e32m-scl', start: { componentId: 'esp32', pinName: 'D22'   }, end: { componentId: 'e32-mpu1', pinName: 'SCL' }, color: '#ff8800' },
+    ],
+  },
+  {
+    id: 'esp32-pir',
+    title: 'ESP32: PIR Motion Detector',
+    description: 'Detect motion with a PIR sensor on GPIO5 of the ESP32. Logs events to Serial with timestamps.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'esp32',
+    boardFilter: 'esp32',
+    code: `// ESP32 — PIR Motion Sensor
+// Wiring: OUT → D5  |  VCC → 3V3  |  GND → GND
+
+#define PIR_PIN 5
+#define LED_PIN 2   // built-in blue LED on ESP32 DevKit
+
+bool prevMotion = false;
+unsigned long detections = 0;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(PIR_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.println("ESP32 PIR Motion Sensor");
+  delay(2000); // warm-up
+  Serial.println("Ready!");
+}
+
+void loop() {
+  bool motion = (digitalRead(PIR_PIN) == HIGH);
+  if (motion && !prevMotion) {
+    detections++;
+    Serial.printf("[%lu ms] Motion detected! (count: %lu)\\n",
+                  millis(), detections);
+    digitalWrite(LED_PIN, HIGH);
+  } else if (!motion && prevMotion) {
+    Serial.println("No motion.");
+    digitalWrite(LED_PIN, LOW);
+  }
+  prevMotion = motion;
+  delay(100);
+}`,
+    components: [
+      { type: 'wokwi-pir-motion-sensor', id: 'e32-pir1', x: 430, y: 150, properties: {} },
+    ],
+    wires: [
+      { id: 'e32p-vcc', start: { componentId: 'esp32', pinName: '3V3'   }, end: { componentId: 'e32-pir1', pinName: 'VCC' }, color: '#ff4444' },
+      { id: 'e32p-gnd', start: { componentId: 'esp32', pinName: 'GND.1' }, end: { componentId: 'e32-pir1', pinName: 'GND' }, color: '#000000' },
+      { id: 'e32p-out', start: { componentId: 'esp32', pinName: 'D5'    }, end: { componentId: 'e32-pir1', pinName: 'OUT' }, color: '#ffcc00' },
+    ],
+  },
+  {
+    id: 'esp32-servo',
+    title: 'ESP32: Servo Motor + Potentiometer',
+    description: 'Control a servo motor angle directly with a potentiometer. The servo follows the pot position in real time.',
+    category: 'robotics',
+    difficulty: 'beginner',
+    boardType: 'esp32',
+    boardFilter: 'esp32',
+    code: `// ESP32 — Servo controlled by Potentiometer
+// Servo: PWM → D13  |  V+ → 3V3  |  GND → GND
+// Pot  : SIG → D34  |  VCC → 3V3  |  GND → GND
+
+#include <ESP32Servo.h>
+
+#define SERVO_PIN 13
+#define POT_PIN   34  // input-only GPIO (ADC)
+
+Servo myServo;
+
+void setup() {
+  Serial.begin(115200);
+  myServo.attach(SERVO_PIN, 500, 2400); // standard servo pulse range
+  Serial.println("ESP32 Servo + Pot control");
+}
+
+void loop() {
+  int raw   = analogRead(POT_PIN);         // 0–4095 (12-bit ADC)
+  int angle = map(raw, 0, 4095, 0, 180);
+  myServo.write(angle);
+  Serial.printf("Pot: %4d  Angle: %3d deg\\n", raw, angle);
+  delay(20);
+}`,
+    components: [
+      { type: 'wokwi-servo',       id: 'e32-sv1',  x: 420, y: 140, properties: {} },
+      { type: 'wokwi-potentiometer', id: 'e32-pot1', x: 420, y: 280, properties: {} },
+    ],
+    wires: [
+      { id: 'e32sv-vcc',  start: { componentId: 'esp32',    pinName: '3V3'   }, end: { componentId: 'e32-sv1',  pinName: 'V+'  }, color: '#ff4444' },
+      { id: 'e32sv-gnd',  start: { componentId: 'esp32',    pinName: 'GND.1' }, end: { componentId: 'e32-sv1',  pinName: 'GND' }, color: '#000000' },
+      { id: 'e32sv-pwm',  start: { componentId: 'esp32',    pinName: 'D13'   }, end: { componentId: 'e32-sv1',  pinName: 'PWM' }, color: '#ff8800' },
+      { id: 'e32pt-vcc',  start: { componentId: 'esp32',    pinName: '3V3'   }, end: { componentId: 'e32-pot1', pinName: 'VCC' }, color: '#ff4444' },
+      { id: 'e32pt-gnd',  start: { componentId: 'esp32',    pinName: 'GND.1' }, end: { componentId: 'e32-pot1', pinName: 'GND' }, color: '#000000' },
+      { id: 'e32pt-sig',  start: { componentId: 'esp32',    pinName: 'D34'   }, end: { componentId: 'e32-pot1', pinName: 'SIG' }, color: '#aa44ff' },
+    ],
+  },
+  {
+    id: 'esp32-joystick',
+    title: 'ESP32: Analog Joystick',
+    description: 'Read X/Y axes and button click from an analog joystick on the ESP32. X on D35, Y on D34, button on GPIO15.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'esp32',
+    boardFilter: 'esp32',
+    code: `// ESP32 — Analog Joystick
+// Wiring: HORZ → D35 | VERT → D34 | SEL → D15
+//         VCC → 3V3  | GND → GND
+
+#define JOY_HORZ 35  // input-only ADC pin
+#define JOY_VERT 34  // input-only ADC pin
+#define JOY_BTN  15  // GPIO with pull-up
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(JOY_BTN, INPUT_PULLUP);
+  Serial.println("ESP32 Joystick ready");
+}
+
+void loop() {
+  int x    = analogRead(JOY_HORZ); // 0–4095
+  int y    = analogRead(JOY_VERT); // 0–4095
+  bool btn = (digitalRead(JOY_BTN) == LOW);
+
+  int xPct = map(x, 0, 4095, -100, 100);
+  int yPct = map(y, 0, 4095, -100, 100);
+
+  Serial.printf("X=%4d(%4d%%) Y=%4d(%4d%%) BTN=%s\\n",
+    x, xPct, y, yPct, btn ? "PRESSED" : "---");
+  delay(100);
+}`,
+    components: [
+      { type: 'wokwi-analog-joystick', id: 'e32-joy1', x: 420, y: 140, properties: {} },
+    ],
+    wires: [
+      { id: 'e32j-vcc',  start: { componentId: 'esp32', pinName: '3V3'   }, end: { componentId: 'e32-joy1', pinName: 'VCC'  }, color: '#ff4444' },
+      { id: 'e32j-gnd',  start: { componentId: 'esp32', pinName: 'GND.1' }, end: { componentId: 'e32-joy1', pinName: 'GND'  }, color: '#000000' },
+      { id: 'e32j-vert', start: { componentId: 'esp32', pinName: 'D34'   }, end: { componentId: 'e32-joy1', pinName: 'VERT' }, color: '#22aaff' },
+      { id: 'e32j-horz', start: { componentId: 'esp32', pinName: 'D35'   }, end: { componentId: 'e32-joy1', pinName: 'HORZ' }, color: '#22cc44' },
+      { id: 'e32j-sel',  start: { componentId: 'esp32', pinName: 'D15'   }, end: { componentId: 'e32-joy1', pinName: 'SEL'  }, color: '#aa44ff' },
+    ],
+  },
+
+  // ─── ESP32-C3 — Sensor Examples ───────────────────────────────────────────
+  {
+    id: 'c3-dht22',
+    title: 'ESP32-C3: DHT22 Temperature & Humidity',
+    description: 'Read temperature and humidity with a DHT22 sensor on GPIO3 of the ESP32-C3 RISC-V board.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'esp32-c3',
+    boardFilter: 'esp32-c3',
+    code: `// ESP32-C3 — DHT22 Temperature & Humidity Sensor
+// Requires: Adafruit DHT sensor library
+// Wiring: DATA → GPIO3  |  VCC → 3V3  |  GND → GND
+
+#include <DHT.h>
+
+#define DHT_PIN  3    // GPIO 3
+#define DHT_TYPE DHT22
+
+DHT dht(DHT_PIN, DHT_TYPE);
+
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
+  delay(1000);
+  Serial.println("ESP32-C3 DHT22 ready!");
+}
+
+void loop() {
+  delay(2000);
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  if (isnan(h) || isnan(t)) {
+    Serial.println("DHT22 read error!");
+    return;
+  }
+  Serial.printf("Temp: %.1f C   Humidity: %.1f %%\\n", t, h);
+}`,
+    components: [
+      { type: 'wokwi-dht22', id: 'c3-dht1', x: 430, y: 150, properties: { temperature: '26', humidity: '58' } },
+    ],
+    wires: [
+      { id: 'c3d-vcc', start: { componentId: 'esp32-c3', pinName: '3V3'   }, end: { componentId: 'c3-dht1', pinName: 'VCC' }, color: '#ff4444' },
+      { id: 'c3d-gnd', start: { componentId: 'esp32-c3', pinName: 'GND.9' }, end: { componentId: 'c3-dht1', pinName: 'GND' }, color: '#000000' },
+      { id: 'c3d-sda', start: { componentId: 'esp32-c3', pinName: '3'     }, end: { componentId: 'c3-dht1', pinName: 'SDA' }, color: '#22aaff' },
+    ],
+  },
+  {
+    id: 'c3-hcsr04',
+    title: 'ESP32-C3: HC-SR04 Ultrasonic Distance',
+    description: 'Measure distance with an HC-SR04 sensor on the ESP32-C3. TRIG on GPIO5, ECHO on GPIO6.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'esp32-c3',
+    boardFilter: 'esp32-c3',
+    code: `// ESP32-C3 — HC-SR04 Ultrasonic Distance Sensor
+// Wiring: TRIG → GPIO5  |  ECHO → GPIO6  |  VCC → 3V3  |  GND → GND
+
+#define TRIG_PIN 5
+#define ECHO_PIN 6
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  Serial.println("ESP32-C3 HC-SR04 ready");
+}
+
+long measureCm() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+  long d = pulseIn(ECHO_PIN, HIGH, 30000UL);
+  return (d == 0) ? -1 : (long)(d * 0.0343 / 2.0);
+}
+
+void loop() {
+  long cm = measureCm();
+  if (cm < 0) Serial.println("Out of range");
+  else        Serial.printf("Distance: %ld cm\\n", cm);
+  delay(500);
+}`,
+    components: [
+      { type: 'wokwi-hc-sr04', id: 'c3-sr1', x: 420, y: 150, properties: { distance: '35' } },
+    ],
+    wires: [
+      { id: 'c3s-vcc',  start: { componentId: 'esp32-c3', pinName: '3V3'   }, end: { componentId: 'c3-sr1', pinName: 'VCC'  }, color: '#ff4444' },
+      { id: 'c3s-gnd',  start: { componentId: 'esp32-c3', pinName: 'GND.9' }, end: { componentId: 'c3-sr1', pinName: 'GND'  }, color: '#000000' },
+      { id: 'c3s-trig', start: { componentId: 'esp32-c3', pinName: '5'     }, end: { componentId: 'c3-sr1', pinName: 'TRIG' }, color: '#ff8800' },
+      { id: 'c3s-echo', start: { componentId: 'esp32-c3', pinName: '6'     }, end: { componentId: 'c3-sr1', pinName: 'ECHO' }, color: '#22cc22' },
+    ],
+  },
+  {
+    id: 'c3-pir',
+    title: 'ESP32-C3: PIR Motion Detector',
+    description: 'Detect motion with a PIR sensor on GPIO7 of the ESP32-C3. Prints detection events and count to Serial.',
+    category: 'sensors',
+    difficulty: 'beginner',
+    boardType: 'esp32-c3',
+    boardFilter: 'esp32-c3',
+    code: `// ESP32-C3 — PIR Motion Sensor
+// Wiring: OUT → GPIO7  |  VCC → 3V3  |  GND → GND
+
+#define PIR_PIN  7
+#define LED_PIN  8  // onboard LED on GPIO8
+
+bool prevMotion = false;
+unsigned long count = 0;
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(PIR_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
+  Serial.println("ESP32-C3 PIR Motion Sensor");
+  delay(2000); // warm-up
+  Serial.println("Ready!");
+}
+
+void loop() {
+  bool motion = (digitalRead(PIR_PIN) == HIGH);
+  if (motion && !prevMotion) {
+    count++;
+    Serial.printf("[%lu ms] MOTION! (count=%lu)\\n", millis(), count);
+    digitalWrite(LED_PIN, HIGH);
+  } else if (!motion && prevMotion) {
+    Serial.println("Still.");
+    digitalWrite(LED_PIN, LOW);
+  }
+  prevMotion = motion;
+  delay(100);
+}`,
+    components: [
+      { type: 'wokwi-pir-motion-sensor', id: 'c3-pir1', x: 430, y: 150, properties: {} },
+    ],
+    wires: [
+      { id: 'c3p-vcc', start: { componentId: 'esp32-c3', pinName: '3V3'   }, end: { componentId: 'c3-pir1', pinName: 'VCC' }, color: '#ff4444' },
+      { id: 'c3p-gnd', start: { componentId: 'esp32-c3', pinName: 'GND.9' }, end: { componentId: 'c3-pir1', pinName: 'GND' }, color: '#000000' },
+      { id: 'c3p-out', start: { componentId: 'esp32-c3', pinName: '7'     }, end: { componentId: 'c3-pir1', pinName: 'OUT' }, color: '#ffcc00' },
+    ],
+  },
+  {
+    id: 'c3-servo',
+    title: 'ESP32-C3: Servo Motor Sweep',
+    description: 'Sweep a servo motor from 0° to 180° and back on the ESP32-C3 using GPIO10 (PWM).',
+    category: 'robotics',
+    difficulty: 'beginner',
+    boardType: 'esp32-c3',
+    boardFilter: 'esp32-c3',
+    code: `// ESP32-C3 — Servo Motor Sweep
+// Wiring: PWM → GPIO10  |  V+ → 3V3  |  GND → GND
+// Uses ESP32Servo library
+
+#include <ESP32Servo.h>
+
+#define SERVO_PIN 10
+
+Servo myServo;
+
+void setup() {
+  Serial.begin(115200);
+  myServo.attach(SERVO_PIN, 500, 2400);
+  Serial.println("ESP32-C3 Servo Sweep");
+}
+
+void loop() {
+  for (int a = 0; a <= 180; a += 3) { myServo.write(a); delay(20); }
+  Serial.println("180 deg"); delay(300);
+  for (int a = 180; a >= 0; a -= 3) { myServo.write(a); delay(20); }
+  Serial.println("0 deg");   delay(300);
+}`,
+    components: [
+      { type: 'wokwi-servo', id: 'c3-sv1', x: 420, y: 150, properties: {} },
+    ],
+    wires: [
+      { id: 'c3sv-vcc', start: { componentId: 'esp32-c3', pinName: '3V3'   }, end: { componentId: 'c3-sv1', pinName: 'V+' }, color: '#ff4444' },
+      { id: 'c3sv-gnd', start: { componentId: 'esp32-c3', pinName: 'GND.9' }, end: { componentId: 'c3-sv1', pinName: 'GND' }, color: '#000000' },
+      { id: 'c3sv-pwm', start: { componentId: 'esp32-c3', pinName: '10'    }, end: { componentId: 'c3-sv1', pinName: 'PWM' }, color: '#ff8800' },
+    ],
+  },
 ];
 
 // Get examples by category
