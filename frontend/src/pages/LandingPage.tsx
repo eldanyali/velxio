@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { AppHeader } from '../components/layout/AppHeader';
+import { useSEO } from '../utils/useSEO';
 import raspberryPi3Svg from '../assets/Raspberry_Pi_3_illustration.svg';
 import './LandingPage.css';
 
@@ -434,6 +435,13 @@ const UserMenu: React.FC = () => {
 
 /* ── Component ────────────────────────────────────────── */
 export const LandingPage: React.FC = () => {
+  useSEO({
+    title: 'Velxio — Free Multi-Board Emulator | Arduino · ESP32 · RP2040 · RISC-V · Raspberry Pi',
+    description:
+      'Velxio is a free, open-source multi-board emulator. 19 boards across 5 CPU architectures: Arduino Uno/Mega/ATtiny (AVR8), ESP32/ESP32-S3 (Xtensa QEMU), ESP32-C3/CH32V003 (RISC-V), Raspberry Pi Pico (RP2040), Raspberry Pi 3 (Linux). 48+ components, no cloud.',
+    url: 'https://velxio.dev/',
+  });
+
   return (
     <div className="landing">
       <AppHeader />
@@ -451,13 +459,14 @@ export const LandingPage: React.FC = () => {
           <div className="hero-ctas">
             <Link to="/editor" className="cta-primary">
               <IcoZap />
-              Launch Editor
+              Try Simulator Free →
             </Link>
             <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" className="cta-secondary">
               <IcoGitHub />
               View on GitHub
             </a>
           </div>
+          <p className="hero-trust-line">No signup required · Runs 100% in your browser · Free &amp; open-source</p>
           
         </div>
         <div className="hero-right">

@@ -10,6 +10,10 @@ import { UserProfilePage } from './pages/UserProfilePage';
 import { ProjectPage } from './pages/ProjectPage';
 import { ProjectByIdPage } from './pages/ProjectByIdPage';
 import { AdminPage } from './pages/AdminPage';
+import { ArduinoSimulatorPage } from './pages/ArduinoSimulatorPage';
+import { ArduinoEmulatorPage } from './pages/ArduinoEmulatorPage';
+import { AtmegaSimulatorPage } from './pages/AtmegaSimulatorPage';
+import { ArduinoMegaSimulatorPage } from './pages/ArduinoMegaSimulatorPage';
 import { useAuthStore } from './store/useAuthStore';
 import './App.css';
 
@@ -31,6 +35,11 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/docs/:section" element={<DocsPage />} />
+        {/* SEO landing pages — keyword-targeted */}
+        <Route path="/arduino-simulator" element={<ArduinoSimulatorPage />} />
+        <Route path="/arduino-emulator" element={<ArduinoEmulatorPage />} />
+        <Route path="/atmega328p-simulator" element={<AtmegaSimulatorPage />} />
+        <Route path="/arduino-mega-simulator" element={<ArduinoMegaSimulatorPage />} />
         {/* Canonical project URL by ID */}
         <Route path="/project/:id" element={<ProjectByIdPage />} />
         {/* Legacy slug route — redirects to /project/:id */}

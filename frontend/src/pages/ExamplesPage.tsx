@@ -8,6 +8,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ExamplesGallery } from '../components/examples/ExamplesGallery';
 import { AppHeader } from '../components/layout/AppHeader';
+import { useSEO } from '../utils/useSEO';
 import { useEditorStore } from '../store/useEditorStore';
 import { useSimulatorStore } from '../store/useSimulatorStore';
 import { useVfsStore } from '../store/useVfsStore';
@@ -16,6 +17,13 @@ import type { ExampleProject } from '../data/examples';
 import type { BoardKind } from '../types/board';
 
 export const ExamplesPage: React.FC = () => {
+  useSEO({
+    title: 'Arduino Simulator Examples — Run 18+ Sketches Instantly | Velxio',
+    description:
+      'Explore 18+ interactive Arduino examples with LEDs, sensors, displays, and games. Runs entirely in your browser — free, no install, no account required.',
+    url: 'https://velxio.dev/examples',
+  });
+
   const navigate = useNavigate();
   const { setCode } = useEditorStore();
   const { setComponents, setWires, setBoardType, activeBoardId, boards, addBoard, removeBoard, setActiveBoardId } = useSimulatorStore();

@@ -3,6 +3,7 @@
  */
 
 import React, { useRef, useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import { useSEO } from '../utils/useSEO';
 import { CodeEditor } from '../components/editor/CodeEditor';
 import { EditorToolbar } from '../components/editor/EditorToolbar';
 import { FileTabs } from '../components/editor/FileTabs';
@@ -45,6 +46,13 @@ const resizeHandleStyle: React.CSSProperties = {
 };
 
 export const EditorPage: React.FC = () => {
+  useSEO({
+    title: 'Multi-Board Simulator Editor — Arduino, ESP32, RP2040, RISC-V | Velxio',
+    description:
+      'Write, compile and simulate Arduino, ESP32, Raspberry Pi Pico, ESP32-C3, and Raspberry Pi 3 code in your browser. 19 boards, 5 CPU architectures, 48+ components. Free and open-source.',
+    url: 'https://velxio.dev/editor',
+  });
+
   const [editorWidthPct, setEditorWidthPct] = useState(45);
   const containerRef = useRef<HTMLDivElement>(null);
   const resizingRef = useRef(false);
