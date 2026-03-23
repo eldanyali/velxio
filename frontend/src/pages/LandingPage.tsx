@@ -440,6 +440,44 @@ export const LandingPage: React.FC = () => {
     description:
       'Velxio is a free, open-source multi-board emulator. 19 boards across 5 CPU architectures: Arduino Uno/Mega/ATtiny (AVR8), ESP32/ESP32-S3 (Xtensa QEMU), ESP32-C3/CH32V003 (RISC-V), Raspberry Pi Pico (RP2040), Raspberry Pi 3 (Linux). 48+ components, no cloud.',
     url: 'https://velxio.dev/',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Is Velxio free?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Velxio is completely free and open-source under the GNU AGPLv3 license. No account required, no cloud subscription. Run it at velxio.dev or self-host with one Docker command.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Does Velxio work offline?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Velxio can be self-hosted via Docker. Once running, the simulation engine works fully offline in the browser. Compilation requires the local arduino-cli backend.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What boards does Velxio support?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Velxio supports 19 boards across 5 CPU architectures: AVR8 (Arduino Uno, Nano, Mega 2560, ATtiny85, Leonardo, Pro Mini), RP2040 (Raspberry Pi Pico, Pico W), RISC-V (ESP32-C3, XIAO ESP32-C3, CH32V003), Xtensa QEMU (ESP32, ESP32-S3, ESP32-CAM, Nano ESP32), and ARM Cortex-A53 QEMU (Raspberry Pi 3B running Linux).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is Velxio a Wokwi alternative?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Velxio is a free, self-hosted alternative to Wokwi. It uses the same avr8js and wokwi-elements open-source libraries but runs entirely on your machine with no cloud dependency.',
+          },
+        },
+      ],
+    },
   });
 
   return (
