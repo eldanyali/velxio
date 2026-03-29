@@ -472,6 +472,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
     },
 
     removeBoard: (boardId: string) => {
+      const board = get().boards.find((b) => b.id === boardId);
       getBoardSimulator(boardId)?.stop();
       simulatorMap.delete(boardId);
       pinManagerMap.delete(boardId);
@@ -484,8 +485,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         const activeBoardId = s.activeBoardId === boardId
           ? (boards[0]?.id ?? null)
           : s.activeBoardId;
-        return { boards, activeBoardId };
+        // Remove wires connected to this board
+        const wires = s.wires.filter((w) =>
+          w.start.componentId !== boardId && w.end.componentId !== boardId
+        );
+        return { boards, activeBoardId, wires };
       });
+      // Clean up file group in editor store
+      if (board) {
+        useEditorStore.getState().deleteFileGroup(board.activeFileGroupId);
+      }
     },
 
     updateBoard: (boardId: string, updates: Partial<BoardInstance>) => {

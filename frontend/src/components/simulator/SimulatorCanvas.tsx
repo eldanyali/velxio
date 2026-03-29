@@ -46,6 +46,7 @@ export const SimulatorCanvas = () => {
     updateComponentState,
     addComponent,
     removeComponent,
+    removeBoard,
     updateComponent,
     serialMonitorOpen,
     toggleSerialMonitor,
@@ -103,6 +104,11 @@ export const SimulatorCanvas = () => {
   // Sensor control panel (shown instead of property dialog for sensor components during simulation)
   const [sensorControlComponentId, setSensorControlComponentId] = useState<string | null>(null);
   const [sensorControlMetadataId, setSensorControlMetadataId] = useState<string | null>(null);
+
+  // Board context menu (right-click)
+  const [boardContextMenu, setBoardContextMenu] = useState<{ boardId: string; x: number; y: number } | null>(null);
+  // Board removal confirmation dialog
+  const [boardToRemove, setBoardToRemove] = useState<string | null>(null);
 
   // Click vs drag detection
   const [clickStartTime, setClickStartTime] = useState<number>(0);
@@ -754,18 +760,23 @@ export const SimulatorCanvas = () => {
     return () => cleanups.forEach(fn => fn());
   }, [components, wires, boards]);
 
-  // Handle keyboard delete
+  // Handle keyboard delete for components and boards
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedComponentId) {
-        removeComponent(selectedComponentId);
-        setSelectedComponentId(null);
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedComponentId) {
+          removeComponent(selectedComponentId);
+          setSelectedComponentId(null);
+        } else if (activeBoardId && boards.length > 1) {
+          // Only allow deleting boards if more than one exists
+          setBoardToRemove(activeBoardId);
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedComponentId, removeComponent]);
+  }, [selectedComponentId, removeComponent, activeBoardId, boards.length]);
 
   // Handle component selection from modal
   const handleSelectComponent = (metadata: ComponentMetadata) => {
@@ -1400,6 +1411,11 @@ export const SimulatorCanvas = () => {
                   setDraggedComponentId(`__board__:${board.id}`);
                   setDragOffset({ x: world.x - board.x, y: world.y - board.y });
                 }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setBoardContextMenu({ boardId: board.id, x: e.clientX, y: e.clientY });
+                }}
                 onPinClick={handlePinClick}
                 zoom={zoom}
               />
@@ -1477,6 +1493,101 @@ export const SimulatorCanvas = () => {
           void newBoardId;
         }}
       />
+
+      {/* Board right-click context menu */}
+      {boardContextMenu && (() => {
+        const board = boards.find((b) => b.id === boardContextMenu.boardId);
+        const label = board ? BOARD_KIND_LABELS[board.boardKind] : 'Board';
+        const connectedWires = wires.filter(
+          (w) => w.start.componentId === boardContextMenu.boardId || w.end.componentId === boardContextMenu.boardId
+        ).length;
+        return (
+          <>
+            <div
+              style={{ position: 'fixed', inset: 0, zIndex: 9998 }}
+              onClick={() => setBoardContextMenu(null)}
+              onContextMenu={(e) => { e.preventDefault(); setBoardContextMenu(null); }}
+            />
+            <div
+              style={{
+                position: 'fixed',
+                left: boardContextMenu.x,
+                top: boardContextMenu.y,
+                background: '#252526',
+                border: '1px solid #3c3c3c',
+                borderRadius: 6,
+                padding: '4px 0',
+                zIndex: 9999,
+                minWidth: 180,
+                boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                fontSize: 13,
+              }}
+            >
+              <div style={{ padding: '6px 14px', color: '#888', fontSize: 11, borderBottom: '1px solid #3c3c3c', marginBottom: 2 }}>
+                {label}
+              </div>
+              <button
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  width: '100%', padding: '7px 14px', background: 'none', border: 'none',
+                  color: boards.length <= 1 ? '#555' : '#e06c75', cursor: boards.length <= 1 ? 'default' : 'pointer',
+                  fontSize: 13, textAlign: 'left',
+                }}
+                disabled={boards.length <= 1}
+                title={boards.length <= 1 ? 'Cannot remove the last board' : undefined}
+                onMouseEnter={(e) => { if (boards.length > 1) (e.currentTarget.style.background = '#2a2d2e'); }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+                onClick={() => {
+                  setBoardContextMenu(null);
+                  setBoardToRemove(boardContextMenu.boardId);
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+                Remove board
+                {connectedWires > 0 && <span style={{ color: '#888', fontSize: 11 }}>({connectedWires} wire{connectedWires > 1 ? 's' : ''})</span>}
+              </button>
+            </div>
+          </>
+        );
+      })()}
+
+      {/* Board removal confirmation dialog */}
+      {boardToRemove && (() => {
+        const board = boards.find((b) => b.id === boardToRemove);
+        const label = board ? BOARD_KIND_LABELS[board.boardKind] : 'Board';
+        const connectedWires = wires.filter(
+          (w) => w.start.componentId === boardToRemove || w.end.componentId === boardToRemove
+        ).length;
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ background: '#1e1e1e', border: '1px solid #3c3c3c', borderRadius: 8, padding: '20px 24px', maxWidth: 380, boxShadow: '0 8px 32px rgba(0,0,0,0.6)' }}>
+              <h3 style={{ margin: '0 0 10px', color: '#e0e0e0', fontSize: 15 }}>Remove {label}?</h3>
+              <p style={{ margin: '0 0 16px', color: '#999', fontSize: 13, lineHeight: 1.5 }}>
+                This will remove the board from the workspace
+                {connectedWires > 0 && <> and <strong style={{ color: '#e06c75' }}>{connectedWires} connected wire{connectedWires > 1 ? 's' : ''}</strong></>}
+                . This action cannot be undone.
+              </p>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => setBoardToRemove(null)}
+                  style={{ padding: '6px 16px', background: '#333', border: '1px solid #555', borderRadius: 4, color: '#ccc', cursor: 'pointer', fontSize: 13 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => { removeBoard(boardToRemove); setBoardToRemove(null); }}
+                  style={{ padding: '6px 16px', background: '#e06c75', border: 'none', borderRadius: 4, color: '#fff', cursor: 'pointer', fontSize: 13 }}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
     </div>
   );
