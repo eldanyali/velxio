@@ -625,6 +625,7 @@ export const Velxio2Page: React.FC = () => {
             <Link to="/esp32-simulator">ESP32 Simulator</Link>
             <Link to="/raspberry-pi-pico-simulator">RP2040 Simulator</Link>
             <Link to="/raspberry-pi-simulator">Pi 3 Simulator</Link>
+            <Link to="/about">About</Link>
           </div>
         </div>
       </main>
