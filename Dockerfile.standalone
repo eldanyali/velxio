@@ -160,6 +160,11 @@ COPY --from=espidf-builder /root/.espressif /root/.espressif
 ENV IDF_PATH=/opt/esp-idf
 ENV IDF_TOOLS_PATH=/root/.espressif
 
+# Install ESP-IDF Python dependencies using the final image's Python
+# The requirements.txt has version constraints required by ESP-IDF 4.4.x
+RUN grep -v 'esp-windows-curses' /opt/esp-idf/requirements.txt \
+    | pip install --no-cache-dir -r /dev/stdin
+
 EXPOSE 80
 
 CMD ["/app/entrypoint.sh"]
