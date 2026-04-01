@@ -22,7 +22,7 @@ arduino-cli core install rp2040:rp2040 2>/dev/null || true
 # If ESP-IDF is not available, fall back to arduino-cli ESP32 core.
 if [ -f /opt/esp-idf/export.sh ]; then
     echo "🔧 Sourcing ESP-IDF environment..."
-    . /opt/esp-idf/export.sh
+    . /opt/esp-idf/export.sh || true
     echo "✅ ESP-IDF $(cat /opt/esp-idf/version.txt 2>/dev/null || echo 'unknown') ready"
 else
     echo "⚠️  ESP-IDF not found — falling back to arduino-cli for ESP32"
