@@ -419,6 +419,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
             );
           }
         };
+        bridge.onWifiStatus = (ws) => {
+          set((s) => ({
+            boards: s.boards.map((b) => b.id === id ? { ...b, wifiStatus: ws } : b),
+          }));
+        };
+        bridge.onBleStatus = (bs) => {
+          set((s) => ({
+            boards: s.boards.map((b) => b.id === id ? { ...b, bleStatus: bs } : b),
+          }));
+        };
         esp32BridgeMap.set(id, bridge);
         // Provide a shim so PartSimulationRegistry components (DHT22, etc.)
         // can call setPinState / access pinManager on ESP32 boards.
@@ -472,6 +482,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
     },
 
     removeBoard: (boardId: string) => {
+      const board = get().boards.find((b) => b.id === boardId);
       getBoardSimulator(boardId)?.stop();
       simulatorMap.delete(boardId);
       pinManagerMap.delete(boardId);
@@ -484,8 +495,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         const activeBoardId = s.activeBoardId === boardId
           ? (boards[0]?.id ?? null)
           : s.activeBoardId;
-        return { boards, activeBoardId };
+        // Remove wires connected to this board
+        const wires = s.wires.filter((w) =>
+          w.start.componentId !== boardId && w.end.componentId !== boardId
+        );
+        return { boards, activeBoardId, wires };
       });
+      // Clean up file group in editor store
+      if (board) {
+        useEditorStore.getState().deleteFileGroup(board.activeFileGroupId);
+      }
     },
 
     updateBoard: (boardId: string, updates: Partial<BoardInstance>) => {
@@ -529,11 +548,14 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       if (!board) return;
 
       if (isEsp32Kind(board.boardKind)) {
-        // Xtensa ESP32 boards: program is base64-encoded .bin — send to QEMU via bridge
+        // All ESP32 boards (Xtensa + RISC-V C3): send firmware to QEMU via bridge.
+        // Note: isEsp32Kind() includes C3 boards, so they route through Esp32Bridge
+        // for full WiFi/BLE emulation via qemu-system-riscv32.
         const esp32Bridge = getEsp32Bridge(boardId);
         if (esp32Bridge) esp32Bridge.loadFirmware(program);
       } else if (isRiscVEsp32Kind(board.boardKind)) {
-        // RISC-V ESP32-C3 boards: parse merged flash image and load into browser emulator
+        // Fallback: browser-only RV32IMC emulation (no WiFi/BLE support).
+        // Currently unreachable because isEsp32Kind() above includes C3 boards.
         const sim = getBoardSimulator(boardId);
         if (sim instanceof Esp32C3Simulator) {
           try {
@@ -636,6 +658,23 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
             }
           }
           esp32Bridge.setSensors(sensors);
+
+          // Auto-detect WiFi usage in sketch files
+          const editorFiles = useEditorStore.getState().files;
+          const hasWifi = editorFiles.some(f =>
+            f.content.includes('#include <WiFi.h>') ||
+            f.content.includes('#include <esp_wifi.h>') ||
+            f.content.includes('#include "WiFi.h"') ||
+            f.content.includes('WiFi.begin(')
+          );
+          esp32Bridge.wifiEnabled = hasWifi;
+
+          // Ensure firmware is loaded into the bridge (handles page-refresh case
+          // where _pendingFirmware is lost but compiledProgram is still in store).
+          if (!esp32Bridge.hasFirmware() && board.compiledProgram) {
+            esp32Bridge.loadFirmware(board.compiledProgram);
+          }
+
           esp32Bridge.connect();
         }
       } else {
