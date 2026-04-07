@@ -266,11 +266,31 @@ export const DynamicComponent: React.FC<DynamicComponentProps> = ({
           marginTop: '4px',
           color: '#666',
           pointerEvents: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '4px',
         }}
       >
         {properties.pin !== undefined
           ? `Pin ${properties.pin}`
           : metadata.name}
+        {properties.protocol && (
+          <span
+            style={{
+              fontSize: '9px',
+              padding: '1px 4px',
+              borderRadius: '3px',
+              backgroundColor: properties.protocol === 'spi' ? '#e67e22' : '#3498db',
+              color: '#fff',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              lineHeight: '1.2',
+            }}
+          >
+            {String(properties.protocol)}
+          </span>
+        )}
       </div>
     </div>
   );

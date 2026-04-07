@@ -22,6 +22,7 @@ import { PartSimulationRegistry } from './PartSimulationRegistry';
 import { VirtualDS1307, VirtualBMP280, VirtualDS3231, VirtualPCF8574 } from '../I2CBusManager';
 import type { I2CDevice } from '../I2CBusManager';
 import { registerSensorUpdate, unregisterSensorUpdate } from '../SensorUpdateRegistry';
+import { useSimulatorStore } from '../../store/useSimulatorStore';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -37,29 +38,23 @@ function removeI2CDevice(simulator: any, address: number): void {
 // ─── SSD1306 OLED ────────────────────────────────────────────────────────────
 
 /**
- * Virtual SSD1306 OLED — full I2C command & GDDRAM decoder.
+ * SSD1306Core — shared GDDRAM buffer, command decoder, and rendering logic.
  *
- * Supported features:
- *  - Control byte  0x00 = command stream, 0x40 = GDDRAM data stream
+ * The SSD1306 command set is identical for I2C and SPI; only the transport
+ * differs.  This core is used by both VirtualSSD1306 (I2C) and
+ * attachSSD1306SPI (SPI).
+ *
+ * Supported commands:
  *  - 0x20 Set Memory Addressing Mode (horizontal / vertical / page)
  *  - 0x21 Set Column Address
  *  - 0x22 Set Page Address
  *  - 0x40–0x7F Set Display Start Line
  *  - 0xAF Display ON / 0xAE Display OFF
- *  - All other single-byte and parameterized commands are parsed but ignored
- *    (contrast, charge pump, COM pin config, etc.)
- *
- * On STOP the 1024-byte framebuffer is written to element.buffer so that
- * wokwi-ssd1306 renders the pixels.
+ *  - All other parameterized commands are parsed but ignored.
  */
-class VirtualSSD1306 implements I2CDevice {
-  address: number;
-
+class SSD1306Core {
   /** 1024-byte GDDRAM: 8 pages × 128 columns. Each byte = 8 vertical pixels. */
   readonly buffer = new Uint8Array(128 * 8);
-
-  private ctrlByte = true;     // waiting for control byte after I2C address
-  private isData   = false;    // true → GDDRAM write; false → command stream
 
   // GDDRAM cursor
   private col      = 0;
@@ -72,14 +67,10 @@ class VirtualSSD1306 implements I2CDevice {
 
   // Multi-byte command accumulation
   private cmdBuf: number[]  = [];
-  private cmdWant           = 0;  // remaining param bytes for current command
-
-  constructor(address: number, private element: HTMLElement) {
-    this.address = address;
-  }
+  private cmdWant           = 0;
 
   /** How many parameter bytes does this command require? */
-  private static cmdParams(cmd: number): number {
+  static cmdParams(cmd: number): number {
     if (cmd === 0x20 || cmd === 0x81 || cmd === 0x8D ||
         cmd === 0xA8 || cmd === 0xD3 || cmd === 0xD5 ||
         cmd === 0xD8 || cmd === 0xD9 || cmd === 0xDA || cmd === 0xDB) return 1;
@@ -87,35 +78,23 @@ class VirtualSSD1306 implements I2CDevice {
     return 0;
   }
 
-  writeByte(value: number): boolean {
-    // ── Control byte (first after I2C address) ──────────────────────────
-    if (this.ctrlByte) {
-      this.isData   = (value & 0x40) !== 0;
-      this.ctrlByte = false;
-      this.cmdBuf   = [];
-      this.cmdWant  = 0;
-      return true;
-    }
+  /** Write a data byte to GDDRAM and advance cursor. */
+  writeData(value: number): void {
+    this.buffer[this.page * 128 + this.col] = value;
+    this.advanceCursor();
+  }
 
-    // ── GDDRAM write ────────────────────────────────────────────────────
-    if (this.isData) {
-      this.buffer[this.page * 128 + this.col] = value;
-      this.advanceCursor();
-      return true;
-    }
-
-    // ── Command stream ──────────────────────────────────────────────────
+  /** Feed a command or parameter byte. Multi-byte commands are accumulated. */
+  writeCommand(value: number): void {
     if (this.cmdWant > 0) {
       this.cmdBuf.push(value);
       this.cmdWant--;
       if (this.cmdWant === 0) this.applyCmd();
-      return true;
+      return;
     }
-
-    this.cmdBuf   = [value];
-    this.cmdWant  = VirtualSSD1306.cmdParams(value);
+    this.cmdBuf  = [value];
+    this.cmdWant = SSD1306Core.cmdParams(value);
     if (this.cmdWant === 0) this.applyCmd();
-    return true;
   }
 
   private applyCmd(): void {
@@ -133,8 +112,7 @@ class VirtualSSD1306 implements I2CDevice {
         this.page      = this.pageStart;
         break;
       default:
-        // Display start line 0x40–0x7F
-        if (cmd >= 0x40 && cmd <= 0x7F) { /* start line — visual, skip */ }
+        if (cmd >= 0x40 && cmd <= 0x7F) { /* display start line — visual, skip */ }
         break;
     }
   }
@@ -160,28 +138,17 @@ class VirtualSSD1306 implements I2CDevice {
     }
   }
 
-  readByte(): number { return 0xFF; }
-
-  stop(): void {
-    this.ctrlByte = true;
-    this.syncElement();
-  }
-
   /**
    * Push the 1-bit GDDRAM buffer to the wokwi-ssd1306 web component.
    *
    * wokwi-ssd1306 API:
    *   - `element.imageData` — a 128×64 ImageData (RGBA, 4 bytes/pixel)
    *   - `element.redraw()` — flushes imageData to the internal canvas
-   *
-   * GDDRAM layout: 8 pages × 128 columns.
-   * Each byte holds 8 vertical pixels; bit 0 = topmost pixel in the page.
    */
-  private syncElement(): void {
-    const el = this.element as any;
+  syncElement(element: HTMLElement): void {
+    const el = element as any;
     if (!el) return;
 
-    // Obtain the ImageData object (initialised by wokwi-ssd1306 constructor)
     let imgData: ImageData | undefined = el.imageData;
     if (!imgData || imgData.width !== 128 || imgData.height !== 64) {
       try {
@@ -191,16 +158,15 @@ class VirtualSSD1306 implements I2CDevice {
       }
     }
 
-    const px = imgData.data; // Uint8ClampedArray, RGBA
+    const px = imgData.data;
 
     for (let page = 0; page < 8; page++) {
       for (let col = 0; col < 128; col++) {
         const byte = this.buffer[page * 128 + col];
         for (let bit = 0; bit < 8; bit++) {
-          const row  = page * 8 + bit;
-          const lit  = (byte >> bit) & 1;
-          const idx  = (row * 128 + col) * 4;
-          // Lit pixel: bright cyan-white typical of OLED; off pixel: full black
+          const row = page * 8 + bit;
+          const lit = (byte >> bit) & 1;
+          const idx = (row * 128 + col) * 4;
           px[idx]     = lit ? 200 : 0;   // R
           px[idx + 1] = lit ? 230 : 0;   // G
           px[idx + 2] = lit ? 255 : 0;   // B
@@ -210,14 +176,122 @@ class VirtualSSD1306 implements I2CDevice {
     }
 
     el.imageData = imgData;
-    if (typeof el.redraw === 'function') {
-      el.redraw();
-    }
+    if (typeof el.redraw === 'function') el.redraw();
   }
 }
 
+/**
+ * VirtualSSD1306 — I2C wrapper around SSD1306Core.
+ *
+ * Handles the I2C control byte (0x00 = command stream, 0x40 = data stream)
+ * and delegates command/data writes to the shared core.
+ */
+class VirtualSSD1306 implements I2CDevice {
+  address: number;
+  private readonly core = new SSD1306Core();
+
+  private ctrlByte = true;
+  private isData   = false;
+
+  constructor(address: number, private element: HTMLElement) {
+    this.address = address;
+  }
+
+  /** Expose core buffer for tests. */
+  get buffer(): Uint8Array { return this.core.buffer; }
+
+  writeByte(value: number): boolean {
+    if (this.ctrlByte) {
+      this.isData   = (value & 0x40) !== 0;
+      this.ctrlByte = false;
+      return true;
+    }
+    if (this.isData) {
+      this.core.writeData(value);
+    } else {
+      this.core.writeCommand(value);
+    }
+    return true;
+  }
+
+  readByte(): number { return 0xFF; }
+
+  stop(): void {
+    this.ctrlByte = true;
+    this.core.syncElement(this.element);
+  }
+}
+
+/**
+ * Attach SSD1306 in SPI mode — intercepts the AVR SPI bus.
+ *
+ * Follows the same pattern as ILI9341 (ComplexParts.ts): hook spi.onByte,
+ * track DC pin state via PinManager, and render GDDRAM to the element.
+ */
+function attachSSD1306SPI(
+  element: HTMLElement,
+  simulator: any,
+  getPin: (name: string) => number | null,
+): () => void {
+  const pinManager = simulator.pinManager;
+  const spi = simulator.spi;
+  if (!pinManager || !spi) return () => {};
+
+  const core = new SSD1306Core();
+  let dcState = false;
+  const unsubs: (() => void)[] = [];
+
+  // Track DC pin (LOW = command, HIGH = data)
+  const pinDC = getPin('DC');
+  if (pinDC !== null) {
+    unsubs.push(
+      pinManager.onPinChange(pinDC, (_: number, s: boolean) => { dcState = s; }),
+    );
+  }
+
+  // Throttle rendering to ~60 fps
+  let dirty = false;
+  let rafId: number | null = null;
+  const scheduleSync = () => {
+    if (rafId !== null) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      if (dirty) { core.syncElement(element); dirty = false; }
+    });
+  };
+
+  // Hook AVR SPI bus (onByte + completeTransfer)
+  const prevOnByte = spi.onByte;
+  spi.onByte = (value: number) => {
+    if (!dcState) {
+      core.writeCommand(value);
+    } else {
+      core.writeData(value);
+      dirty = true;
+      scheduleSync();
+    }
+    spi.completeTransfer(0xFF);
+  };
+
+  return () => {
+    spi.onByte = prevOnByte;
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    unsubs.forEach(u => u());
+  };
+}
+
 PartSimulationRegistry.register('ssd1306', {
-  attachEvents: (element, simulator, _getPin) => {
+  attachEvents: (element, simulator, getPin, componentId) => {
+    // Read the protocol property from the component in the store
+    const { components } = useSimulatorStore.getState();
+    const comp = components.find(c => c.id === componentId);
+    const protocol = (comp?.properties?.protocol as string) ?? 'i2c';
+
+    if (protocol === 'spi') {
+      return attachSSD1306SPI(element, simulator, getPin);
+    }
+
+    // I2C mode (default)
     const sim = simulator as any;
     if (typeof sim.addI2CDevice !== 'function') return () => {};
     const device = new VirtualSSD1306(0x3C, element);

@@ -1533,6 +1533,14 @@ export const SimulatorCanvas = () => {
               removeComponent(id);
               setShowPropertyDialog(false);
             }}
+            onPropertyChange={(id, propName, value) => {
+              const comp = components.find((c) => c.id === id);
+              if (comp) {
+                updateComponent(id, {
+                  properties: { ...comp.properties, [propName]: value },
+                });
+              }
+            }}
           />
         );
       })()}

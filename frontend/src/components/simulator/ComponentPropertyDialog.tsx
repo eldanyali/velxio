@@ -18,6 +18,7 @@ interface ComponentPropertyDialogProps {
   onClose: () => void;
   onRotate: (componentId: string) => void;
   onDelete: (componentId: string) => void;
+  onPropertyChange?: (componentId: string, propertyName: string, value: unknown) => void;
 }
 
 export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = ({
@@ -29,6 +30,7 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
   onClose,
   onRotate,
   onDelete,
+  onPropertyChange,
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
@@ -139,6 +141,36 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
               ? `A${componentProperties.pin - 14}`
               : `D${componentProperties.pin}`}
           </div>
+        </div>
+      )}
+
+      {/* Editable Properties (select dropdowns) */}
+      {componentMetadata.properties
+        .filter((p: any) => p.control === 'select' && p.options)
+        .length > 0 && (
+        <div className="property-edit-section">
+          {componentMetadata.properties
+            .filter((p: any) => p.control === 'select' && p.options)
+            .map((prop: any) => (
+              <div key={prop.name} className="property-edit-row">
+                <label className="property-edit-label">
+                  {prop.description || prop.name}
+                </label>
+                <select
+                  className="property-edit-select"
+                  value={String(componentProperties[prop.name] ?? prop.defaultValue ?? '')}
+                  onChange={(e) =>
+                    onPropertyChange?.(componentId, prop.name, e.target.value)
+                  }
+                >
+                  {prop.options.map((opt: string) => (
+                    <option key={opt} value={opt}>
+                      {opt.toUpperCase()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
         </div>
       )}
 
