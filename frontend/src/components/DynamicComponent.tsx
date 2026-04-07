@@ -59,6 +59,15 @@ export const DynamicComponent: React.FC<DynamicComponentProps> = ({
   // display to flash blank and lose its frame buffer.
   const hexEpoch = useSimulatorStore((s) => s.hexEpoch);
 
+  // Track wires connected to this component so attachEvents re-runs when
+  // wires are added or removed (e.g. disconnecting an LED cathode from GND).
+  const wireFingerprint = useSimulatorStore((s) => {
+    const myWires = s.wires.filter(
+      w => w.start.componentId === id || w.end.componentId === id
+    );
+    return myWires.map(w => w.id).join(',');
+  });
+
   // Check if component is interactive (has simulation logic with attachEvents)
   const logic = PartSimulationRegistry.get(metadata.id || id.split('-')[0]);
   const isInteractive = logic?.attachEvents !== undefined;
@@ -228,7 +237,7 @@ export const DynamicComponent: React.FC<DynamicComponentProps> = ({
       el.removeEventListener('button-press', onButtonPress);
       el.removeEventListener('button-release', onButtonRelease);
     };
-  }, [id, handleComponentEvent, metadata.id, simulator, hexEpoch]);
+  }, [id, handleComponentEvent, metadata.id, simulator, hexEpoch, wireFingerprint]);
 
   return (
     <div

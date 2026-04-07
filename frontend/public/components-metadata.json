@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-04-02T01:25:51.523Z",
+  "generatedAt": "2026-04-07T14:03:23.074Z",
   "components": [
     {
       "id": "arduino-mega",
@@ -247,17 +247,9 @@
           "name": "imageData",
           "type": "string",
           "control": "text"
-        },
-        {
-          "name": "protocol",
-          "type": "select",
-          "control": "select",
-          "options": ["i2c", "spi"],
-          "defaultValue": "i2c",
-          "description": "Communication protocol"
         }
       ],
-      "defaultValues": { "protocol": "i2c" },
+      "defaultValues": {},
       "pinCount": 0,
       "tags": [
         "ssd1306"
@@ -1332,11 +1324,9 @@
         },
         {
           "name": "color",
-          "type": "select",
+          "type": "string",
           "defaultValue": "red",
-          "control": "select",
-          "options": ["red", "green", "blue", "yellow", "orange", "white", "purple"],
-          "description": "LED color"
+          "control": "text"
         },
         {
           "name": "lightColor",
