@@ -30,6 +30,24 @@ const SENSOR_COMPONENT_MAP: Record<string, {
   'hc-sr04': { sensorType: 'hc-sr04', dataPinName: 'TRIG', propertyKeys: ['distance'], extraPins: { echo_pin: 'ECHO' } },
 };
 
+// ── I2C sensor pre-registration ───────────────────────────────────────────────
+// I2C sensors use virtual pins (200 + i2c_addr) instead of real GPIO pins.
+// They are identified by I2C address and do not need wire-resolution.
+// `addrProp` is the component property that overrides the default address.
+const I2C_SENSOR_MAP: Record<string, {
+  sensorType: string;
+  defaultAddr: number;
+  addrProp?: string;       // property key that holds the I2C address (e.g. 'address')
+  propertyKeys?: string[]; // additional sensor values to forward (e.g. temperature, pressure)
+}> = {
+  'mpu6050': { sensorType: 'mpu6050', defaultAddr: 0x68 },
+  'bmp280':  { sensorType: 'bmp280',  defaultAddr: 0x76, addrProp: 'address', propertyKeys: ['temperature', 'pressure'] },
+  'ds1307':  { sensorType: 'ds1307',  defaultAddr: 0x68 },
+  'ds3231':  { sensorType: 'ds3231',  defaultAddr: 0x68, propertyKeys: ['temperature'] },
+  'ssd1306': { sensorType: 'ssd1306', defaultAddr: 0x3C },
+  'pcf8574': { sensorType: 'pcf8574', defaultAddr: 0x27, addrProp: 'i2cAddress' },
+};
+
 // ── Legacy type aliases (keep external consumers working) ──────────────────
 export type BoardType = 'arduino-uno' | 'arduino-nano' | 'arduino-mega' | 'raspberry-pi-pico';
 
@@ -674,6 +692,31 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
               break; // only one data pin per sensor
             }
           }
+
+          // Pre-register I2C sensors (virtual pin = 200 + i2c_addr, no wire resolution needed)
+          for (const comp of components) {
+            const i2cDef = I2C_SENSOR_MAP[comp.metadataId];
+            if (!i2cDef) continue;
+            // Resolve I2C address from component property or use default
+            let addr = i2cDef.defaultAddr;
+            if (i2cDef.addrProp) {
+              const rawAddr = comp.properties[i2cDef.addrProp];
+              if (rawAddr !== undefined) {
+                const parsed = typeof rawAddr === 'string'
+                  ? (rawAddr.startsWith('0x') ? parseInt(rawAddr, 16) : parseInt(rawAddr, 10))
+                  : Number(rawAddr);
+                if (!isNaN(parsed)) addr = parsed;
+              }
+            }
+            const virtualPin = 200 + addr;
+            const props: Record<string, unknown> = { sensor_type: i2cDef.sensorType, pin: virtualPin, addr };
+            for (const key of (i2cDef.propertyKeys ?? [])) {
+              const val = comp.properties[key];
+              if (val !== undefined) props[key] = typeof val === 'string' ? parseFloat(val) : val;
+            }
+            sensors.push(props);
+          }
+
           esp32Bridge.setSensors(sensors);
 
           // Use WiFi flag set by the compiler (most reliable — avoids stale file group issues).
