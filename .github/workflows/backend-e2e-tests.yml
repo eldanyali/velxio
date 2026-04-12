@@ -66,7 +66,7 @@ jobs:
           path: |
             ~/.arduino15
             ~/Arduino/libraries
-          key: arduino-cores-esp32-libs-${{ runner.os }}-v2
+          key: arduino-cores-esp32-2x-libs-${{ runner.os }}-v1
 
       - name: Install ESP32 arduino core and required libraries
         run: |
@@ -74,7 +74,9 @@ jobs:
           arduino-cli config add board_manager.additional_urls \
             https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
           arduino-cli core update-index
-          arduino-cli core install esp32:esp32
+          # Pin to 2.x — the lcgamboa QEMU (esp32-picsimlab) was built against IDF 4.x.
+          # ESP32 Arduino 3.x (IDF 5.x) triggers "Cache disabled" panics on that machine.
+          arduino-cli core install esp32:esp32@2.0.17
 
           # Libraries needed by the e2e test sketches
           # DHT22 test needs: DHT sensor library
