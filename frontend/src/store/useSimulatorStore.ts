@@ -697,10 +697,11 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         ),
       }));
 
-      // Replace file group with appropriate default files
+      // Replace file group with appropriate default files and activate it
       const editorStore = useEditorStore.getState();
       editorStore.deleteFileGroup(board.activeFileGroupId);
       editorStore.createFileGroup(board.activeFileGroupId, mode);
+      editorStore.setActiveGroup(board.activeFileGroupId);
     },
 
     startBoard: (boardId: string) => {
