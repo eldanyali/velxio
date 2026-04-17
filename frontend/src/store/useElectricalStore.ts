@@ -36,6 +36,8 @@ interface ElectricalState {
   engineLoading: boolean;
   engineReady: boolean;
   submittedNetlist: string;
+  /** "boardId:pinName" → SPICE net name. Populated after each solve. */
+  pinNetMap: Map<string, string>;
 
   setMode: (m: ElectricalMode) => Promise<void>;
   triggerSolve: (input: BuildNetlistInput) => void;
@@ -54,6 +56,7 @@ export const useElectricalStore = create<ElectricalState>((set, get) => {
       error: r.error,
       lastSolveMs: r.solveMs,
       submittedNetlist: r.submittedNetlist,
+      pinNetMap: r.pinNetMap,
     });
   });
 
@@ -67,6 +70,7 @@ export const useElectricalStore = create<ElectricalState>((set, get) => {
     engineLoading: false,
     engineReady: false,
     submittedNetlist: '',
+    pinNetMap: new Map(),
 
     async setMode(m) {
       if (!ELECTRICAL_SIM_ENABLED && m !== 'off') {
@@ -111,6 +115,7 @@ export const useElectricalStore = create<ElectricalState>((set, get) => {
         error: null,
         lastSolveMs: 0,
         submittedNetlist: '',
+        pinNetMap: new Map(),
       });
     },
   };

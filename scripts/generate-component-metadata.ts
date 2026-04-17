@@ -72,6 +72,7 @@ const CATEGORY_MAP: Record<string, ComponentCategory> = {
   // Passive Components
   'resistor': 'passive',
   'capacitor': 'passive',
+  'inductor': 'passive',
   'diode': 'passive',
   'analog-multiplexer': 'passive',
   'ir-receiver': 'passive',

@@ -49,7 +49,7 @@ describe('parseValueWithUnits', () => {
 
 describe('NetlistBuilder — simple cases', () => {
   it('emits a voltage divider and ngspice gets 6V', { timeout: 30_000 }, async () => {
-    const netlist = buildNetlist({
+    const { netlist } = buildNetlist({
       components: [
         { id: 'r1', metadataId: 'resistor', properties: { value: '1k' } },
         { id: 'r2', metadataId: 'resistor', properties: { value: '2k' } },
@@ -86,7 +86,7 @@ describe('NetlistBuilder — simple cases', () => {
   });
 
   it('emits an LED + resistor from 5V rail and ngspice solves non-linear', { timeout: 30_000 }, async () => {
-    const netlist = buildNetlist({
+    const { netlist } = buildNetlist({
       components: [
         { id: 'r1', metadataId: 'resistor', properties: { value: '220' } },
         { id: 'led1', metadataId: 'led', properties: { color: 'red' } },
@@ -120,7 +120,7 @@ describe('NetlistBuilder — simple cases', () => {
   });
 
   it('NTC divider: T=25°C produces V(a0) ≈ 2.5V', { timeout: 30_000 }, async () => {
-    const netlist = buildNetlist({
+    const { netlist } = buildNetlist({
       components: [
         { id: 'r1', metadataId: 'resistor', properties: { value: '10k' } },
         { id: 'ntc1', metadataId: 'ntc-temperature-sensor', properties: { temperature: 25 } },
@@ -149,7 +149,7 @@ describe('NetlistBuilder — simple cases', () => {
 
   it('adds auto pull-down on floating cap-only node', () => {
     // Two caps share a node (net x) that only touches capacitors → DC-floating.
-    const netlist = buildNetlist({
+    const { netlist } = buildNetlist({
       components: [
         { id: 'c1', metadataId: 'capacitor', properties: { value: '1u' } },
         { id: 'c2', metadataId: 'capacitor', properties: { value: '1u' } },
@@ -166,7 +166,7 @@ describe('NetlistBuilder — simple cases', () => {
   });
 
   it('PWM pin emits DC-equivalent voltage source', () => {
-    const netlist = buildNetlist({
+    const { netlist } = buildNetlist({
       components: [],
       wires: [
         { id: 'w1', start: { componentId: 'uno', pinName: 'D9' }, end: { componentId: 'uno', pinName: 'GND' } },

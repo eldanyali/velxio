@@ -10,7 +10,7 @@ import { runNetlist } from '../simulation/spice/SpiceEngine';
 
 describe('Voltmeter (instr-voltmeter)', () => {
   it('reads ~3.33V across the midpoint of a 1k+2k divider', { timeout: 30_000 }, async () => {
-    const netlist = buildNetlist({
+    const { netlist } = buildNetlist({
       components: [
         { id: 'r1', metadataId: 'resistor', properties: { value: '1k' } },
         { id: 'r2', metadataId: 'resistor', properties: { value: '2k' } },
@@ -48,7 +48,7 @@ describe('Ammeter (instr-ammeter)', () => {
   it('reads ~22.7 mA through a 220 Ω load on 5V', { timeout: 30_000 }, async () => {
     // Circuit:
     //   +5V ── R (220Ω) ── [A+ ammeter A-] ── GND
-    const netlist = buildNetlist({
+    const { netlist } = buildNetlist({
       components: [
         { id: 'r1', metadataId: 'resistor', properties: { value: '220' } },
         { id: 'am', metadataId: 'instr-ammeter', properties: {} },

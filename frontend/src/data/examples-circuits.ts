@@ -55,6 +55,7 @@ void loop() {
     category: 'circuits', difficulty: 'beginner',
     code: `// RC Low-Pass Filter
 // PWM on pin 9 → R=10k → C=10uF → smooth DC on A0
+// DC steady-state: V_out ≈ duty × Vcc = 0.5 × 5 = 2.5 V
 void setup() { Serial.begin(9600); analogWrite(9, 128); } // 50% duty
 void loop() {
   float v = analogRead(A0) * 5.0 / 1023.0;
@@ -64,11 +65,13 @@ void loop() {
     components: [
       UNO,
       { type: 'wokwi-resistor', id: 'r1', x: 350, y: 100, properties: { value: '10000' } },
+      { type: 'wokwi-capacitor', id: 'c1', x: 420, y: 200, properties: { value: '10u' } },
     ],
     wires: [
       w('w1', ['arduino-uno','9'], ['r1','1'], '#00aaff'),
       w('w2', ['r1','2'], ['arduino-uno','A0'], '#ffaa00'),
-      w('w3', ['r1','2'], ['arduino-uno','GND'], '#000000'),
+      w('w3', ['r1','2'], ['c1','1'], '#ffaa00'),
+      w('w4', ['c1','2'], ['arduino-uno','GND'], '#000000'),
     ],
   },
 
@@ -290,11 +293,13 @@ void loop() {
     components: [
       UNO,
       { type: 'wokwi-resistor', id: 'r1', x: 380, y: 100, properties: { value: '10000' } },
+      { type: 'wokwi-capacitor', id: 'c1', x: 450, y: 200, properties: { value: '100u' } },
     ],
     wires: [
       w('w1', ['arduino-uno','8'], ['r1','1'], '#00aaff'),
-      w('w2', ['r1','2'], ['arduino-uno','A0'], '#ffaa00'),
-      w('w3', ['r1','2'], ['arduino-uno','GND'], '#000000'),
+      w('w2', ['r1','2'], ['c1','1'], '#ffaa00'),
+      w('w3', ['r1','2'], ['arduino-uno','A0'], '#ffaa00'),
+      w('w4', ['c1','2'], ['arduino-uno','GND'], '#000000'),
     ],
   },
 

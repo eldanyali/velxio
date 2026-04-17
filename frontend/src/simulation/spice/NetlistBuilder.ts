@@ -35,7 +35,13 @@ function skipCanonicalization(metadataId: string): boolean {
   return metadataId.startsWith('instr-');
 }
 
-export function buildNetlist(input: BuildNetlistInput): string {
+export interface BuildNetlistResult {
+  netlist: string;
+  /** "boardId:pinName" → SPICE net name, from the same UF used to build the netlist. */
+  pinNetMap: Map<string, string>;
+}
+
+export function buildNetlist(input: BuildNetlistInput): BuildNetlistResult {
   const { components, wires, boards, analysis, extraCards = [] } = input;
 
   // ── 1. Union-Find over wires ─────────────────────────────────────────────
@@ -141,7 +147,23 @@ export function buildNetlist(input: BuildNetlistInput): string {
   }
   lines.push('.end');
 
-  return lines.join('\n');
+  // ── 9. Build board pin → net map from the same UF ─────────────────────────
+  // Must use the same `uf` and `netNames` so net names match what ngspice sees.
+  const pinNetMap = new Map<string, string>();
+  for (const board of boards) {
+    // All wire endpoints that belong to this board are already in the UF.
+    for (const w of wires) {
+      for (const endpoint of [w.start, w.end]) {
+        if (endpoint.componentId !== board.id) continue;
+        const key = pinKey(board.id, endpoint.pinName);
+        if (!uf.has(key)) continue;
+        const netName = netNames.get(uf.find(key));
+        if (netName) pinNetMap.set(key, netName);
+      }
+    }
+  }
+
+  return { netlist: lines.join('\n'), pinNetMap };
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -257,6 +279,76 @@ export function buildWireNetMap(
     if (uf.has(key)) {
       const netName = netNames.get(uf.find(key));
       if (netName) result.set(w.id, netName);
+    }
+  }
+  return result;
+}
+
+/**
+ * Build a map from `"${boardId}:${pinName}"` → SPICE net name for every
+ * board pin that participates in the circuit. Used by the ADC injection
+ * step in subscribeToStore so it can look up voltages by pin name.
+ */
+export function buildBoardPinNetMap(
+  input: Pick<BuildNetlistInput, 'components' | 'wires' | 'boards'>,
+): Map<string, string> {
+  const { wires, boards, components } = input;
+  const uf = new UnionFind();
+  const pin = (cId: string, pName: string) => `${cId}:${pName}`;
+
+  // Collect board IDs for fast lookup
+  const boardIds = new Set(boards.map((b) => b.id));
+
+  for (const w of wires) {
+    const a = pin(w.start.componentId, w.start.pinName);
+    const b = pin(w.end.componentId, w.end.pinName);
+    uf.add(a);
+    uf.add(b);
+    uf.union(a, b);
+  }
+
+  // Canonicalize board ground/vcc pins (from boardPinGroups metadata)
+  for (const board of boards) {
+    for (const pName of board.groundPinNames ?? []) {
+      const k = pin(board.id, pName);
+      uf.add(k);
+      uf.setCanonical(k, '0');
+    }
+    for (const pName of board.vccPinNames ?? []) {
+      const k = pin(board.id, pName);
+      uf.add(k);
+      uf.setCanonical(k, 'vcc_rail');
+    }
+  }
+  // Canonicalize non-board component GND/VCC pins referenced by wires
+  for (const comp of components) {
+    if (comp.metadataId.startsWith('instr-')) continue;
+    if (boardIds.has(comp.id)) continue; // board handled above
+    for (const pName of pinsReferencedByWires(comp.id, wires)) {
+      if (GROUND_PIN_RE.test(pName)) uf.setCanonical(pin(comp.id, pName), '0');
+      else if (VCC_PIN_RE.test(pName)) uf.setCanonical(pin(comp.id, pName), 'vcc_rail');
+    }
+  }
+
+  const netNames = assignDeterministicNetNames(uf);
+  const result = new Map<string, string>();
+
+  // For each board, collect ALL pins that appear in wires (via wire endpoints)
+  // plus the explicit groundPinNames/vccPinNames/pins lists.
+  for (const board of boards) {
+    const wireReferencedPins = pinsReferencedByWires(board.id, wires);
+    const allPins = new Set([
+      ...(board.groundPinNames ?? []),
+      ...(board.vccPinNames ?? []),
+      ...Object.keys(board.pins ?? {}),
+      ...wireReferencedPins,   // ← the pins that actually exist in the UF
+    ]);
+    for (const pName of allPins) {
+      const k = pin(board.id, pName);
+      if (uf.has(k)) {
+        const netName = netNames.get(uf.find(k));
+        if (netName) result.set(k, netName);
+      }
     }
   }
   return result;

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generatedAt": "2026-04-16T04:07:07.823Z",
+  "generatedAt": "2026-04-17T22:10:37.555Z",
   "components": [
     {
       "thumbnail": "<svg width=\"64\" height=\"64\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect width=\"64\" height=\"64\" fill=\"#e0e0e0\" rx=\"4\"/>\n      <text x=\"50%\" y=\"50%\" text-anchor=\"middle\" dy=\".3em\" font-size=\"10\" fill=\"#666\">\n        DIODE-1N4007\n      </text>\n    </svg>",
@@ -2854,6 +2854,29 @@
       ]
     },
     {
+      "id": "capacitor",
+      "tagName": "wokwi-capacitor",
+      "name": "Capacitor",
+      "category": "passive",
+      "thumbnail": "<svg width=\"64\" height=\"64\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect width=\"64\" height=\"64\" fill=\"#e0e0e0\" rx=\"4\"/>\n      <text x=\"50%\" y=\"50%\" text-anchor=\"middle\" dy=\".3em\" font-size=\"10\" fill=\"#666\">\n        CAPACITOR\n      </text>\n    </svg>",
+      "properties": [
+        {
+          "name": "value",
+          "type": "string",
+          "defaultValue": "1u",
+          "control": "text"
+        }
+      ],
+      "defaultValues": {
+        "value": "1u"
+      },
+      "pinCount": 0,
+      "tags": [
+        "capacitor",
+        ""
+      ]
+    },
+    {
       "id": "franzininho",
       "tagName": "wokwi-franzininho",
       "name": "Franzininho",
@@ -2887,6 +2910,29 @@
       "pinCount": 0,
       "tags": [
         "franzininho"
+      ]
+    },
+    {
+      "id": "inductor",
+      "tagName": "wokwi-inductor",
+      "name": "Inductor",
+      "category": "passive",
+      "thumbnail": "<svg width=\"64\" height=\"64\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect width=\"64\" height=\"64\" fill=\"#e0e0e0\" rx=\"4\"/>\n      <text x=\"50%\" y=\"50%\" text-anchor=\"middle\" dy=\".3em\" font-size=\"10\" fill=\"#666\">\n        INDUCTOR\n      </text>\n    </svg>",
+      "properties": [
+        {
+          "name": "value",
+          "type": "string",
+          "defaultValue": "1m",
+          "control": "text"
+        }
+      ],
+      "defaultValues": {
+        "value": "1m"
+      },
+      "pinCount": 0,
+      "tags": [
+        "inductor",
+        ""
       ]
     },
     {

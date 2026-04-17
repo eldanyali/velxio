@@ -71,4 +71,9 @@ export interface ElectricalSolveResult {
   solveMs: number;
   /** The netlist we submitted — useful for debugging in the UI. */
   submittedNetlist: string;
+  /**
+   * Maps "boardId:pinName" → SPICE net name, built from the same Union-Find
+   * used to generate the netlist. Used by ADC injection to locate voltages.
+   */
+  pinNetMap: Map<string, string>;
 }

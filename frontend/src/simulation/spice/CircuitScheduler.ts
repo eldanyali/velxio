@@ -71,7 +71,7 @@ class CircuitScheduler {
     this.pending = null;
     this.inFlight = true;
 
-    const netlist = buildNetlist(req.input);
+    const { netlist, pinNetMap } = buildNetlist(req.input);
     const t0 = performance.now();
     let result: ElectricalSolveResult;
     try {
@@ -99,6 +99,7 @@ class CircuitScheduler {
         error: null,
         solveMs: performance.now() - t0,
         submittedNetlist: netlist,
+        pinNetMap,
       };
     } catch (err) {
       result = {
@@ -108,6 +109,7 @@ class CircuitScheduler {
         error: String(err instanceof Error ? err.message : err),
         solveMs: performance.now() - t0,
         submittedNetlist: netlist,
+        pinNetMap,
       };
     } finally {
       this.inFlight = false;
@@ -141,6 +143,7 @@ function noopResult(reason: string): ElectricalSolveResult {
     error: reason,
     solveMs: 0,
     submittedNetlist: '',
+    pinNetMap: new Map(),
   };
 }
 

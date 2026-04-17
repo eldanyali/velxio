@@ -172,7 +172,7 @@ describe('componentToSpice — ngspice accepts every card', () => {
         });
         extraLoadCards.push(`R_load_${i} n_probe_${i} 0 1Meg`);
       }
-      const netlist = buildNetlist({
+      const { netlist } = buildNetlist({
         components: [
           { id: 'dut', metadataId: id, properties: fx.properties ?? {} },
           ...Array.from({ length: pins.length - 2 }, (_, i) => ({

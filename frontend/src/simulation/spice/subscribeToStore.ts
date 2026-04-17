@@ -7,11 +7,13 @@
  * Called once at app startup (typically from EditorPage or main.tsx).
  * Returns an `unsubscribe()` for cleanup.
  */
-import { useSimulatorStore } from '../../store/useSimulatorStore';
+import { useSimulatorStore, getBoardSimulator, getBoardPinManager } from '../../store/useSimulatorStore';
 import { useElectricalStore } from '../../store/useElectricalStore';
 import { buildInputFromStore } from './storeAdapter';
+import { setAdcVoltage } from '../parts/partUtils';
 import type { PinSourceState } from './types';
 import type { BoardKind } from '../../types/board';
+import { BOARD_PIN_GROUPS } from './boardPinGroups';
 
 // Which Arduino-style pin name maps to which ADC channel, per board.
 // Used to inject SPICE-solved voltages back into the MCU's ADC peripheral.
@@ -62,75 +64,149 @@ const ADC_PIN_MAP: Partial<Record<BoardKind, Array<{ pinName: string; channel: n
   'aitewinrobot-esp32c3-supermini': adcRange('GPIO', 0, 6),
 };
 
-export function wireElectricalSolver(): () => void {
-  let lastPinStates: Record<string, Record<string, PinSourceState>> = {};
+/**
+ * Convert an ADC pin name + channel to the GPIO pin number that
+ * `setAdcVoltage()` (partUtils) expects, per board family.
+ *
+ *   AVR:   A0→14, A1→15, ... (analog pins start at 14)
+ *   RP2040: GP26→26, GP27→27, ... (GPIO number directly)
+ *   ESP32:  GPIO32→32, ... or A0→channel-dependent (GPIO number)
+ */
+function avrPinFromName(_name: string, channel: number): number { return 14 + channel; }
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function gpioPinFromName(name: string, _channel: number): number {
+  const m = name.match(/(\d+)$/);
+  return m ? parseInt(m[1], 10) : -1;
+}
 
-  function collectPinStates(): Record<string, Record<string, PinSourceState>> {
-    const boards = useSimulatorStore.getState().boards;
-    const out: Record<string, Record<string, PinSourceState>> = {};
-    for (const board of boards) {
-      const simulator = board.simulator as unknown as {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        pinManager?: any;
-      } | null;
-      const entries: Record<string, PinSourceState> = {};
-      // NOTE: Velxio's PinManager tracks state per pin number. Translating
-      // number → pin name depends on board-specific maps. For Phase 8.3 we
-      // emit pin states only when `pinManager.getPinState(pin)` is readable;
-      // boards without that accessor simply contribute no GPIO sources
-      // (their wires still participate via canonicalized ground/vcc).
-      if (simulator?.pinManager?.getPinState) {
-        // Best-effort: we don't yet have a canonical pin-number → pin-name
-        // map for all boards here. Future work (Phase 8.4) will enrich this.
-      }
-      out[board.id] = entries;
-    }
-    return out;
+const ADC_PIN_TO_GPIO: Partial<Record<BoardKind, (pinName: string, channel: number) => number>> = {
+  'arduino-uno':  avrPinFromName,
+  'arduino-nano': avrPinFromName,
+  'arduino-mega': avrPinFromName,
+  'attiny85':     avrPinFromName,
+
+  'raspberry-pi-pico': gpioPinFromName,
+  'pi-pico-w':         gpioPinFromName,
+
+  'esp32':              gpioPinFromName,
+  'esp32-devkit-c-v4':  gpioPinFromName,
+  'esp32-cam':          gpioPinFromName,
+  'wemos-lolin32-lite': gpioPinFromName,
+  'esp32-s3':           gpioPinFromName,
+  'xiao-esp32-s3':      gpioPinFromName,
+  'arduino-nano-esp32': avrPinFromName,  // uses A0-A7 naming
+  'esp32-c3':                      gpioPinFromName,
+  'xiao-esp32-c3':                 gpioPinFromName,
+  'aitewinrobot-esp32c3-supermini': gpioPinFromName,
+};
+
+/**
+ * Convert a board pin name (e.g. "9", "A0", "GP26", "GPIO32") to the
+ * Arduino-style pin number that PinManager uses internally.
+ * Returns -1 if the name doesn't map to a GPIO pin.
+ */
+function pinNameToArduinoPin(pinName: string, boardKind: BoardKind): number {
+  const group = BOARD_PIN_GROUPS[boardKind] ?? BOARD_PIN_GROUPS.default;
+  // Skip power/ground pins — they're handled as canonical nets
+  if (group.gnd.includes(pinName) || group.vcc_pins.includes(pinName)) return -1;
+
+  // RP2040: "GP26" → 26
+  if (pinName.startsWith('GP')) {
+    const n = parseInt(pinName.slice(2), 10);
+    return Number.isFinite(n) ? n : -1;
   }
+  // ESP32: "GPIO32" → 32
+  if (pinName.startsWith('GPIO')) {
+    const n = parseInt(pinName.slice(4), 10);
+    return Number.isFinite(n) ? n : -1;
+  }
+  // AVR analog: "A0" → 14, "A1" → 15, ...
+  if (/^A\d+$/.test(pinName)) {
+    return 14 + parseInt(pinName.slice(1), 10);
+  }
+  // Bare numeric: "9" → 9, "13" → 13
+  if (/^\d+$/.test(pinName)) {
+    return parseInt(pinName, 10);
+  }
+  return -1;
+}
+
+/**
+ * Collect MCU output pin states from PinManager for pins that participate
+ * in the circuit (i.e., are referenced by wires).
+ */
+function collectPinStates(
+  boardId: string,
+  boardKind: BoardKind,
+  wires: Array<{ start: { componentId: string; pinName: string }; end: { componentId: string; pinName: string } }>,
+): Record<string, PinSourceState> {
+  const pm = getBoardPinManager(boardId);
+  if (!pm) return {};
+  const group = BOARD_PIN_GROUPS[boardKind] ?? BOARD_PIN_GROUPS.default;
+  const vcc = group.vcc;
+
+  const result: Record<string, PinSourceState> = {};
+  // Gather all pin names wired to this board
+  const pinNames = new Set<string>();
+  for (const w of wires) {
+    if (w.start.componentId === boardId) pinNames.add(w.start.pinName);
+    if (w.end.componentId === boardId) pinNames.add(w.end.pinName);
+  }
+
+  for (const pinName of pinNames) {
+    const arduinoPin = pinNameToArduinoPin(pinName, boardKind);
+    if (arduinoPin < 0) continue;
+    const pwmDuty = pm.getPwmValue(arduinoPin);
+    if (pwmDuty > 0) {
+      result[pinName] = { type: 'pwm', duty: pwmDuty };
+    } else if (pm.getPinState(arduinoPin)) {
+      result[pinName] = { type: 'digital', v: vcc };
+    }
+    // If pin is LOW or unknown, don't add — treated as input/floating by SPICE
+  }
+  return result;
+}
+
+export function wireElectricalSolver(): () => void {
 
   function maybeSolve() {
     const { mode } = useElectricalStore.getState();
     if (mode === 'off') return;
     const storeState = useSimulatorStore.getState();
-    const pinStates = collectPinStates();
-    lastPinStates = pinStates;
     const snap = {
       components: storeState.components,
       wires: storeState.wires,
       boards: storeState.boards.map((b) => ({
         id: b.id,
         boardKind: b.boardKind,
-        pinStates: pinStates[b.id] ?? {},
+        pinStates: collectPinStates(b.id, b.boardKind, storeState.wires),
       })),
     };
     const input = buildInputFromStore(snap);
+    // pinNetMap is now built inside buildNetlist() from the same UF and
+    // returned via CircuitScheduler → ElectricalSolveResult → store.
     useElectricalStore.getState().triggerSolve(input);
   }
 
   function injectVoltagesIntoADC() {
-    const { nodeVoltages } = useElectricalStore.getState();
+    const { nodeVoltages, pinNetMap } = useElectricalStore.getState();
     const { boards } = useSimulatorStore.getState();
     for (const board of boards) {
-      const map = ADC_PIN_MAP[board.boardKind];
-      if (!map) continue;
-      const simulator = board.simulator as unknown as {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        getADC?: () => { channelValues: number[] } | null;
-      } | null;
-      const adc = simulator?.getADC?.();
-      if (!adc) continue;
-      // Try to find a net matching "<boardId>_<pinName>" by string lookup
-      for (const { pinName, channel } of map) {
-        const probeKey = `${board.id}:${pinName}`;
-        // ngspice result keys are net names from NetlistBuilder — we don't
-        // yet have a direct pin→net lookup here. This is a forward-looking
-        // scaffold; Phase 8.4 will add the map via storeAdapter.
-        void probeKey;
-        // For now: if any net name literally equals the pin label, use it.
-        const v = nodeVoltages[pinName] ?? nodeVoltages[probeKey] ?? null;
-        if (v != null) {
-          adc.channelValues[channel] = Math.max(0, Math.min(board.boardKind.startsWith('esp32') ? 3.3 : 5, v));
-        }
+      const adcPins = ADC_PIN_MAP[board.boardKind];
+      if (!adcPins) continue;
+      const sim = getBoardSimulator(board.id);
+      if (!sim) continue;
+      const vMax = board.boardKind.startsWith('esp32') ? 3.3 : 5.0;
+      for (const { pinName, channel } of adcPins) {
+        const netName = pinNetMap.get(`${board.id}:${pinName}`);
+        if (!netName) continue;
+        const v = nodeVoltages[netName];
+        if (v == null) continue;
+        const clamped = Math.max(0, Math.min(vMax, v));
+        // setAdcVoltage handles AVR (pin 14-19), RP2040 (GPIO 26-29),
+        // and ESP32 (bridge shim) transparently.
+        const gpioPin = ADC_PIN_TO_GPIO[board.boardKind]?.(pinName, channel);
+        if (gpioPin != null) setAdcVoltage(sim, gpioPin, clamped);
       }
     }
   }
@@ -155,10 +231,53 @@ export function wireElectricalSolver(): () => void {
     }
   });
 
+  // Re-inject whenever boards change (e.g. loadHex recreates AVRADC).
+  // loadHex() creates a fresh AVRADC *before* updating the store, so by the
+  // time this fires the new ADC already exists and needs the SPICE values.
+  const unsubBoards = useSimulatorStore.subscribe((state, prev) => {
+    if (state.boards !== prev.boards) {
+      const { nodeVoltages } = useElectricalStore.getState();
+      if (Object.keys(nodeVoltages).length > 0) {
+        injectVoltagesIntoADC();
+      }
+    }
+  });
+
+  // Periodic re-solve while any board is running, so SPICE picks up
+  // MCU pin-state changes (e.g. analogWrite → PWM → voltage source).
+  let solveInterval: ReturnType<typeof setInterval> | null = null;
+  const SOLVE_INTERVAL_MS = 200;
+
+  function updateSolveTimer() {
+    const { mode } = useElectricalStore.getState();
+    const anyRunning = useSimulatorStore.getState().boards.some((b) => b.running);
+    if (mode !== 'off' && anyRunning) {
+      if (!solveInterval) {
+        solveInterval = setInterval(maybeSolve, SOLVE_INTERVAL_MS);
+      }
+    } else if (solveInterval) {
+      clearInterval(solveInterval);
+      solveInterval = null;
+    }
+  }
+
+  const unsubRunning = useSimulatorStore.subscribe((state, prev) => {
+    const wasRunning = prev.boards.some((b) => b.running);
+    const nowRunning = state.boards.some((b) => b.running);
+    if (wasRunning !== nowRunning) updateSolveTimer();
+  });
+
+  const unsubModeTimer = useElectricalStore.subscribe((state, prev) => {
+    if (state.mode !== prev.mode) updateSolveTimer();
+  });
+
   return () => {
     unsubSim();
     unsubMode();
     unsubResult();
-    void lastPinStates;
+    unsubBoards();
+    unsubRunning();
+    unsubModeTimer();
+    if (solveInterval) clearInterval(solveInterval);
   };
 }
