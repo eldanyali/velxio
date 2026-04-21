@@ -17,9 +17,12 @@ import { useSimulatorStore } from '../store/useSimulatorStore';
 import { PartSimulationRegistry } from '../simulation/parts';
 import { isBoardComponent, boardPinToNumber } from '../utils/boardPinMapping';
 
-// Side-effect import: registers ALL wokwi custom elements (including new ones
-// like wokwi-capacitor, wokwi-inductor) so document.createElement() works.
+// Side-effect imports: register every web component we'll create at runtime.
+// `@wokwi/elements` covers the upstream catalog; `../wokwi-custom` adds the
+// velxio-local elements (e.g. <wokwi-capacitor>, <wokwi-inductor>) that we
+// can't push back to the upstream wokwi-elements repo.
 import '@wokwi/elements';
+import '../wokwi-custom';
 
 interface DynamicComponentProps {
   id: string;
