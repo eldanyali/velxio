@@ -65,11 +65,10 @@ describe('component-overrides → components-metadata drift detector', () => {
     }
   });
 
-  it('all _customComponents tagNames are unique (no collisions)', () => {
-    const tagNames = custom.map(c => c.tagName);
-    const dupes = tagNames.filter((t, i) => tagNames.indexOf(t) !== i);
-    expect(dupes, `Duplicate tagNames: ${dupes.join(', ')}`).toEqual([]);
-  });
+  // NOTE: tagName is intentionally NOT required to be unique — multiple value
+  // variants (e.g. cap-10p, cap-22p, cap-100n) share the same Web Component tag
+  // (`wokwi-capacitor`) but differ in id and default attribute values. The id
+  // uniqueness check below is the actual collision guard.
 
   it('all _customComponents ids are unique', () => {
     const ids = custom.map(c => c.id);
