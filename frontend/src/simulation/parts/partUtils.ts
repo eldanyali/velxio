@@ -7,6 +7,28 @@
 
 import type { AnySimulator } from './PartSimulationRegistry';
 import { RP2040Simulator } from '../RP2040Simulator';
+import { useSimulatorStore } from '../../store/useSimulatorStore';
+
+/**
+ * Mirror a live DOM / sensor-panel value into the component's store properties
+ * so SPICE's netlist memo invalidates and the next `maybeSolve()` picks up the
+ * change. Without this, dragging a potentiometer, pressing a button, or moving
+ * a sensor slider updates the ADC but leaves the SPICE netlist stale, so any
+ * analog circuit driven by the input (comparators, op-amp networks, divider
+ * bridges) freezes at the first `.op` solve.
+ *
+ * Idempotent — no-op when the value hasn't changed since the previous sync.
+ */
+export function syncStoreProperty(componentId: string, propName: string, value: unknown): void {
+    const store = useSimulatorStore.getState();
+    const comp = store.components.find((c) => c.id === componentId);
+    if (!comp) return;
+    const prev = comp.properties?.[propName];
+    if (String(prev) === String(value)) return;
+    store.updateComponent(componentId, {
+        properties: { ...comp.properties, [propName]: value },
+    });
+}
 
 /** Read the ADC instance from the simulator (returns null if not initialized) */
 export function getADC(avrSimulator: AnySimulator): any | null {

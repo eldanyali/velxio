@@ -110,6 +110,23 @@ class Esp32BridgeShim {
     this.bridge.setAdc(channel, millivolts);
     return true;
   }
+
+  /**
+   * Push a 12-bit waveform LUT to QEMU for per-read ADC interpolation.
+   * Call once per SPICE `.tran` solve; QEMU interpolates at every MMIO
+   * read against its virtual clock. See `Esp32Bridge.setAdcWaveform`.
+   *
+   * `pin` follows the same GPIO→channel mapping as `setAdcVoltage`.
+   * `samples` are 12-bit raw values (0-4095) aligned on a uniform grid.
+   */
+  setAdcWaveform(pin: number, samples: Uint16Array, periodNs: number): boolean {
+    let channel = -1;
+    if (pin >= 36 && pin <= 39) channel = pin - 36;
+    else if (pin >= 32 && pin <= 35) channel = pin - 28;
+    if (channel < 0) return false;
+    this.bridge.setAdcWaveform(channel, samples, periodNs);
+    return true;
+  }
   getMCU(): null { return null; }
   start(): void { /* managed by bridge */ }
   stop(): void { /* managed by bridge */ }

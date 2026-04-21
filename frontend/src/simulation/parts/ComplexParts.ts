@@ -1,7 +1,7 @@
 import { PartSimulationRegistry } from './PartSimulationRegistry';
 import type { AnySimulator } from './PartSimulationRegistry';
 import { RP2040Simulator } from '../RP2040Simulator';
-import { getADC, setAdcVoltage } from './partUtils';
+import { getADC, setAdcVoltage, syncStoreProperty } from './partUtils';
 import { registerSensorUpdate, unregisterSensorUpdate } from '../SensorUpdateRegistry';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -62,9 +62,8 @@ PartSimulationRegistry.register('rgb-led', {
 // ─── Potentiometer (rotary) ──────────────────────────────────────────────────
 
 PartSimulationRegistry.register('potentiometer', {
-    attachEvents: (element, simulator, getArduinoPinHelper) => {
+    attachEvents: (element, simulator, getArduinoPinHelper, componentId) => {
         const pin = getArduinoPinHelper('SIG');
-        if (pin === null) return () => { };
 
         // Determine reference voltage based on board type
         const isRP2040 = simulator instanceof RP2040Simulator;
@@ -72,12 +71,17 @@ PartSimulationRegistry.register('potentiometer', {
         const refVoltage = (isRP2040 || isESP32) ? 3.3 : 5.0;
 
         const onInput = () => {
-            const raw = parseInt((element as any).value || '0', 10);
-            const volts = (raw / 1023.0) * refVoltage;
-            setAdcVoltage(simulator, pin, volts);
+            const rawStr = (element as any).value ?? '0';
+            const raw = parseInt(rawStr, 10);
+            if (pin !== null) {
+                const volts = (raw / 1023.0) * refVoltage;
+                setAdcVoltage(simulator, pin, volts);
+            }
+            // Mirror to store so the SPICE netlist re-solves (op-amp
+            // comparators, divider-driven circuits etc. depend on this).
+            syncStoreProperty(componentId, 'value', raw);
         };
 
-        // Fire once on attach to set initial value
         onInput();
 
         element.addEventListener('input', onInput);
@@ -88,9 +92,8 @@ PartSimulationRegistry.register('potentiometer', {
 // ─── Slide Potentiometer ─────────────────────────────────────────────────────
 
 PartSimulationRegistry.register('slide-potentiometer', {
-    attachEvents: (element, avrSimulator, getArduinoPinHelper) => {
+    attachEvents: (element, avrSimulator, getArduinoPinHelper, componentId) => {
         const arduinoPin = getArduinoPinHelper('SIG') ?? getArduinoPinHelper('OUT');
-        if (arduinoPin === null) return () => { };
 
         const el = element as any;
         const isRP2040 = avrSimulator instanceof RP2040Simulator;
@@ -98,15 +101,17 @@ PartSimulationRegistry.register('slide-potentiometer', {
         const refVoltage = (isRP2040 || isESP32) ? 3.3 : 5.0;
 
         const onInput = () => {
-            const min = el.min ?? 0;
-            const max = el.max ?? 1023;
-            const value = el.value ?? 0;
+            const min = Number(el.min ?? 0);
+            const max = Number(el.max ?? 1023);
+            const value = Number(el.value ?? 0);
             const normalized = (value - min) / (max - min || 1);
-            const volts = normalized * refVoltage;
-            setAdcVoltage(avrSimulator, arduinoPin, volts);
+            if (arduinoPin !== null) {
+                const volts = normalized * refVoltage;
+                setAdcVoltage(avrSimulator, arduinoPin, volts);
+            }
+            syncStoreProperty(componentId, 'value', value);
         };
 
-        // Fire once on attach to set initial value
         onInput();
 
         element.addEventListener('input', onInput);
@@ -141,9 +146,14 @@ PartSimulationRegistry.register('photoresistor-sensor', {
         // Watch element's 'input' events in case the element supports it
         const onInput = () => {
             const val = (element as any).value;
-            if (val !== undefined && pinAO !== null) {
-                const volts = (val / 1023.0) * 5.0;
-                setAdcVoltage(avrSimulator, pinAO, volts);
+            if (val !== undefined) {
+                if (pinAO !== null) {
+                    const volts = (val / 1023.0) * 5.0;
+                    setAdcVoltage(avrSimulator, pinAO, volts);
+                }
+                // Mirror to store — maps the slider 0-1023 back to lux 0-1000
+                // so the SPICE photoresistor handler re-computes its R_ldr.
+                syncStoreProperty(componentId, 'lux', Math.round((val / 1023) * 1000));
             }
         };
         element.addEventListener('input', onInput);
@@ -158,8 +168,11 @@ PartSimulationRegistry.register('photoresistor-sensor', {
 
         // SensorControlPanel: lux 0–1000 → volts 0–5
         registerSensorUpdate(componentId, (values) => {
-            if ('lux' in values && pinAO !== null) {
-                setAdcVoltage(avrSimulator, pinAO, ((values.lux as number) / 1000) * 5.0);
+            if ('lux' in values) {
+                if (pinAO !== null) {
+                    setAdcVoltage(avrSimulator, pinAO, ((values.lux as number) / 1000) * 5.0);
+                }
+                syncStoreProperty(componentId, 'lux', values.lux);
             }
         });
 

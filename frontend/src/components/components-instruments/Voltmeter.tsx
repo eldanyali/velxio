@@ -1,10 +1,10 @@
 /**
  * Voltmeter — probe component that displays the voltage between V+ and V-.
  *
- * Renders as a simple SVG with two pin stubs and a live reading. Velxio
- * registers it through the standard metadata path (`instr-voltmeter`).
- * The SPICE emission is handled by `componentToSpice` which inserts a
- * 10 MΩ sense resistor across the terminals.
+ * For DC nets the display is a single scalar (e.g. "3.300 V"). For nets
+ * with AC content (reflected in `.tran` `timeWaveforms`) the display shows
+ * RMS prominently with peak and DC underneath — the convention of real
+ * bench DMMs in AC-V mode.
  */
 import { useMemo } from 'react';
 import { useElectricalStore } from '../../store/useElectricalStore';
@@ -20,6 +20,7 @@ export function Voltmeter({ id }: VoltmeterProps) {
   const nodeVoltages = useElectricalStore((s) => s.nodeVoltages);
   const converged = useElectricalStore((s) => s.converged);
   const error = useElectricalStore((s) => s.error);
+  const timeWaveforms = useElectricalStore((s) => s.timeWaveforms);
   const wires = useSimulatorStore((s) => s.wires);
   const boards = useSimulatorStore((s) => s.boards);
 
@@ -47,17 +48,24 @@ export function Voltmeter({ id }: VoltmeterProps) {
         error,
         solveMs: 0,
         submittedNetlist: '',
+        pinNetMap: new Map(),
+        analysisMode: timeWaveforms ? 'tran' : 'op',
+        timeWaveforms,
       },
+      timeWaveforms,
     );
-  }, [nodeVoltages, wires, boards, id, converged, error]);
+  }, [nodeVoltages, wires, boards, id, converged, error, timeWaveforms]);
+
+  const color = reading.stale ? '#666' : '#ffa500';
+  const height = reading.ac ? 78 : 60;
 
   return (
     <div
       data-component-id={id}
       data-metadata-id="instr-voltmeter"
       style={{
-        width: 100,
-        height: 60,
+        width: 110,
+        height,
         background: '#1f1f1f',
         border: '2px solid #ffa500',
         borderRadius: 6,
@@ -65,13 +73,33 @@ export function Voltmeter({ id }: VoltmeterProps) {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        color: reading.stale ? '#666' : '#ffa500',
+        color,
         fontFamily: 'monospace',
         fontSize: 13,
+        padding: '2px 4px',
+        boxSizing: 'border-box',
       }}
     >
-      <div style={{ fontSize: 9, letterSpacing: 1 }}>V METER</div>
-      <div style={{ fontSize: 15, fontWeight: 'bold' }}>{reading.display}</div>
+      <div style={{ fontSize: 9, letterSpacing: 1, opacity: 0.8 }}>
+        V METER {reading.ac ? '~AC' : 'DC'}
+      </div>
+      <div style={{ fontSize: reading.ac ? 13 : 15, fontWeight: 'bold', lineHeight: 1.15 }}>
+        {reading.display}
+      </div>
+      {reading.ac && (
+        <div
+          style={{
+            fontSize: 9,
+            opacity: 0.85,
+            display: 'flex',
+            gap: 6,
+            lineHeight: 1.1,
+          }}
+        >
+          <span>{reading.ac.peakDisplay}</span>
+          <span>{reading.ac.dcDisplay}</span>
+        </div>
+      )}
     </div>
   );
 }

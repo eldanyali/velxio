@@ -1,24 +1,25 @@
 import { PartSimulationRegistry } from './PartSimulationRegistry';
 import { useElectricalStore } from '../../store/useElectricalStore';
+import { syncStoreProperty } from './partUtils';
 
 /**
  * Basic Pushbutton implementation (full-size)
  */
 PartSimulationRegistry.register('pushbutton', {
-    attachEvents: (element, avrSimulator, getArduinoPinHelper) => {
+    attachEvents: (element, avrSimulator, getArduinoPinHelper, componentId) => {
         const arduinoPin =
             getArduinoPinHelper('1.l') ?? getArduinoPinHelper('2.l') ??
             getArduinoPinHelper('1.r') ?? getArduinoPinHelper('2.r');
 
-        if (arduinoPin === null) return () => { };
-
         const onButtonPress = () => {
-            avrSimulator.setPinState(arduinoPin, false); // Active LOW
+            if (arduinoPin !== null) avrSimulator.setPinState(arduinoPin, false); // Active LOW
             (element as any).pressed = true;
+            syncStoreProperty(componentId, 'pressed', true);
         };
         const onButtonRelease = () => {
-            avrSimulator.setPinState(arduinoPin, true);
+            if (arduinoPin !== null) avrSimulator.setPinState(arduinoPin, true);
             (element as any).pressed = false;
+            syncStoreProperty(componentId, 'pressed', false);
         };
 
         element.addEventListener('button-press', onButtonPress);
@@ -34,20 +35,20 @@ PartSimulationRegistry.register('pushbutton', {
  * 6mm Pushbutton — same behaviour as the full-size pushbutton
  */
 PartSimulationRegistry.register('pushbutton-6mm', {
-    attachEvents: (element, avrSimulator, getArduinoPinHelper) => {
+    attachEvents: (element, avrSimulator, getArduinoPinHelper, componentId) => {
         const arduinoPin =
             getArduinoPinHelper('1.l') ?? getArduinoPinHelper('2.l') ??
             getArduinoPinHelper('1.r') ?? getArduinoPinHelper('2.r');
 
-        if (arduinoPin === null) return () => { };
-
         const onPress = () => {
-            avrSimulator.setPinState(arduinoPin, false);
+            if (arduinoPin !== null) avrSimulator.setPinState(arduinoPin, false);
             (element as any).pressed = true;
+            syncStoreProperty(componentId, 'pressed', true);
         };
         const onRelease = () => {
-            avrSimulator.setPinState(arduinoPin, true);
+            if (arduinoPin !== null) avrSimulator.setPinState(arduinoPin, true);
             (element as any).pressed = false;
+            syncStoreProperty(componentId, 'pressed', false);
         };
 
         element.addEventListener('button-press', onPress);
@@ -63,19 +64,21 @@ PartSimulationRegistry.register('pushbutton-6mm', {
  * Slide Switch — toggles between HIGH and LOW on each click
  */
 PartSimulationRegistry.register('slide-switch', {
-    attachEvents: (element, avrSimulator, getArduinoPinHelper) => {
+    attachEvents: (element, avrSimulator, getArduinoPinHelper, componentId) => {
         // Slide switch has pins: 1, 2, 3 — middle pin (2) is the common output
         const arduinoPin = getArduinoPinHelper('2') ?? getArduinoPinHelper('1');
-        if (arduinoPin === null) return () => { };
 
         // Read initial value from element (0 or 1)
-        let state = (element as any).value === 1;
-        avrSimulator.setPinState(arduinoPin, state);
+        const raw = (element as any).value;
+        let state = raw === 1 || raw === '1';
+        if (arduinoPin !== null) avrSimulator.setPinState(arduinoPin, state);
+        syncStoreProperty(componentId, 'value', state ? 1 : 0);
 
         const onChange = () => {
-            state = (element as any).value === 1;
-            avrSimulator.setPinState(arduinoPin, state);
-            console.log(`[SlideSwitch] pin ${arduinoPin} → ${state ? 'HIGH' : 'LOW'}`);
+            const v = (element as any).value;
+            state = v === 1 || v === '1';
+            if (arduinoPin !== null) avrSimulator.setPinState(arduinoPin, state);
+            syncStoreProperty(componentId, 'value', state ? 1 : 0);
         };
 
         element.addEventListener('change', onChange);

@@ -4,6 +4,10 @@
  * landed. Reads voltages from `useElectricalStore.nodeVoltages` (updated
  * by the scheduler) and maps wires to nets via `buildWireNetMap`.
  *
+ * For nets with AC content (detected via `.tran` `timeWaveforms`) labels
+ * show `~<RMS>` prefixed with a tilde to mark them as time-varying. A
+ * summary pill in the top-left advertises DC vs AC analysis mode.
+ *
  * This is a read-only, zero-interactivity layer — it sits ABOVE the wire
  * layer but below the component layer so labels remain legible without
  * blocking clicks.
@@ -13,6 +17,7 @@ import { useElectricalStore } from '../../store/useElectricalStore';
 import { useSimulatorStore } from '../../store/useSimulatorStore';
 import { buildWireNetMap } from '../../simulation/spice/NetlistBuilder';
 import { BOARD_PIN_GROUPS } from '../../simulation/spice/boardPinGroups';
+import { rms, isAC } from '../../simulation/spice/waveformStats';
 
 function formatV(v: number): string {
   const abs = Math.abs(v);
@@ -27,6 +32,8 @@ export function ElectricalOverlay() {
   const converged = useElectricalStore((s) => s.converged);
   const error = useElectricalStore((s) => s.error);
   const solveMs = useElectricalStore((s) => s.lastSolveMs);
+  const analysisMode = useElectricalStore((s) => s.analysisMode);
+  const timeWaveforms = useElectricalStore((s) => s.timeWaveforms);
 
   const wires = useSimulatorStore((s) => s.wires);
   const components = useSimulatorStore((s) => s.components);
@@ -66,10 +73,15 @@ export function ElectricalOverlay() {
       const mx = (w.start.x + w.end.x) / 2;
       const my = (w.start.y + w.end.y) / 2;
       const netName = wireNetMap.get(w.id);
-      const v = netName ? nodeVoltages[netName] : undefined;
-      return { id: w.id, x: mx, y: my, v, netName };
+      const samples = netName ? timeWaveforms?.nodes.get(netName) : undefined;
+      const ac = samples && samples.length > 0 && isAC(samples);
+      const displayV = ac ? rms(samples!) : (netName ? nodeVoltages[netName] : undefined);
+      return { id: w.id, x: mx, y: my, v: displayV, netName, ac };
     }).filter((l) => l.v !== undefined && l.netName !== '0');
-  }, [wires, components, boards, nodeVoltages]);
+  }, [wires, components, boards, nodeVoltages, timeWaveforms]);
+
+  const modeBadge = analysisMode === 'tran' ? 'AC' : 'DC';
+  const badgeColor = analysisMode === 'tran' ? '#4dd0e1' : '#ffa500';
 
   const summaryLines: string[] = [];
   if (error) summaryLines.push(`Warning: ${error}`);
@@ -91,19 +103,33 @@ export function ElectricalOverlay() {
         zIndex: 20,
       }}
     >
-      {/* Summary pill */}
+      {/* Summary pill with AC/DC badge */}
       <g transform="translate(12, 12)">
         <rect
           x={0}
           y={0}
           rx={4}
           ry={4}
-          width={220}
+          width={250}
           height={24}
           fill="rgba(26, 26, 26, 0.85)"
-          stroke={error ? '#ff6666' : '#ffa500'}
+          stroke={error ? '#ff6666' : badgeColor}
         />
-        <text x={8} y={17} fontSize={11} fill={error ? '#ff9999' : '#ffa500'} fontFamily="monospace">
+        <rect
+          x={4}
+          y={4}
+          rx={2}
+          ry={2}
+          width={22}
+          height={16}
+          fill={badgeColor}
+          opacity={0.2}
+          stroke={badgeColor}
+        />
+        <text x={15} y={16} fontSize={10} fill={badgeColor} fontFamily="monospace" textAnchor="middle" fontWeight="bold">
+          {modeBadge}
+        </text>
+        <text x={32} y={17} fontSize={11} fill={error ? '#ff9999' : '#ffa500'} fontFamily="monospace">
           SPICE {summaryLines.join(' ')}
         </text>
       </g>
@@ -112,13 +138,15 @@ export function ElectricalOverlay() {
       {labels.map((l) => (
         <g key={l.id} transform={`translate(${l.x}, ${l.y})`}>
           <rect
-            x={-20}
+            x={-22}
             y={-9}
             rx={3}
             ry={3}
-            width={40}
+            width={44}
             height={16}
             fill="rgba(0, 0, 0, 0.75)"
+            stroke={l.ac ? '#4dd0e1' : 'none'}
+            strokeWidth={l.ac ? 0.5 : 0}
           />
           <text
             x={0}
@@ -126,9 +154,9 @@ export function ElectricalOverlay() {
             textAnchor="middle"
             fontSize={10}
             fontFamily="monospace"
-            fill="#ffd700"
+            fill={l.ac ? '#4dd0e1' : '#ffd700'}
           >
-            {formatV(l.v!)}
+            {l.ac ? `~${formatV(l.v!)}` : formatV(l.v!)}
           </text>
         </g>
       ))}

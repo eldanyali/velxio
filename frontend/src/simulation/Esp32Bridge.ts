@@ -341,6 +341,39 @@ export class Esp32Bridge {
     this._send({ type: 'esp32_adc_set', data: { channel, millivolts } });
   }
 
+  /**
+   * Push a periodic waveform LUT for an ADC channel. The backend forwards
+   * the samples to QEMU, which interpolates them against its virtual clock
+   * on every MMIO ADC read — matching the per-read fidelity AVR and RP2040
+   * get via `onADCRead` monkey-patching.
+   *
+   *   samples: 12-bit raw values (0-4095) aligned on a uniform time grid
+   *   periodNs: full period of the LUT in nanoseconds
+   *
+   * Samples are sent as base64-encoded uint16 little-endian. Clearing the
+   * waveform (returning to DC `setAdc` behavior) is done by passing an
+   * empty `samples` array.
+   */
+  setAdcWaveform(channel: number, samples: Uint16Array, periodNs: number): void {
+    // Encode little-endian uint16 → base64 (transport-safe for JSON stdin/WS).
+    const bytes = new Uint8Array(samples.buffer, samples.byteOffset, samples.byteLength);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const base64 = typeof btoa === 'function' ? btoa(binary) : Buffer.from(bytes).toString('base64');
+    this._send({
+      type: 'esp32_adc_waveform',
+      data: { channel, samples_u12_b64: base64, period_ns: periodNs },
+    });
+  }
+
+  /** Clear a previously-pushed ADC waveform, reverting to DC `setAdc`. */
+  clearAdcWaveform(channel: number): void {
+    this._send({
+      type: 'esp32_adc_waveform',
+      data: { channel, samples_u12_b64: '', period_ns: 0 },
+    });
+  }
+
   /** Configure the byte an I2C device at addr returns */
   setI2cResponse(addr: number, response: number): void {
     this._send({ type: 'esp32_i2c_response', data: { addr, response } });

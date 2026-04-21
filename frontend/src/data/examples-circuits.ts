@@ -541,18 +541,20 @@ void loop() {
     title: 'Darlington Pair (High Current)',
     description: 'Two NPN BJTs cascaded for beta-squared current gain. Drives heavy loads from MCU.',
     category: 'circuits', difficulty: 'advanced',
-    code: `// Darlington pair — drives a high-current load
+    code: `// Darlington pair — beta-squared gain drives LED from tiny base current.
+// Fade in/out so you can SEE the Darlington proportionally amplifying.
 void setup() { pinMode(9, OUTPUT); }
 void loop() {
-  analogWrite(9, 128); // 50% duty
-  delay(1000);
+  for (int d = 0; d <= 255; d += 5) { analogWrite(9, d); delay(15); }
+  for (int d = 255; d >= 0; d -= 5) { analogWrite(9, d); delay(15); }
 }`,
     components: [
       UNO,
-      { type: 'wokwi-resistor',  id: 'rb', x: 340, y: 140, properties: { value: '10000' } },
-      { type: 'wokwi-resistor',  id: 'rl', x: 520, y: 60,  properties: { value: '100' } },
-      { type: 'wokwi-bjt-2n2222', id: 'q1', x: 440, y: 140, properties: {} },
-      { type: 'wokwi-bjt-2n2222', id: 'q2', x: 520, y: 220, properties: {} },
+      { type: 'wokwi-resistor',   id: 'rb',   x: 340, y: 140, properties: { value: '10000' } },
+      { type: 'wokwi-resistor',   id: 'rl',   x: 520, y: 40,  properties: { value: '220' } },
+      { type: 'wokwi-led',        id: 'led1', x: 520, y: 120, properties: { color: 'red' } },
+      { type: 'wokwi-bjt-2n2222', id: 'q1',   x: 440, y: 200, properties: {} },
+      { type: 'wokwi-bjt-2n2222', id: 'q2',   x: 520, y: 280, properties: {} },
     ],
     wires: [
       // Pin 9 → Rb → Q1 base
@@ -560,13 +562,14 @@ void loop() {
       w('w2', ['rb','2'],          ['q1','B']),
       // Q1 emitter drives Q2 base (darlington pair)
       w('w3', ['q1','E'],          ['q2','B']),
-      // Collectors tied together to the load return
+      // Collectors tied together — common collector node
       w('w4', ['q1','C'],          ['q2','C']),
-      // 5V → Rl → combined collectors (high-side load)
+      // High-side load: 5V → Rl → LED anode, LED cathode → common collector
       w('w5', ['arduino-uno','5V'], ['rl','1'], '#ff0000'),
-      w('w6', ['rl','2'],           ['q1','C']),
+      w('w6', ['rl','2'],           ['led1','A']),
+      w('w7', ['led1','C'],         ['q1','C']),
       // Q2 emitter → GND
-      w('w7', ['q2','E'],           ['arduino-uno','GND'], '#000000'),
+      w('w8', ['q2','E'],           ['arduino-uno','GND'], '#000000'),
     ],
   },
 

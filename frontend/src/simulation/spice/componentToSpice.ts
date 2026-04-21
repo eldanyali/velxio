@@ -534,7 +534,32 @@ const MAPPERS: Record<string, Mapper> = {
     return emitResistor(comp, pins, closed ? 0.01 : 1e9);
   },
 
-  // Potentiometer (3-terminal voltage divider)
+  // Rotary potentiometer — 3-terminal divider. `value` lives in [min..max]
+  // (defaults match the wokwi-potentiometer element: 0..1023). Total track
+  // resistance defaults to 10 kΩ; callers can override via `properties.total`.
+  'potentiometer': (comp, netLookup) => {
+    const top = netLookup('VCC');
+    const wiper = netLookup('SIG');
+    const bot = netLookup('GND');
+    if (!top || !wiper || !bot) return null;
+    const total = parseValueWithUnits(comp.properties.total ?? comp.properties.resistance, 10_000);
+    const min = Number(comp.properties.min ?? 0);
+    const max = Number(comp.properties.max ?? 1023);
+    const raw = Number(comp.properties.value ?? min);
+    const span = max - min || 1;
+    const ratio = Math.max(0, Math.min(1, (raw - min) / span));
+    const Rtop = Math.max(1, (1 - ratio) * total);
+    const Rbot = Math.max(1, ratio * total);
+    return {
+      cards: [
+        `R_${comp.id}_top ${top} ${wiper} ${Rtop}`,
+        `R_${comp.id}_bot ${wiper} ${bot} ${Rbot}`,
+      ],
+      modelsUsed: new Set(),
+    };
+  },
+
+  // Slide potentiometer (3-terminal voltage divider)
   'slide-potentiometer': (comp, netLookup) => {
     const top = netLookup('VCC');
     const wiper = netLookup('SIG');

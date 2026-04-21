@@ -208,37 +208,58 @@ The installer auto-detects which path to use:
 const isRp2040 = 'resolution' in (adc as object);
 ```
 
-### ESP32 remains on 60 Hz RAF-only
+### ESP32 family — per-read fidelity via QEMU waveform injection
 
-ESP32 boards use the `Esp32BridgeShim.setAdcVoltage` bridge (see
-`partUtils.ts`), which has no per-read hook. Until we expose one from the
-ESP32 bridge, ESP32 AC readings will be limited to 60 Hz RAF sampling.
-**This is acceptable today** because the only AC examples in
-`examples-circuits.ts` use AVR boards. If/when we ship an ESP32 AC example,
-add a matching hook to `Esp32Bridge.ts::Esp32BridgeShim`.
+ESP32 / ESP32-S3 / ESP32-C3 run inside QEMU (`wokwi-libs/qemu-lcgamboa`),
+so we cannot monkey-patch a JS `onADCRead` function. Instead the full
+periodic waveform is pushed down to the QEMU SAR ADC peripheral, which
+interpolates it against `QEMU_CLOCK_VIRTUAL` on every MMIO read — giving
+the guest the same sub-read fidelity as the AVR/RP2040 path.
+
+Pipeline:
+
+```
+frontend solve (.tran)
+  └─► useElectricalStore.timeWaveforms
+        └─► installAdcReadHooks() → pushEsp32Waveforms()
+              └─► Esp32Bridge.setAdcWaveform(pin, u12, periodNs)
+                    └─► WebSocket "esp32_adc_waveform"
+                          └─► backend esp32_worker.py
+                                └─► lib.qemu_picsimlab_set_apin_waveform(...)
+                                      └─► QEMU SAR ADC interpolates on read
+```
+
+See `docs/wiki/circuit-emulation-esp32-qemu.md` for the QEMU-side details
+(rebuild instructions, symbol names, data format).
 
 ---
 
 ## 8. Where fidelity still falls short (and what to do about it)
 
-The per-read hook brings ADC readings to hardware-faithful fidelity. Other
-paths that consume SPICE results still see only scalar (last-sample) values:
+The per-read hook brings ADC readings to hardware-faithful fidelity across
+AVR, RP2040, and ESP32 (QEMU). Several items from earlier drafts of this
+table have since been implemented:
 
-| Consumer | Current behavior | Fidelity upgrade |
-| --- | --- | --- |
-| `<Voltmeter/>` overlay | Shows last `.tran` sample | Show RMS or mean of `timeWaveforms.nodes[net]` |
-| `<Ammeter/>` overlay | Shows last `.tran` sample | Show RMS or mean of `timeWaveforms.branches[src]` |
-| LED brightness | `Math.abs(branchCurrents[iKey])` | Average `|I(t)|` over the period — see Plan §4 |
-| Resistor/diode heat dots | — | Future: `I²R` integrated over period |
-| Capacitor Charging example | Uses `.op` → instantaneous only | Promote to `.tran` on step changes, not just AC sources |
+| Consumer | Status |
+| --- | --- |
+| `<Voltmeter/>` overlay | ✅ Reads `timeWaveforms.nodes[net]` and displays RMS / pk / DC (see Phase 2b) |
+| `<Ammeter/>` overlay | ✅ Reads `timeWaveforms.branches[src]` and displays RMS / pk / DC (see Phase 2c) |
+| `<ElectricalOverlay/>` | ✅ Prefixes AC wires with `~` and shows AC/DC badge (Phase 2d) |
+| Capacitor-charging examples | ✅ `pickDynamicAnalysis` promotes to `.tran` when a reactive element is wired to an MCU-driven pin (Phase 4) |
+| ESP32 per-read ADC | ✅ Waveform pushed to QEMU SAR ADC; interpolated on MMIO read (Phase 3) |
 
-The **Capacitor Charging** example deserves particular attention: it's
-supposed to show an exponential `V(t) = Vsource × (1 − e^(−t/RC))` charging
-curve, but the current `.op` analysis gives only the steady-state endpoint.
-Extending `pickDynamicAnalysis` in `storeAdapter.ts` to treat step-function
-DC sources (e.g. when a board pin goes from LOW to HIGH into an RC) as
-transient inputs would fix this, with the same replay machinery we already
-have.
+Still on the backlog (out of scope for the Phase 1-6 delivery):
+
+- **LED brightness** already period-averages `|I(t)|` at
+  `BasicParts.ts:170`; no work required there.
+- **PWM-as-voltage-source fidelity** — PWM is still modeled as
+  `V = duty · Vcc` (quasi-static). For class-D amps or buck converters that
+  rely on switching edges, this is still a gap.
+- **ngspice state resumption / lockstep co-simulation** — would let the
+  MCU drive ngspice cycle-by-cycle rather than consuming a precomputed
+  periodic waveform. Large refactor; not needed for the examples we ship.
+- **Resistor/diode heat dots** — `I²R` integrated over the period is easy
+  now that `timeWaveforms` is available, but no UI hook has been wired yet.
 
 ---
 
@@ -252,11 +273,13 @@ have.
    sketch samples at ≥ 2 × f_signal (e.g. `delay(2)` for 50 Hz → 500 Hz
    sampling, plenty of headroom).
 3. Boards supported today for per-read fidelity: AVR (Uno, Nano, Mega,
-   ATtiny85) and RP2040 (Pico, Pico W). ESP32 is RAF-rate.
+   ATtiny85), RP2040 (Pico, Pico W), and the ESP32 family
+   (ESP32, ESP32-S3, ESP32-C3) via QEMU waveform injection.
 4. Add a test in `frontend/src/__tests__/` following the pattern in
-   `spice-rectifier-live-repro.test.ts::L9` — advance simulated wall-clock
-   across multiple RAF frames and assert the captured trace has the
-   expected periodicity.
+   `spice-rectifier-live-repro.test.ts::L9` — install the per-read hook,
+   advance simulated wall-clock, and assert the captured trace has the
+   expected periodicity. For ESP32 coverage, gate behind
+   `VELXIO_ESP32_E2E=1` (see `esp32-rectifier-integration.test.ts`).
 
 ---
 
@@ -264,13 +287,22 @@ have.
 
 | File | Role |
 | --- | --- |
-| `frontend/src/simulation/spice/subscribeToStore.ts` | RAF replay loop + per-read `onADCRead` hooks (AVR + RP2040) |
+| `frontend/src/simulation/spice/subscribeToStore.ts` | Per-read `onADCRead` hooks (AVR + RP2040) + `pushEsp32Waveforms` (QEMU) |
+| `frontend/src/simulation/spice/waveformStats.ts` | `rms`, `mean`, `peak`, `peakToPeak`, `isAC`, `interpolateAt` |
+| `frontend/src/simulation/spice/probes.ts` | Voltmeter/Ammeter readings (AC stats when `timeWaveforms` present) |
 | `frontend/src/simulation/spice/CircuitScheduler.ts` | Runs `.tran` and returns `timeWaveforms` |
-| `frontend/src/simulation/spice/storeAdapter.ts::pickDynamicAnalysis` | Decides `.op` vs `.tran` |
+| `frontend/src/simulation/spice/storeAdapter.ts::pickDynamicAnalysis` | Decides `.op` vs `.tran` (AC source OR reactive + driven pin) |
 | `wokwi-libs/avr8js/src/peripherals/adc.ts` | `AVRADC.onADCRead` — patched at runtime |
 | `wokwi-libs/rp2040js/src/peripherals/adc.ts` | `RPADC.onADCRead` — patched at runtime |
+| `wokwi-libs/qemu-lcgamboa/hw/misc/esp32_sens.c` | ESP32 SAR ADC — LUT + interpolation |
+| `wokwi-libs/qemu-lcgamboa/hw/misc/esp32c3_saradc.c` | ESP32-C3 SAR ADC — LUT + interpolation |
+| `frontend/src/simulation/Esp32Bridge.ts::setAdcWaveform` | Base64 encoder + WebSocket transport for waveform LUTs |
+| `backend/app/services/esp32_worker.py` | Calls `qemu_picsimlab_set_apin_waveform` via ctypes |
 | `frontend/src/simulation/parts/partUtils.ts::setAdcVoltage` | DC-path voltage injection (fallback) |
 | `frontend/src/__tests__/spice-rectifier-live-repro.test.ts` | Live-flow regression test |
+| `frontend/src/__tests__/{voltmeter,ammeter}-waveform.test.ts` | Voltmeter/Ammeter AC-reading regression |
+| `frontend/src/__tests__/capacitor-charge-transient.test.ts` | RC step-response pickup regression |
+| `frontend/src/__tests__/esp32-rectifier-integration.test.ts` | ESP32 E2E (gated by `VELXIO_ESP32_E2E=1`) |
 
 ---
 
@@ -284,6 +316,13 @@ have.
   moment of each read.
 - **Why tests missed it:** tests asserted on writes to `channelValues`, not
   on values returned by `analogRead`. Add read-side tests going forward.
-- **Where this doesn't generalize yet:** ESP32 (bridged ADC, no per-read
-  hook), voltmeter/ammeter overlays (scalar only), capacitor charging
-  (needs `.tran` on DC step-function inputs).
+- **Where this doesn't generalize yet:** PWM fidelity is still quasi-static
+  (`V = duty·Vcc`) — switching edges are invisible to SPICE. ngspice state
+  resumption / lockstep co-simulation is the next big unlock but is a
+  weeks-long scheduler rewrite.
+- **What WAS still a gap in earlier drafts and is now fixed:**
+  - ESP32 family — waveforms pushed to QEMU SAR ADC (Phase 3).
+  - Voltmeter / Ammeter / Overlay — compute RMS / peak / DC from
+    `timeWaveforms` (Phase 2).
+  - MCU-driven RC / RL step response — `pickDynamicAnalysis` promotes to
+    `.tran` automatically (Phase 4).

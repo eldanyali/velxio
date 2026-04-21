@@ -17,7 +17,7 @@
  */
 
 import { PartSimulationRegistry } from './PartSimulationRegistry';
-import { setAdcVoltage } from './partUtils';
+import { setAdcVoltage, syncStoreProperty } from './partUtils';
 import { registerSensorUpdate, unregisterSensorUpdate } from '../SensorUpdateRegistry';
 
 // ─── Tilt Switch ─────────────────────────────────────────────────────────────
@@ -67,17 +67,16 @@ PartSimulationRegistry.register('tilt-switch', {
 PartSimulationRegistry.register('ntc-temperature-sensor', {
     attachEvents: (element, simulator, getArduinoPinHelper, componentId) => {
         const pin = getArduinoPinHelper('OUT');
-        if (pin === null) return () => {};
 
         const tempToVolts = (temp: number) =>
             Math.max(0, Math.min(5, 2.5 - (temp - 25) * 0.02));
 
         // Room temperature default
-        setAdcVoltage(simulator, pin, tempToVolts(25));
+        if (pin !== null) setAdcVoltage(simulator, pin, tempToVolts(25));
 
         const onInput = () => {
             const val = (element as any).value;
-            if (val !== undefined) {
+            if (val !== undefined && pin !== null) {
                 setAdcVoltage(simulator, pin, (val / 1023.0) * 5.0);
             }
         };
@@ -85,7 +84,12 @@ PartSimulationRegistry.register('ntc-temperature-sensor', {
 
         registerSensorUpdate(componentId, (values) => {
             if ('temperature' in values) {
-                setAdcVoltage(simulator, pin, tempToVolts(values.temperature as number));
+                if (pin !== null) {
+                    setAdcVoltage(simulator, pin, tempToVolts(values.temperature as number));
+                }
+                // Mirror to store — the SPICE ntc-temperature-sensor handler
+                // reads comp.properties.temperature when computing R_ntc.
+                syncStoreProperty(componentId, 'temperature', values.temperature);
             }
         });
 

@@ -74,6 +74,7 @@ const MINIMAL_FIXTURES: Record<string, Fixture> = {
   pushbutton: { pins: ['A', 'B'] },
   'slide-switch': { pins: ['1', '2'], properties: { value: 1 } },
   'slide-potentiometer': { pins: ['VCC', 'SIG', 'GND'], properties: { value: '10k', position: 50 } },
+  potentiometer: { pins: ['VCC', 'SIG', 'GND'], properties: { min: 0, max: 1023, value: 512 } },
   'ntc-temperature-sensor': { pins: ['VCC', 'OUT', 'GND'], properties: { temperature: 25 } },
   photoresistor: { pins: ['VCC', 'AO', 'GND'], properties: { lux: 500 } },
   'instr-voltmeter': { pins: ['V+', 'V-'] },

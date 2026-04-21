@@ -11,22 +11,44 @@
  * branch current for it. Phase 8.5 MVP: emit the sense source by extending
  * componentToSpice with an ammeter mapper.
  */
-import type { ComponentForSpice, ElectricalSolveResult } from './types';
+import type { ComponentForSpice, ElectricalSolveResult, TimeWaveforms } from './types';
 import type { Wire } from '../../types/wire';
 import { UnionFind } from './unionFind';
+import { rms, mean, peak, subtract, isAC } from './waveformStats';
 
 export type ProbeKind = 'voltmeter' | 'ammeter' | 'multimeter';
+
+/**
+ * Time-domain statistics computed from a `.tran` waveform.
+ * Present only when the probed net has AC content.
+ */
+export interface ProbeAcStats {
+  /** Root-mean-square (what a real RMS meter reads for AC). */
+  rms: number;
+  /** DC component (mean). */
+  dc: number;
+  /** Peak absolute value. */
+  peak: number;
+  /** Pre-formatted "RMS X.XX V" / "RMS X.XX mA" line. */
+  rmsDisplay: string;
+  /** Pre-formatted "pk X.XX V" line. */
+  peakDisplay: string;
+  /** Pre-formatted "DC X.XX V" line. */
+  dcDisplay: string;
+}
 
 export interface ProbeReading {
   kind: ProbeKind;
   /** Primary numeric value (volts for voltmeter, amps for ammeter). */
   value: number;
-  /** Pretty string for UI display. */
+  /** Pretty string for UI display (legacy single-line). */
   display: string;
   /** Unit label shown next to the value. */
   unit: 'V' | 'mV' | 'µV' | 'A' | 'mA' | 'µA' | 'nA' | 'Ω' | 'kΩ' | 'MΩ' | '—';
   /** Whether the reading is stale / invalid. */
   stale: boolean;
+  /** Time-domain statistics when the probed net has AC content. */
+  ac?: ProbeAcStats;
 }
 
 /** True if a component is an instrument (doesn't stamp SPICE cards itself). */
@@ -83,10 +105,45 @@ export function buildPinNetLookup(
   };
 }
 
+function buildAcStatsV(samples: readonly number[]): ProbeAcStats {
+  const r = rms(samples);
+  const dc = mean(samples);
+  const pk = peak(samples);
+  const rmsFmt = formatV(r);
+  const dcFmt = formatV(dc);
+  const pkFmt = formatV(pk);
+  return {
+    rms: r,
+    dc,
+    peak: pk,
+    rmsDisplay: `RMS ${rmsFmt.display}`,
+    peakDisplay: `pk ${pkFmt.display}`,
+    dcDisplay: `DC ${dcFmt.display}`,
+  };
+}
+
+function buildAcStatsI(samples: readonly number[]): ProbeAcStats {
+  const r = rms(samples);
+  const dc = mean(samples);
+  const pk = peak(samples);
+  const rmsFmt = formatI(r);
+  const dcFmt = formatI(dc);
+  const pkFmt = formatI(pk);
+  return {
+    rms: r,
+    dc,
+    peak: pk,
+    rmsDisplay: `RMS ${rmsFmt.display}`,
+    peakDisplay: `pk ${pkFmt.display}`,
+    dcDisplay: `DC ${dcFmt.display}`,
+  };
+}
+
 export function readVoltmeter(
   comp: ComponentForSpice,
   netLookup: (componentId: string, pinName: string) => string | null,
   solve: ElectricalSolveResult,
+  timeWaveforms?: TimeWaveforms,
 ): ProbeReading {
   const plusNet = netLookup(comp.id, 'V+');
   const minusNet = netLookup(comp.id, 'V-');
@@ -97,12 +154,41 @@ export function readVoltmeter(
   const vm = solve.nodeVoltages[minusNet] ?? 0;
   const diff = vp - vm;
   const fmt = formatV(diff);
-  return { kind: 'voltmeter', value: fmt.value, unit: fmt.unit, display: fmt.display, stale: !solve.converged };
+
+  let ac: ProbeAcStats | undefined;
+  if (timeWaveforms) {
+    const plusSamples = timeWaveforms.nodes.get(plusNet);
+    const minusSamples = plusNet === '0' ? undefined : timeWaveforms.nodes.get(minusNet);
+    const plusArr = plusSamples ?? (plusNet === '0' ? [] : undefined);
+    const minusArr = minusSamples ?? (minusNet === '0' ? [] : undefined);
+    if (plusArr !== undefined && minusArr !== undefined) {
+      // subtract() tolerates a zero-length array and returns []; guard with a length check.
+      const diffSamples =
+        plusArr.length === 0
+          ? minusArr.map((v) => -v)
+          : minusArr.length === 0
+          ? [...plusArr]
+          : subtract(plusArr, minusArr);
+      if (diffSamples.length > 0 && isAC(diffSamples)) {
+        ac = buildAcStatsV(diffSamples);
+      }
+    }
+  }
+
+  return {
+    kind: 'voltmeter',
+    value: fmt.value,
+    unit: fmt.unit,
+    display: ac ? ac.rmsDisplay : fmt.display,
+    stale: !solve.converged,
+    ac,
+  };
 }
 
 export function readAmmeter(
   comp: ComponentForSpice,
   solve: ElectricalSolveResult,
+  timeWaveforms?: TimeWaveforms,
 ): ProbeReading {
   const key = `v_${comp.id}_sense`;
   const i = solve.branchCurrents[key];
@@ -114,5 +200,24 @@ export function readAmmeter(
   // current through, with a sign convention of + out of the "+" probe.
   const signed = -i;
   const fmt = formatI(signed);
-  return { kind: 'ammeter', value: fmt.value, unit: fmt.unit, display: fmt.display, stale: !solve.converged };
+
+  let ac: ProbeAcStats | undefined;
+  if (timeWaveforms) {
+    const raw = timeWaveforms.branches.get(key);
+    if (raw && raw.length > 0) {
+      const signedSamples = raw.map((v) => -v);
+      if (isAC(signedSamples)) {
+        ac = buildAcStatsI(signedSamples);
+      }
+    }
+  }
+
+  return {
+    kind: 'ammeter',
+    value: fmt.value,
+    unit: fmt.unit,
+    display: ac ? ac.rmsDisplay : fmt.display,
+    stale: !solve.converged,
+    ac,
+  };
 }
