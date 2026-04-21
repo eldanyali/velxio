@@ -7,7 +7,6 @@ import { SensorControlPanel } from './SensorControlPanel';
 import { SENSOR_CONTROLS } from '../../simulation/sensorControlConfig';
 import { DynamicComponent, createComponentFromMetadata } from '../DynamicComponent';
 import { ComponentRegistry } from '../../services/ComponentRegistry';
-import { PinSelector } from './PinSelector';
 import { getTabSessionId } from '../../simulation/Esp32Bridge';
 import { WireLayer } from './WireLayer';
 import type { SegmentHandle } from './WireLayer';
@@ -107,8 +106,6 @@ export const SimulatorCanvas = () => {
 
   // Component selection
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
-  const [showPinSelector, setShowPinSelector] = useState(false);
-  const [pinSelectorPos, setPinSelectorPos] = useState({ x: 0, y: 0 });
 
   // Component property dialog
   const [showPropertyDialog, setShowPropertyDialog] = useState(false);
@@ -573,14 +570,18 @@ export const SimulatorCanvas = () => {
             const boardId = touchId.slice('__board__:'.length);
             useSimulatorStore.getState().setActiveBoardId(boardId);
           } else if (touchId !== '__board__') {
-            // Short tap on component → open property dialog or sensor panel
+            // Short tap on component → open property dialog or sensor panel.
+            // While the simulator is running, components stay interactive —
+            // only sensor panels may open; property editing is disabled.
             const component = componentsRef.current.find(
               (c) => c.id === touchId
             );
             if (component) {
-              if (runningRef.current && SENSOR_CONTROLS[component.metadataId] !== undefined) {
-                setSensorControlComponentId(touchId);
-                setSensorControlMetadataId(component.metadataId);
+              if (runningRef.current) {
+                if (SENSOR_CONTROLS[component.metadataId] !== undefined) {
+                  setSensorControlComponentId(touchId);
+                  setSensorControlMetadataId(component.metadataId);
+                }
               } else {
                 setPropertyDialogComponentId(touchId);
                 setPropertyDialogPosition({
@@ -903,24 +904,6 @@ export const SimulatorCanvas = () => {
     setShowComponentPicker(false);
   };
 
-  // Component selection (double click to open pin selector)
-  const handleComponentDoubleClick = (componentId: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-    setSelectedComponentId(componentId);
-    setPinSelectorPos({ x: event.clientX, y: event.clientY });
-    setShowPinSelector(true);
-  };
-
-  // Pin assignment
-  const handlePinSelect = (componentId: string, pin: number) => {
-    updateComponent(componentId, {
-      properties: {
-        ...components.find((c) => c.id === componentId)?.properties,
-        pin,
-      },
-    } as any);
-  };
-
   // Component rotation
   const handleRotateComponent = (componentId: string) => {
     const component = components.find((c) => c.id === componentId);
@@ -937,7 +920,7 @@ export const SimulatorCanvas = () => {
 
   // Component dragging handlers
   const handleComponentMouseDown = (componentId: string, e: React.MouseEvent) => {
-    if (showPinSelector || showPropertyDialog) return;
+    if (showPropertyDialog) return;
 
     e.stopPropagation();
     const component = components.find((c) => c.id === componentId);
@@ -1056,10 +1039,15 @@ export const SimulatorCanvas = () => {
         } else if (draggedComponentId !== '__board__') {
           const component = components.find((c) => c.id === draggedComponentId);
           if (component) {
-            // During simulation: sensor components show the SensorControlPanel
-            if (running && SENSOR_CONTROLS[component.metadataId] !== undefined) {
-              setSensorControlComponentId(draggedComponentId);
-              setSensorControlMetadataId(component.metadataId);
+            if (running) {
+              // During simulation only sensor panels open on click — every
+              // other component is interactive (pushbutton, switch, pot, …)
+              // and must handle its own clicks, so we suppress the property
+              // dialog entirely.
+              if (SENSOR_CONTROLS[component.metadataId] !== undefined) {
+                setSensorControlComponentId(draggedComponentId);
+                setSensorControlMetadataId(component.metadataId);
+              }
             } else {
               setPropertyDialogComponentId(draggedComponentId);
               setPropertyDialogPosition({
@@ -1293,12 +1281,6 @@ export const SimulatorCanvas = () => {
           isSelected={isSelected}
           onMouseDown={(e) => {
             handleComponentMouseDown(component.id, e);
-          }}
-          onDoubleClick={(e) => {
-            // Only handle UI events when simulation is NOT running
-            if (!running) {
-              handleComponentDoubleClick(component.id, e);
-            }
           }}
         />
 
@@ -1594,22 +1576,6 @@ export const SimulatorCanvas = () => {
           )}
         </div>
       </div>
-
-      {/* Pin Selector Modal */}
-      {showPinSelector && selectedComponentId && (
-        <PinSelector
-          componentId={selectedComponentId}
-          componentType={
-            components.find((c) => c.id === selectedComponentId)?.metadataId || 'unknown'
-          }
-          currentPin={
-            components.find((c) => c.id === selectedComponentId)?.properties.pin as number | undefined
-          }
-          onPinSelect={handlePinSelect}
-          onClose={() => setShowPinSelector(false)}
-          position={pinSelectorPos}
-        />
-      )}
 
       {/* Component Property Dialog */}
       {showPropertyDialog && propertyDialogComponentId && (() => {
