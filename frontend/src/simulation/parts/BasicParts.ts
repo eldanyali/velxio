@@ -158,12 +158,26 @@ PartSimulationRegistry.register('led', {
             // `i(v_<componentId>_sense)` → stored under the
             // `v_<componentId>_sense` key in `branchCurrents`.
             //
+            // For `.tran` circuits the scalar current is the last sample
+            // (≈ steady state). If a full waveform is available we instead
+            // compute the period-averaged |I|, which is what a real observer
+            // sees — a 50 Hz rectified LED does not flicker to the eye, it
+            // glows at ~Ipeak/π of its peak brightness.
+            //
             // Digital fallback (anodeHigh && cathodeLow) is only used if
             // the electrical store can't be loaded at all — e.g. in a
             // Node-side test harness that stubs it out.
-            const { branchCurrents } = useElectricalStore.getState();
+            const { branchCurrents, timeWaveforms } = useElectricalStore.getState();
             const iKey = `v_${componentId}_sense`;
-            const raw = branchCurrents[iKey];
+            let raw = branchCurrents[iKey];
+            if (timeWaveforms) {
+                const samples = timeWaveforms.branches.get(iKey);
+                if (samples && samples.length > 0) {
+                    let sum = 0;
+                    for (const s of samples) sum += Math.abs(s);
+                    raw = sum / samples.length;
+                }
+            }
             if (raw !== undefined) {
                 const current = Math.abs(raw);
                 lastSpiceBrightness = Math.min(1, current / 0.020);
@@ -208,7 +222,10 @@ PartSimulationRegistry.register('led', {
         // whenever the SPICE solver delivers a new result.
         const unsubElectrical = useElectricalStore.subscribe(
             (state, prev) => {
-                if (state.branchCurrents !== prev.branchCurrents) update();
+                if (
+                    state.branchCurrents !== prev.branchCurrents ||
+                    state.timeWaveforms !== prev.timeWaveforms
+                ) update();
             },
         );
         unsubs.push(unsubElectrical);

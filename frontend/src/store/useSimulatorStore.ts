@@ -16,6 +16,7 @@ import { Esp32Bridge } from '../simulation/Esp32Bridge';
 import { useEditorStore } from './useEditorStore';
 import { useVfsStore } from './useVfsStore';
 import { boardPinToNumber, isBoardComponent } from '../utils/boardPinMapping';
+import { createSerialBatcher } from './serialBatcher';
 
 // ── Sensor pre-registration ──────────────────────────────────────────────────
 // Maps component metadataId → { sensorType, dataPinName, propertyKeys }
@@ -341,6 +342,24 @@ const INITIAL_BOARD: BoardInstance = {
   languageMode: 'arduino' as LanguageMode,
 };
 
+// ── Serial batching ───────────────────────────────────────────────────────
+// USART callbacks fire once per byte. Sketches doing `Serial.println(x)` at
+// ~200 Hz emit ~600 bytes/s, and a raw `set()` per byte overwhelms React's
+// useSyncExternalStore reconciliation (→ "Maximum update depth exceeded").
+// The batcher coalesces chunks per animation frame (≤60 Hz), grouped by board.
+const { append: appendSerial } = createSerialBatcher((perBoard) => {
+  useSimulatorStore.setState((s) => {
+    let globalOut = s.serialOutput;
+    const boards = s.boards.map((b) => {
+      const chunk = perBoard.get(b.id);
+      if (!chunk) return b;
+      if (s.activeBoardId === b.id) globalOut += chunk;
+      return { ...b, serialOutput: b.serialOutput + chunk };
+    });
+    return { boards, serialOutput: globalOut };
+  });
+});
+
 // ── Store ─────────────────────────────────────────────────────────────────
 export const useSimulatorStore = create<SimulatorState>((set, get) => {
   // Initialise runtime objects for the default board
@@ -359,15 +378,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
   const initialSim = createSimulator(
     'arduino-uno',
     initialPm,
-    (ch) => {
-      set((s) => {
-        const boards = s.boards.map((b) =>
-          b.id === INITIAL_BOARD_ID ? { ...b, serialOutput: b.serialOutput + ch } : b
-        );
-        const isActive = s.activeBoardId === INITIAL_BOARD_ID;
-        return { boards, ...(isActive ? { serialOutput: s.serialOutput + ch } : {}) };
-      });
-    },
+    (ch) => appendSerial(INITIAL_BOARD_ID, ch),
     (baud) => {
       set((s) => {
         const boards = s.boards.map((b) =>
@@ -407,15 +418,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       const pm = new PinManager();
       pinManagerMap.set(id, pm);
 
-      const serialCallback = (ch: string) => {
-        set((s) => {
-          const boards = s.boards.map((b) =>
-            b.id === id ? { ...b, serialOutput: b.serialOutput + ch } : b
-          );
-          const isActive = s.activeBoardId === id;
-          return { boards, ...(isActive ? { serialOutput: s.serialOutput + ch } : {}) };
-        });
-      };
+      const serialCallback = (ch: string) => appendSerial(id, ch);
 
       if (boardKind === 'raspberry-pi-3') {
         const bridge = new RaspberryPi3Bridge(id);
@@ -870,15 +873,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         if (sim) {
           sim.reset();
           // Re-wire serial callback after reset
-          sim.onSerialData = (ch) => {
-            set((s) => {
-              const boards = s.boards.map((b) =>
-                b.id === boardId ? { ...b, serialOutput: b.serialOutput + ch } : b
-              );
-              const isActive = s.activeBoardId === boardId;
-              return { boards, ...(isActive ? { serialOutput: s.serialOutput + ch } : {}) };
-            });
-          };
+          sim.onSerialData = (ch) => appendSerial(boardId, ch);
           if (sim instanceof AVRSimulator) {
             sim.onBaudRateChange = (baud) => {
               set((s) => {
@@ -932,12 +927,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       getEsp32Bridge(boardId)?.disconnect();
       esp32BridgeMap.delete(boardId);
 
-      const serialCallback = (ch: string) => set((s) => {
-        const boards = s.boards.map((b) =>
-          b.id === boardId ? { ...b, serialOutput: b.serialOutput + ch } : b
-        );
-        return { boards, serialOutput: s.serialOutput + ch };
-      });
+      const serialCallback = (ch: string) => appendSerial(boardId, ch);
 
       if (isEsp32Kind(type as BoardKind)) {
         // ESP32: use bridge, not AVR simulator
@@ -1020,12 +1010,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       getEsp32Bridge(boardId)?.disconnect();
       esp32BridgeMap.delete(boardId);
 
-      const serialCallback = (ch: string) => set((s) => {
-        const boards = s.boards.map((b) =>
-          b.id === boardId ? { ...b, serialOutput: b.serialOutput + ch } : b
-        );
-        return { boards, serialOutput: s.serialOutput + ch };
-      });
+      const serialCallback = (ch: string) => appendSerial(boardId, ch);
 
       if (isEsp32Kind(boardType as BoardKind)) {
         // ESP32: create bridge + shim (same as setBoardType)
@@ -1150,15 +1135,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       let bridge = getBoardBridge(boardId);
       if (!bridge) {
         bridge = new RaspberryPi3Bridge(boardId);
-        bridge.onSerialData = (ch) => {
-          set((s) => {
-            const boards = s.boards.map((b) =>
-              b.id === boardId ? { ...b, serialOutput: b.serialOutput + ch } : b
-            );
-            const isActive = s.activeBoardId === boardId;
-            return { boards, ...(isActive ? { serialOutput: s.serialOutput + ch } : {}) };
-          });
-        };
+        bridge.onSerialData = (ch) => appendSerial(boardId, ch);
         bridge.onPinChange = (gpioPin, state) => {
           const { wires } = get();
           const sim = getBoardSimulator(get().activeBoardId ?? INITIAL_BOARD_ID);

@@ -57,11 +57,35 @@ export interface BuildNetlistInput {
   extraCards?: string[];
 }
 
+/**
+ * Per-sample voltage/current vectors from a `.tran` analysis.
+ *
+ * Present only when `analysisMode === 'tran'`. All vectors share the same
+ * `time` axis (seconds, monotonic, starts at 0). Downstream consumers (ADC
+ * injection, LED brightness) interpolate `samples[t]` to the current AVR sim
+ * time modulo the period to replay the waveform continuously.
+ */
+export interface TimeWaveforms {
+  /** Monotonic time axis in seconds. */
+  time: number[];
+  /** Net name → voltage samples aligned with `time`. */
+  nodes: Map<string, number[]>;
+  /** Voltage-source name → current samples aligned with `time`. */
+  branches: Map<string, number[]>;
+}
+
 /** Cooked solve results exposed to UI layers. */
 export interface ElectricalSolveResult {
-  /** Net name → voltage (V). Ground net is always 0. */
+  /**
+   * Net name → scalar voltage (V). Ground net is always 0.
+   *
+   * For `.op`: the operating-point value. For `.tran`: the **last** sample
+   * (≈ steady state) so legacy consumers that read a single number still
+   * see a plausible value. The instantaneous/periodic replay is available
+   * through `timeWaveforms`.
+   */
   nodeVoltages: Record<string, number>;
-  /** Voltage source name → current (A). */
+  /** Voltage source name → scalar current (A). Same semantics as `nodeVoltages`. */
   branchCurrents: Record<string, number>;
   /** Convergence flag. `false` means the result is suspect. */
   converged: boolean;
@@ -76,4 +100,11 @@ export interface ElectricalSolveResult {
    * used to generate the netlist. Used by ADC injection to locate voltages.
    */
   pinNetMap: Map<string, string>;
+  /** Which analysis produced this result. */
+  analysisMode: 'op' | 'tran' | 'ac';
+  /**
+   * Periodic waveforms from a `.tran` analysis. Present only when
+   * `analysisMode === 'tran'`; `undefined` for `.op` / `.ac`.
+   */
+  timeWaveforms?: TimeWaveforms;
 }

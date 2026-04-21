@@ -95,14 +95,26 @@ export const SerialMonitor: React.FC = () => {
   const resolvedTabId = (boards.find((b) => b.id === activeTabId) ? activeTabId : boards[0]?.id) ?? null;
   const activeBoard = boards.find((b) => b.id === resolvedTabId);
 
-  // Mark tab as read when it becomes active
+  // Snapshot the current length the moment a tab becomes active so any
+  // future bytes register as unread on *other* tabs. Deliberately omits
+  // `activeBoard?.serialOutput.length` from the deps — the unread dot is
+  // already hidden on the active tab (`hasUnread && !isActive`), so there's
+  // no need to re-snapshot on every byte arrival. Doing so under a high
+  // serial rate (~600 bytes/s from `Serial.println` in a tight loop) drove
+  // React's useSyncExternalStore into "Maximum update depth exceeded".
   useEffect(() => {
-    if (resolvedTabId && activeBoard) {
-      setLastSeenLen((prev) => ({ ...prev, [resolvedTabId]: activeBoard.serialOutput.length }));
+    if (resolvedTabId) {
+      const board = boards.find((b) => b.id === resolvedTabId);
+      if (board) {
+        setLastSeenLen((prev) => ({ ...prev, [resolvedTabId]: board.serialOutput.length }));
+      }
     }
-  }, [resolvedTabId, activeBoard?.serialOutput.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedTabId]);
 
-  // Auto-scroll when output changes on the visible tab
+  // Auto-scroll when output changes on the visible tab. Depending on the
+  // string identity (not its length) means one scroll per RAF flush — the
+  // batcher guarantees this doesn't run faster than 60 Hz.
   useEffect(() => {
     if (autoscroll && outputRef.current) {
       outputRef.current.scrollTop = outputRef.current.scrollHeight;

@@ -13,7 +13,7 @@
  * changes. See [`main.tsx`] or `EditorPage.tsx`.
  */
 import { create } from 'zustand';
-import type { BuildNetlistInput, ElectricalSolveResult } from '../simulation/spice/types';
+import type { BuildNetlistInput, ElectricalSolveResult, TimeWaveforms } from '../simulation/spice/types';
 import { circuitScheduler } from '../simulation/spice/CircuitScheduler';
 
 interface ElectricalState {
@@ -25,6 +25,13 @@ interface ElectricalState {
   submittedNetlist: string;
   /** "boardId:pinName" → SPICE net name. Populated after each solve. */
   pinNetMap: Map<string, string>;
+  /** Which analysis the last solve used. */
+  analysisMode: 'op' | 'tran' | 'ac';
+  /**
+   * Periodic waveforms from the last `.tran` solve (undefined for `.op`).
+   * RAF-driven ADC replay and LED brightness averaging read from this field.
+   */
+  timeWaveforms?: TimeWaveforms;
 
   triggerSolve: (input: BuildNetlistInput) => void;
   solveNow: (input: BuildNetlistInput) => Promise<ElectricalSolveResult>;
@@ -54,6 +61,8 @@ export const useElectricalStore = create<ElectricalState>((set) => {
       lastSolveMs: r.solveMs,
       submittedNetlist: r.submittedNetlist,
       pinNetMap: r.pinNetMap,
+      analysisMode: r.analysisMode,
+      timeWaveforms: r.timeWaveforms,
     });
   });
 
@@ -65,6 +74,8 @@ export const useElectricalStore = create<ElectricalState>((set) => {
     lastSolveMs: 0,
     submittedNetlist: '',
     pinNetMap: new Map(),
+    analysisMode: 'op' as const,
+    timeWaveforms: undefined,
 
     triggerSolve(input) {
       circuitScheduler.requestSolve(input);
@@ -87,6 +98,8 @@ export const useElectricalStore = create<ElectricalState>((set) => {
         lastSolveMs: 0,
         submittedNetlist: '',
         pinNetMap: new Map(),
+        analysisMode: 'op',
+        timeWaveforms: undefined,
       });
     },
   };

@@ -10,7 +10,7 @@
  *     trailing solve so we never miss the latest edit.
  *   - Exposes `onResult` hooks so the store can subscribe.
  */
-import type { BuildNetlistInput, ElectricalSolveResult } from './types';
+import type { BuildNetlistInput, ElectricalSolveResult, TimeWaveforms } from './types';
 import { buildNetlist } from './NetlistBuilder';
 import { runNetlist } from './SpiceEngine.lazy';
 
@@ -72,15 +72,28 @@ class CircuitScheduler {
     this.inFlight = true;
 
     const { netlist, pinNetMap } = buildNetlist(req.input);
+    const analysisKind = req.input.analysis.kind;
     const t0 = performance.now();
     let result: ElectricalSolveResult;
     try {
       const cooked = await runNetlist(netlist);
+      const isTran = analysisKind === 'tran';
+
+      // For `.tran`, the scalar `nodeVoltages`/`branchCurrents` are taken
+      // from the **last** sample (≈ steady state) so legacy consumers that
+      // read a single number still see a plausible value. Instantaneous
+      // replay goes through `timeWaveforms` below.
+      const scalarOf = (name: string): number => {
+        const v = isTran ? cooked.vAtLast(name) : cooked.dcValue(name);
+        if (typeof v === 'number') return v;
+        return v.real;
+      };
+
       const nodeVoltages: Record<string, number> = { '0': 0 };
       for (const name of cooked.variableNames) {
         if (name.startsWith('v(')) {
           const net = name.slice(2, -1);
-          const v = cooked.dcValue(name);
+          const v = scalarOf(name);
           if (Number.isFinite(v)) nodeVoltages[net] = v;
         }
       }
@@ -88,10 +101,36 @@ class CircuitScheduler {
       for (const name of cooked.variableNames) {
         if (name.startsWith('i(')) {
           const src = name.slice(2, -1);
-          const i = cooked.dcValue(name);
+          const i = scalarOf(name);
           if (Number.isFinite(i)) branchCurrents[src] = i;
         }
       }
+
+      let timeWaveforms: TimeWaveforms | undefined;
+      if (isTran) {
+        try {
+          const timeVec = cooked.vec('time') as number[];
+          if (timeVec && timeVec.length > 0) {
+            const nodes = new Map<string, number[]>();
+            const branches = new Map<string, number[]>();
+            for (const name of cooked.variableNames) {
+              if (name.toLowerCase() === 'time') continue;
+              const samples = cooked.vec(name) as number[];
+              if (name.startsWith('v(')) {
+                nodes.set(name.slice(2, -1), samples);
+              } else if (name.startsWith('i(')) {
+                branches.set(name.slice(2, -1), samples);
+              }
+            }
+            timeWaveforms = { time: timeVec, nodes, branches };
+          }
+        } catch {
+          // ngspice occasionally omits the time vector on degenerate inputs —
+          // fall back to scalar-only result in that case.
+          timeWaveforms = undefined;
+        }
+      }
+
       result = {
         nodeVoltages,
         branchCurrents,
@@ -100,6 +139,8 @@ class CircuitScheduler {
         solveMs: performance.now() - t0,
         submittedNetlist: netlist,
         pinNetMap,
+        analysisMode: analysisKind,
+        timeWaveforms,
       };
     } catch (err) {
       result = {
@@ -110,9 +151,25 @@ class CircuitScheduler {
         solveMs: performance.now() - t0,
         submittedNetlist: netlist,
         pinNetMap,
+        analysisMode: analysisKind,
       };
     } finally {
       this.inFlight = false;
+    }
+
+    console.log('[spice] solve result', {
+      analysisMode: result.analysisMode,
+      converged: result.converged,
+      error: result.error,
+      solveMs: result.solveMs.toFixed(1),
+      nodeCount: Object.keys(result.nodeVoltages).length,
+      hasWaveforms: !!result.timeWaveforms,
+      waveformNodeKeys: result.timeWaveforms ? [...result.timeWaveforms.nodes.keys()] : [],
+      pinNetMapSize: result.pinNetMap.size,
+      netlistLines: result.submittedNetlist.split('\n').length,
+    });
+    if (!result.converged || result.error) {
+      console.warn('[spice] netlist that failed:\n' + result.submittedNetlist);
     }
 
     for (const cb of this.listeners) cb(result);
@@ -144,6 +201,7 @@ function noopResult(reason: string): ElectricalSolveResult {
     solveMs: 0,
     submittedNetlist: '',
     pinNetMap: new Map(),
+    analysisMode: 'op',
   };
 }
 

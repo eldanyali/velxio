@@ -454,6 +454,13 @@ export class AVRSimulator {
 
     this.running = true;
     console.log('Starting AVR simulation...');
+    try {
+      const dbg = (window as unknown as { __spiceDebug?: () => void }).__spiceDebug;
+      if (typeof dbg === 'function') dbg();
+      else console.warn('[spice] __spiceDebug not attached — wireElectricalSolver never mounted');
+    } catch (e) {
+      console.warn('[spice] debug dump failed', e);
+    }
 
     // ATmega328p @ 16MHz
     const CPU_HZ = 16_000_000;

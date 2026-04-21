@@ -383,11 +383,105 @@ switches, I²C displays, servos, buzzers) continue through the unchanged
 asserts monotonic LED current across the ramp; the diag test above
 asserts the scheduler-filtered keys still land in `branchCurrents`.
 
+## G-S. SPICE-mapped components silently stop updating after `parts/*.ts` edits
+
+Two distinct bugs, both surfaced while finishing the G-R rollout. Both have
+the same shape: `buildNetlist` + `runNetlist` produce correct currents in a
+Vitest harness, but the component in the browser never reflects them. Tests
+green, UI wrong — the most frustrating failure mode.
+
+### G-S.1 — `require()` inside an `attachEvents` callback
+
+**Symptom:** LED stays dark in the `mosfet-pwm-led` (and any) SPICE-driven
+example even after the G-R fix lands. No console error. No thrown promise.
+The `branchCurrents` store is populated correctly; the LED just never reads
+from it.
+
+**Root cause:** `BasicParts.ts` imported the Zustand store lazily from
+inside the subscribe callback:
+
+```typescript
+attachEvents: (el, _sim, _getPin, componentId) => {
+  const update = () => {
+    const { useElectricalStore } = require('../../store/useElectricalStore'); // ← dies silently
+    const { branchCurrents } = useElectricalStore.getState();
+    …
+  };
+  const unsub = useElectricalStore.subscribe(update); // ← same problem
+  …
+},
+```
+
+Vite's esbuild pipeline doesn't polyfill CommonJS `require` in browser code.
+The call threw `ReferenceError: require is not defined` the first time
+`update()` ran. Zustand's `subscribe` swallows exceptions from listener
+callbacks (by design — one broken listener can't kill the others), so the
+error never made it to the console and the LED silently did nothing.
+
+**Fix:** static ESM import at module top.
+
+```typescript
+import { useElectricalStore } from '../../store/useElectricalStore';
+
+attachEvents: (el, _sim, _getPin, componentId) => {
+  const update = () => {
+    const { branchCurrents } = useElectricalStore.getState();
+    …
+  };
+  …
+},
+```
+
+**Principle:** inside any file that ships to the browser, `require()` is a
+footgun. If a bundler tolerates it in dev, production may not. And if the
+call lives inside a subscribe/pin-change/event callback, the exception
+won't even be visible. Prefer top-of-file `import` always.
+
+### G-S.2 — Vite HMR keeps old `attachEvents` bound after `parts/*.ts` edits
+
+**Symptom:** You edit `BasicParts.ts` (or any `parts/*.ts`), save, the HMR
+banner flashes "updated" — but the circuit behaviour in the browser is
+unchanged. You doubt your own fix, add `console.log`s that never fire, and
+eventually rewrite code that was already correct.
+
+**Root cause:** `parts/index.ts` registers every part into
+`PartSimulationRegistry` via module-load side effects. When HMR swaps a
+`parts/*.ts` module, the *registry* sees the new `attachEvents`, but the
+LED/MOSFET/etc. components that were rendered before the edit are still
+holding references to the *old* `attachEvents` via the `unsub` closures
+they set up in their mount effect. Until those components unmount and
+remount, they keep running the stale callback.
+
+The NPN-switch debug session burned ~90 min on this: all three Vitest
+harnesses (`spice-npn-switch-diag`, `spice-npn-switch-integration`, and the
+pre-existing `spice-mosfet-pwm`) proved the pipeline was correct end-to-end
+while the browser kept showing the LED permanently lit.
+
+**Fix:** full restart whenever you touch anything under
+`frontend/src/simulation/parts/` or `frontend/src/simulation/spice/`:
+
+```
+Ctrl+C                          # kill dev server
+npm run dev                     # fresh module graph
+Ctrl+Shift+R  (in browser)      # discard old Zustand subscribers
+```
+
+**Mitigation (not applied):** we could add `import.meta.hot?.invalidate()`
+at the bottom of every `parts/*.ts` to force a full page reload on edit.
+Considered too disruptive for the file-frequency these get edited at —
+the restart rule is easier to remember once you've been bitten.
+
+**Principle:** HMR is fine for React components and CSS. For code that
+wires long-lived subscriptions inside a global registry, assume HMR is
+lying to you and restart.
+
 ## What to check first when something fails
 
+0. **If you just edited `parts/*.ts` or `spice/*.ts` and the browser looks wrong** — restart the dev server before anything else (see G-S.2). Tests are the authoritative signal; the dev server is not.
 1. **Console stderr** from ngspice often contains the root cause ("singular matrix", "model not found", "syntax error at line X").
 2. **`result.variableNames`** — if you expect `v(out)` and the list has `v(OUT)`, case matching bit you. Our wrapper lowercases, but check.
 3. **`sim.getError()`** — returns the ngspice error buffer.
 4. **Run in isolation** — `npx vitest run -t "specific test name"` to rule out test-to-test contamination.
 5. **Simplify the netlist** — strip components until the problem either disappears (you found the culprit) or persists (the remaining part is the problem).
 6. **Add explicit DC paths** — `R_pull node 0 10Meg` on every suspect-floating node.
+7. **Mirror the browser path in a Vitest harness** — if tests pass but UI fails, the bug is upstream of `buildNetlist` (subscription, import, HMR) not in SPICE. `spice-npn-switch-integration.test.ts` is the reference template for this.
