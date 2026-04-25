@@ -17,6 +17,12 @@ import { useEditorStore } from './useEditorStore';
 import { useVfsStore } from './useVfsStore';
 import { boardPinToNumber, isBoardComponent } from '../utils/boardPinMapping';
 import { createSerialBatcher } from './serialBatcher';
+import {
+  bindBoard as icBindBoard,
+  unbindBoard as icUnbindBoard,
+  updateWires as icUpdateWires,
+  setInterconnectRuntime,
+} from '../simulation/Interconnect';
 
 // ── Sensor pre-registration ──────────────────────────────────────────────────
 // Maps component metadataId → { sensorType, dataPinName, propertyKeys }
@@ -475,15 +481,8 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
     },
     getOscilloscopeCallback(INITIAL_BOARD_ID),
   );
-  // Cross-board serial bridge for the initial board: AVR TX → Pi bridges RX
-  const initialOrigSerial = initialSim.onSerialData;
-  initialSim.onSerialData = (ch: string) => {
-    initialOrigSerial?.(ch);
-    get().boards.forEach((b) => {
-      const bridge = bridgeMap.get(b.id);
-      if (bridge) bridge.sendSerialBytes([ch.charCodeAt(0)]);
-    });
-  };
+  // Cross-board routing for the initial board is handled by the Interconnect
+  // (registered after the store is created — see bottom of this file).
   simulatorMap.set(INITIAL_BOARD_ID, initialSim);
 
   // ── Legacy single-board PinManager (references initial board's pm) ───────
@@ -507,14 +506,10 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         const bridge = new RaspberryPi3Bridge(id);
         bridge.onSerialData = (ch: string) => {
           serialCallback(ch);
-          // Cross-board serial bridge: Pi TX → all AVR simulators RX
-          get().boards.forEach((b) => {
-            const sim = simulatorMap.get(b.id);
-            if (sim instanceof AVRSimulator || sim instanceof RiscVSimulator) sim.serialWrite(ch);
-          });
+          // Cross-board routing now handled by Interconnect (see bind below).
         };
         bridge.onPinChange = (_gpioPin, _state) => {
-          // Cross-board routing handled in SimulatorCanvas
+          // Cross-board routing now handled by Interconnect (see bind below).
         };
         bridgeMap.set(id, bridge);
       } else if (isEsp32Kind(boardKind)) {
@@ -576,15 +571,7 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
           },
           getOscilloscopeCallback(id),
         );
-        // Cross-board serial bridge: AVR TX → all Pi bridges RX
-        const origSerial = sim.onSerialData;
-        sim.onSerialData = (ch: string) => {
-          origSerial?.(ch);
-          get().boards.forEach((b) => {
-            const bridge = bridgeMap.get(b.id);
-            if (bridge) bridge.sendSerialBytes([ch.charCodeAt(0)]);
-          });
-        };
+        // Cross-board routing now handled by Interconnect (see bind below).
         simulatorMap.set(id, sim);
       }
 
@@ -609,6 +596,9 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       if (boardKind === 'raspberry-pi-3') {
         useVfsStore.getState().initBoardVfs(id);
       }
+      // ── Interconnect: register the board and rebuild routes ──────────
+      icBindBoard(id, boardKind);
+      icUpdateWires(get().wires);
       return id;
     },
 
@@ -641,6 +631,9 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       if (board) {
         useEditorStore.getState().deleteFileGroup(board.activeFileGroupId);
       }
+      // ── Interconnect: drop board and rebuild routes ──────────────────
+      icUnbindBoard(boardId);
+      icUpdateWires(get().wires);
     },
 
     updateBoard: (boardId: string, updates: Partial<BoardInstance>) => {
@@ -1571,3 +1564,39 @@ export function getActiveBoard(): BoardInstance | null {
   const { boards, activeBoardId } = useSimulatorStore.getState();
   return boards.find((b) => b.id === activeBoardId) ?? null;
 }
+
+// ── Cross-board interconnect wiring ────────────────────────────────────────
+//
+// The Interconnect router subscribes to wire and board changes to propagate
+// digital pin transitions and UART bytes between boards. We register the
+// runtime accessors once, bind the initial board, and watch for store
+// mutations.
+
+setInterconnectRuntime({
+  getBoardSimulator: (id: string) => simulatorMap.get(id),
+  getBoardPinManager: (id: string) => pinManagerMap.get(id),
+  getBoardBridge: (id: string) => bridgeMap.get(id),
+  getEsp32Bridge: (id: string) => esp32BridgeMap.get(id),
+});
+
+// Bind the initial Arduino Uno that ships with the store.
+icBindBoard(INITIAL_BOARD_ID, 'arduino-uno');
+icUpdateWires(useSimulatorStore.getState().wires);
+
+// React to wire mutations from any source (drag, import, setState, ...).
+let lastWiresRef: readonly Wire[] = useSimulatorStore.getState().wires;
+let lastBoardsRef: readonly BoardInstance[] = useSimulatorStore.getState().boards;
+useSimulatorStore.subscribe((state) => {
+  const wiresChanged = state.wires !== lastWiresRef;
+  const boardsChanged = state.boards !== lastBoardsRef;
+  if (boardsChanged) {
+    lastBoardsRef = state.boards;
+    // Bind any boards that appeared in state but not yet in interconnect
+    // (covers paths that bypass addBoard, e.g. import-from-zip, hot reload).
+    for (const b of state.boards) icBindBoard(b.id, b.boardKind);
+  }
+  if (wiresChanged || boardsChanged) {
+    lastWiresRef = state.wires;
+    icUpdateWires(state.wires);
+  }
+});

@@ -103,6 +103,15 @@ export class PinManager {
     }
   }
 
+  /**
+   * Clear cached pin states (without removing listeners).
+   * Useful in tests so that a fresh `triggerPinChange` after a reset
+   * isn't suppressed by the same-state early-return.
+   */
+  resetPinStates(): void {
+    this.pinStates.clear();
+  }
+
   // ── PWM duty cycle API ───────────────────────────────────────────────────
 
   /**
