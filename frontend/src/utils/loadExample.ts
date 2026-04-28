@@ -103,8 +103,10 @@ export async function loadExample(
       if (!board) return;
 
       if (eb.code) {
-        const AVR_BOARDS = ['arduino-uno', 'arduino-nano', 'arduino-mega', 'attiny85'];
-        const filename = AVR_BOARDS.includes(eb.boardKind) ? 'sketch.ino' : 'main.cpp';
+        // Arduino-style boards (AVR, RP2040, ESP32, …) all need the `.ino`
+        // extension so arduino-cli auto-includes <Arduino.h>. Only the Pi 3B
+        // uses a different toolchain (Python via VFS or g++ for `.cpp`).
+        const filename = eb.boardKind === 'raspberry-pi-3' ? 'main.cpp' : 'sketch.ino';
         useEditorStore.getState().setActiveGroup(board.activeFileGroupId);
         useEditorStore.getState().loadFiles([{ name: filename, content: eb.code }]);
       }
