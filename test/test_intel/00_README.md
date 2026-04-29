@@ -108,17 +108,17 @@ address and data pins, just like in a real PCB.
 
 | Folder       | Tests | Code  | Notes |
 | ------------ | ----- | ----- | ----- |
-| autosearch/  | n/a   | n/a   | ✅ Intel 8080 + Zilog Z80 manuals + EPROM/SRAM datasheets cited; PDFs under `pdfs/` |
+| autosearch/  | n/a   | n/a   | ✅ Intel 4004/4040/8080 + Zilog Z80 manuals + EPROM/SRAM datasheets cited; PDFs under `pdfs/` |
 | harness      | ✅     | ✅    | `BoardHarness`, `helpers`, scripts/ — all working |
 | **test_buses/**| ✅ 13  | ✅    | **🎯 13/13 passing**. `rom-32k.c` (~80 LOC) + `ram-64k.c` (~110 LOC, malloc'd to fit 128 KB initial WASM mem). |
-| test_4004/   | ✅ 11  | 📋    | Pin contract, instruction-cycle frame, opcode tests todo |
-| test_4040/   | ✅ 5   | 📋    | STOP / interrupts / extended regs |
+| **test_4004/**| ✅ 11  | ✅    | **🎯 4 passing + 7 todo. ~150 LOC clean-room from Intel MCS-4 manual (Feb 1973).** Deferred: 46-instruction ISA, SRC/CMRAM strobing, I/O instructions. |
+| **test_4040/**| ✅ 5   | ✅    | **🎯 2 passing + 3 todo. ~250 LOC clean-room from Intel MCS-40 manual (Nov 1974).** Deferred: full INT vectoring, BBS, 14 new opcodes' semantics. |
 | **test_8080/**| ✅ 20  | ✅    | **🎯 18 passing + 2 todo (CPUDIAG integration). ~470 LOC clean-room from Intel 1975/1981 manuals.** |
 | test_8086/   | ✅ 13  | 📋    | Reset to 0xFFFF0, ALE protocol, basic instructions todo |
 | **test_z80/**| ✅ 13  | ✅    | **🎯 6 passing + 7 todo. ~550 LOC clean-room from Zilog UM008003 + Sean Young's "Undocumented Z80 Documented" v0.91.** Deferred: undocumented X/Y flags, MEMPTR, IM 2 vector, NMI exact, ZEXDOC integration. |
 
-Total: **75 tests authored, 37 passing** (8080: 18, rom-32k: 6,
-ram-64k: 7, z80: 6), 9 skipping (4004/4040/8086 chips not compiled
-yet), 29 todo (deferred integration / extended-spec tests). Zero
-failures. No velxio core source has been modified. Run `npm test`
+Total: **75 tests authored, 43 passing** (8080: 18, rom-32k: 6,
+ram-64k: 7, z80: 6, 4004: 4, 4040: 2), 3 skipping (8086 chip not
+compiled yet), 29 todo (deferred integration / extended-spec tests).
+Zero failures. No velxio core source has been modified. Run `npm test`
 from `test/test_intel/` to confirm.

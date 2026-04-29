@@ -36,11 +36,12 @@ function fullPinMap() {
 async function bootChip(board) {
   await board.addChip(CHIP, fullPinMap());
   board.setNet('TEST', false);
-  // Pulse RESET high then low
+  // Pulse RESET high then low. Do NOT advance time after RESET goes
+  // low — caller does that so the first observed cycle starts at
+  // phase A1 with PC = 0. (Same lesson as bootCpu in the 8080 tests.)
   board.setNet('RESET', true);
   board.advanceNanos(CLOCK_NS * 10);
   board.setNet('RESET', false);
-  board.advanceNanos(CLOCK_NS * 4);
 }
 
 describe('Intel 4004 chip', () => {
@@ -84,10 +85,10 @@ describe('Intel 4004 chip', () => {
       // should all be 0 (low addr nibble first, by 4004 convention).
       const samples = [];
       let sinceSync = -1;
-      board.watchNet('SYNC', (high) => { if (high) sinceSync = 0; });
+      // Latch on the FIRST SYNC only — a second pulse in the window
+      // would otherwise re-arm the sampler and over-collect.
+      board.watchNet('SYNC', (high) => { if (high && sinceSync === -1) sinceSync = 0; });
 
-      // We need to sample D0..D3 once per clock cycle. The runtime fires
-      // pin watchers on changes only, so we step the clock and read.
       for (let i = 0; i < 10; i++) {
         board.advanceNanos(CLOCK_NS);
         if (sinceSync >= 0 && sinceSync < 3) {
