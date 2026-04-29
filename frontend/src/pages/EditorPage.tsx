@@ -123,6 +123,11 @@ export const EditorPage: React.FC = () => {
   const [isMobile, setIsMobile] = useState(
     () => window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches,
   );
+  // Slot element for SimulatorCanvas to portal its header into. When set, the
+  // canvas board selector / Serial / Scope / zoom / Add buttons render here
+  // instead of above the canvas — keeping the top bar a single full-width row
+  // that doesn't reflow when the editor/canvas splitter is dragged.
+  const [canvasHeaderSlot, setCanvasHeaderSlot] = useState<HTMLDivElement | null>(null);
   // Default to 'code' on mobile — show the editor so users can write/view code
   const [mobileView, setMobileView] = useState<'code' | 'circuit'>('code');
   const user = useAuthStore((s) => s.user);
@@ -298,6 +303,44 @@ export const EditorPage: React.FC = () => {
         </nav>
       )}
 
+      {/* ── Unified top toolbar (desktop only) ──
+          Editor controls + canvas controls share a single full-width row so
+          the bar doesn't reflow when the editor/canvas splitter is dragged.
+          The canvas controls (board selector, Serial, Scope, zoom, Add) are
+          portaled into `canvasHeaderSlot` from inside SimulatorCanvas. */}
+      {!isMobile && (
+        <div className="unified-toolbar">
+          <button
+            className="explorer-toggle-btn unified-toolbar-explorer-toggle"
+            onClick={() => setExplorerOpen((v) => !v)}
+            title={explorerOpen ? 'Hide file explorer' : 'Show file explorer'}
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+            </svg>
+          </button>
+          <div className="unified-toolbar-editor">
+            <EditorToolbar
+              consoleOpen={consoleOpen}
+              setConsoleOpen={setConsoleOpen}
+              compileLogs={compileLogs}
+              setCompileLogs={setCompileLogs}
+              centerSlot={!isRaspberryPi3 ? <FileTabs /> : null}
+            />
+          </div>
+          <div className="unified-toolbar-canvas" ref={setCanvasHeaderSlot} />
+        </div>
+      )}
+
       <div className="app-container" ref={containerRef}>
         {/* ── Editor side ── */}
         <div
@@ -335,38 +378,39 @@ export const EditorPage: React.FC = () => {
               minWidth: 0,
             }}
           >
-            {/* Explorer toggle + toolbar */}
-            <div style={{ display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>
-              <button
-                className="explorer-toggle-btn"
-                onClick={() => setExplorerOpen((v) => !v)}
-                title={explorerOpen ? 'Hide file explorer' : 'Show file explorer'}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+            {/* Mobile-only: explorer toggle + editor toolbar inside the panel.
+                On desktop these are hoisted into the unified top toolbar. */}
+            {isMobile && (
+              <div style={{ display: 'flex', alignItems: 'stretch', flexShrink: 0 }}>
+                <button
+                  className="explorer-toggle-btn"
+                  onClick={() => setExplorerOpen((v) => !v)}
+                  title={explorerOpen ? 'Hide file explorer' : 'Show file explorer'}
                 >
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-                </svg>
-              </button>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <EditorToolbar
-                  consoleOpen={consoleOpen}
-                  setConsoleOpen={setConsoleOpen}
-                  compileLogs={compileLogs}
-                  setCompileLogs={setCompileLogs}
-                  /* File tabs share the toolbar row — keeps every action
-                     icon pinned regardless of editor-pane width. */
-                  centerSlot={!isRaspberryPi3 ? <FileTabs /> : null}
-                />
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                  </svg>
+                </button>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <EditorToolbar
+                    consoleOpen={consoleOpen}
+                    setConsoleOpen={setConsoleOpen}
+                    compileLogs={compileLogs}
+                    setCompileLogs={setCompileLogs}
+                    centerSlot={!isRaspberryPi3 ? <FileTabs /> : null}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Editor area: Pi workspace or Monaco editor */}
             <div className="editor-wrapper" style={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
@@ -423,7 +467,7 @@ export const EditorPage: React.FC = () => {
           }}
         >
           <div style={{ flex: 1, overflow: 'hidden', position: 'relative', minHeight: 0 }}>
-            <SimulatorCanvas />
+            <SimulatorCanvas headerSlot={!isMobile ? canvasHeaderSlot : null} />
           </div>
           {serialMonitorOpen && (
             <>

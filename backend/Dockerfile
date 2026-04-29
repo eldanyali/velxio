@@ -20,9 +20,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV WASI_SDK=/opt/wasi-sdk
 
-# Initialize arduino-cli and install AVR core
-RUN arduino-cli core update-index \
-    && arduino-cli core install arduino:avr
+# Initialize arduino-cli and install cores.
+# - arduino:avr  → Uno / Nano / Mega / etc. (built-in core, always needed)
+# - ATTinyCore:avr → ATtiny85 (Spence Konde's third-party core, drazzy.com index)
+#   Without this the FQBN ATTinyCore:avr:attinyx5:chip=85,clock=internal16mhz
+#   fails with "Platform 'ATTinyCore:avr' not found: platform not installed".
+RUN arduino-cli config init \
+    && arduino-cli config add board_manager.additional_urls \
+        http://drazzy.com/package_drazzy.com_index.json \
+    && arduino-cli core update-index \
+    && arduino-cli core install arduino:avr \
+    && arduino-cli core install ATTinyCore:avr
 
 WORKDIR /app
 

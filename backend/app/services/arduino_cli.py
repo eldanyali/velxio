@@ -10,13 +10,21 @@ class ArduinoCLIService:
     CORE_URLS: dict[str, str] = {
         "rp2040:rp2040": "https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json",
         "esp32:esp32": "https://espressif.github.io/arduino-esp32/package_esp32_index.json",
+        # Spence Konde's ATTinyCore — needed for ATtiny85 FQBNs like
+        #   ATTinyCore:avr:attinyx5:chip=85,clock=internal16mhz
+        # Without it arduino-cli reports
+        #   "Platform 'ATTinyCore:avr' not found: platform not installed".
+        "ATTinyCore:avr": "http://drazzy.com/package_drazzy.com_index.json",
     }
 
     # Cores to auto-install on startup
     REQUIRED_CORES = ["arduino:avr"]
 
-    # Cores to install on-demand when a board FQBN is requested
+    # Cores to install on-demand when a board FQBN is requested.
+    # Match order matters: longer / more-specific prefixes first so we don't
+    # mis-route (e.g. an FQBN that mentions both vendors).
     ON_DEMAND_CORES: dict[str, str] = {
+        "ATTinyCore:avr": "ATTinyCore:avr",
         "rp2040": "rp2040:rp2040",
         "mbed_rp2040": "arduino:mbed_rp2040",
         "esp32": "esp32:esp32",

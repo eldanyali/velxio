@@ -160,6 +160,47 @@ body {
   background: #e0e0e0;
 }
 
+/* ── Unified top toolbar (desktop) ───────────────
+   Editor controls + canvas controls share a single full-width row that does
+   NOT reflow when the editor/canvas splitter below is dragged. The canvas
+   side renders into the empty `.unified-toolbar-canvas` slot via a React
+   portal from inside SimulatorCanvas. */
+.unified-toolbar {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  background: #252526;
+  border-bottom: 1px solid #333;
+  min-height: 38px;
+}
+
+.unified-toolbar-explorer-toggle {
+  border-bottom: none;
+}
+
+.unified-toolbar-editor {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+
+.unified-toolbar-editor .editor-toolbar-wrapper,
+.unified-toolbar-editor .editor-toolbar {
+  flex: 1;
+  min-width: 0;
+}
+
+.unified-toolbar-editor .editor-toolbar {
+  border-bottom: none;
+}
+
+.unified-toolbar-canvas {
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  border-left: 1px solid #333;
+}
+
 /* ── Main panels container ──────────────────────── */
 .app-container {
   flex: 1;

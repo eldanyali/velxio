@@ -1,5 +1,6 @@
 import { useSimulatorStore, getEsp32Bridge } from '../../store/useSimulatorStore';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { ESP32_ADC_PIN_MAP } from '../velxio-components/Esp32Element';
 import { ComponentPickerModal } from '../ComponentPickerModal';
 import { ComponentPropertyDialog } from './ComponentPropertyDialog';
@@ -66,7 +67,18 @@ function isEsp32Kind(kind: BoardKind): boolean {
   );
 }
 
-export const SimulatorCanvas = () => {
+interface SimulatorCanvasProps {
+  /**
+   * Optional DOM element to portal the canvas header (board selector,
+   * Serial/Scope toggles, zoom controls, Add component button) into. When
+   * provided, the header renders into the slot instead of in place — used by
+   * EditorPage to merge it with the editor toolbar into a single full-width
+   * top bar that doesn't reflow when the editor/canvas splitter moves.
+   */
+  headerSlot?: HTMLElement | null;
+}
+
+export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
   const {
     boards,
     activeBoardId,
@@ -1615,7 +1627,9 @@ export const SimulatorCanvas = () => {
 
       {/* Main Canvas */}
       <div className="simulator-canvas">
-        <div className="canvas-header">
+        {(() => {
+          const headerJsx = (
+        <div className={`canvas-header${headerSlot ? ' canvas-header--portaled' : ''}`}>
           <div className="canvas-header-left">
             {/* Status LED */}
             <span
@@ -1873,6 +1887,9 @@ export const SimulatorCanvas = () => {
             </button>
           </div>
         </div>
+          );
+          return headerSlot ? createPortal(headerJsx, headerSlot) : headerJsx;
+        })()}
         <div
           ref={canvasRef}
           className="canvas-content"

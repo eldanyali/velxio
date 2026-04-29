@@ -24,6 +24,19 @@
   flex-shrink: 0;
 }
 
+/* When portaled into the unified top toolbar, drop the standalone chrome
+   (border + background) and shrink to match the editor toolbar height so
+   the two halves read as a single bar. Also drop space-between so the
+   left/right groups sit adjacent to each other inside the slot. */
+.canvas-header--portaled {
+  height: 38px;
+  padding: 0 8px;
+  background: transparent;
+  border-bottom: none;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
 .canvas-header-left,
 .canvas-header-right {
   display: flex;

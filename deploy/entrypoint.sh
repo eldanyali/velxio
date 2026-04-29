@@ -9,6 +9,12 @@ if [ ! -f /root/.arduino15/arduino-cli.yaml ]; then
         https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json 2>/dev/null || true
     arduino-cli config add board_manager.additional_urls \
         https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json 2>/dev/null || true
+    # ATTinyCore (Spence Konde) — needed for ATtiny85 FQBNs.
+    # Without this URL `core install ATTinyCore:avr` fails with
+    #   "Platform 'ATTinyCore:avr' not found: platform not installed".
+    # See https://github.com/SpenceKonde/ATTinyCore
+    arduino-cli config add board_manager.additional_urls \
+        http://drazzy.com/package_drazzy.com_index.json 2>/dev/null || true
 fi
 
 # Install missing cores.
@@ -16,6 +22,7 @@ fi
 arduino-cli core update-index 2>/dev/null || true
 arduino-cli core install arduino:avr 2>/dev/null || true
 arduino-cli core install rp2040:rp2040 2>/dev/null || true
+arduino-cli core install ATTinyCore:avr 2>/dev/null || true
 
 # ESP32 compilation now uses ESP-IDF instead of arduino-cli.
 # arduino-cli ESP32 core is no longer needed for QEMU-compatible builds.
