@@ -6,8 +6,6 @@ import { BOARD_KIND_FQBN, BOARD_KIND_LABELS, BOARD_SUPPORTS_MICROPYTHON } from '
 import { compileCode } from '../../services/compilation';
 import { reportRunEvent } from '../../services/metricsService';
 import { useProjectStore } from '../../store/useProjectStore';
-import { CompileAllProgress } from './CompileAllProgress';
-import type { BoardCompileStatus } from './CompileAllProgress';
 import { LibraryManagerModal } from '../simulator/LibraryManagerModal';
 import { InstallLibrariesModal } from '../simulator/InstallLibrariesModal';
 import { parseCompileResult } from '../../utils/compilationLogger';
@@ -127,10 +125,8 @@ export const EditorToolbar = ({
     return () => document.removeEventListener('mousedown', handler);
   }, [overflowOpen]);
 
-  // Compile All state
-  const [compileAllOpen, setCompileAllOpen] = useState(false);
+  // Compile All / Run All — runs sequentially, logs to console (no dialog)
   const [compileAllRunning, setCompileAllRunning] = useState(false);
-  const [compileAllStatuses, setCompileAllStatuses] = useState<BoardCompileStatus[]>([]);
 
   const addLog = useCallback(
     (log: CompilationLog) => {
@@ -388,41 +384,59 @@ export const EditorToolbar = ({
     setMessage(null);
   };
 
-  const handleCompileAll = async () => {
+  /**
+   * Compile every board on the canvas sequentially. Progress + per-board
+   * results stream to the existing compilation console — no separate dialog.
+   * Returns the count of boards that ended up with a runnable program (so
+   * Run All can use it to decide whether to proceed to start them).
+   */
+  const compileAllBoards = async (): Promise<{ ok: number; failed: number }> => {
     const boardsList = useSimulatorStore.getState().boards;
-    const initialStatuses: BoardCompileStatus[] = boardsList.map((b) => ({
-      boardId: b.id,
-      boardKind: b.boardKind,
-      state: 'pending',
-    }));
-    setCompileAllStatuses(initialStatuses);
-    setCompileAllOpen(true);
+    if (boardsList.length === 0) return { ok: 0, failed: 0 };
+
     setCompileAllRunning(true);
+    setConsoleOpen(true);
+    addLog({
+      timestamp: new Date(),
+      type: 'info',
+      message: `Compiling all ${boardsList.length} board${boardsList.length === 1 ? '' : 's'}...`,
+    });
+
+    let ok = 0;
+    let failed = 0;
 
     for (const board of boardsList) {
-      const updateStatus = (patch: Partial<BoardCompileStatus>) =>
-        setCompileAllStatuses((prev) =>
-          prev.map((s) => (s.boardId === board.id ? { ...s, ...patch } : s)),
-        );
+      const label = BOARD_KIND_LABELS[board.boardKind] ?? board.boardKind;
 
-      // Pi 3 doesn't need compilation
       if (board.boardKind === 'raspberry-pi-3') {
-        updateStatus({ state: 'skipped' });
+        addLog({
+          timestamp: new Date(),
+          type: 'info',
+          message: `${label}: skipped (no compilation needed)`,
+        });
+        ok++;
         continue;
       }
 
       const fqbn = BOARD_KIND_FQBN[board.boardKind];
       if (!fqbn) {
-        updateStatus({ state: 'error', error: `No FQBN configured for ${board.boardKind}` });
+        addLog({
+          timestamp: new Date(),
+          type: 'error',
+          message: `${label}: no FQBN configured`,
+        });
+        failed++;
         continue;
       }
 
-      updateStatus({ state: 'compiling' });
+      addLog({ timestamp: new Date(), type: 'info', message: `${label}: compiling...` });
 
       try {
         const groupFiles = useEditorStore.getState().getGroupFiles(board.activeFileGroupId);
         const sketchFiles = groupFiles.map((f) => ({ name: f.name, content: f.content }));
         const result = await compileCode(sketchFiles, fqbn, currentProject?.id ?? null);
+        const resultLogs = parseCompileResult(result, label);
+        setCompileLogs((prev: CompilationLog[]) => [...prev, ...resultLogs]);
 
         if (result.success) {
           const program = result.hex_content ?? result.binary_content ?? null;
@@ -432,35 +446,69 @@ export const EditorToolbar = ({
               updateBoard(board.id, { hasWifi: result.has_wifi });
             }
           }
-          updateStatus({ state: 'success' });
+          ok++;
         } else {
-          updateStatus({
-            state: 'error',
-            error: result.stderr || result.error || 'Compilation failed',
-          });
+          failed++;
         }
       } catch (err) {
-        updateStatus({ state: 'error', error: err instanceof Error ? err.message : String(err) });
+        addLog({
+          timestamp: new Date(),
+          type: 'error',
+          message: `${label}: ${err instanceof Error ? err.message : String(err)}`,
+        });
+        failed++;
       }
-      // Always continue to next board
     }
 
+    addLog({
+      timestamp: new Date(),
+      type: ok > 0 && failed === 0 ? 'success' : failed > 0 ? 'error' : 'info',
+      message: `Done — ${ok} succeeded, ${failed} failed`,
+    });
+    if (ok > 0 && failed === 0) markCompiled();
     setCompileAllRunning(false);
+    return { ok, failed };
   };
 
-  const handleRunAll = () => {
+  const handleCompileAll = () => {
+    trackCompileCode();
+    void compileAllBoards();
+  };
+
+  /** Run All = compile all (if needed) + start every board, mirroring single Run. */
+  const handleRunAll = async () => {
     const boardsList = useSimulatorStore.getState().boards;
-    for (const board of boardsList) {
+    if (boardsList.length === 0) return;
+
+    // Compile if anything is missing a program or code changed since last compile
+    const needsCompile =
+      codeChangedSinceLastCompile ||
+      boardsList.some(
+        (b) =>
+          b.boardKind !== 'raspberry-pi-3' &&
+          b.languageMode !== 'micropython' &&
+          !b.compiledProgram,
+      );
+
+    if (needsCompile) {
+      const { failed } = await compileAllBoards();
+      if (failed > 0) return; // Don't start anything if any board failed
+    }
+
+    // Refresh list after compile (compiledProgram may have changed)
+    const refreshed = useSimulatorStore.getState().boards;
+    for (const board of refreshed) {
+      if (board.running) continue;
       const isQemu =
         board.boardKind === 'raspberry-pi-3' ||
         board.boardKind === 'esp32' ||
         board.boardKind === 'esp32-s3';
-      if (!board.running && (isQemu || board.compiledProgram)) {
+      if (isQemu || board.compiledProgram || board.languageMode === 'micropython') {
+        trackRunSimulation(board.boardKind);
         reportRun(board.boardKind);
         startBoard(board.id);
       }
     }
-    setCompileAllOpen(false);
   };
 
   const handleExport = async () => {
@@ -549,15 +597,6 @@ export const EditorToolbar = ({
   return (
     <>
       <div className="editor-toolbar-wrapper" style={{ position: 'relative' }}>
-        {/* Compile All progress panel — floats above the toolbar */}
-        {compileAllOpen && (
-          <CompileAllProgress
-            statuses={compileAllStatuses}
-            isRunning={compileAllRunning}
-            onRunAll={handleRunAll}
-            onClose={() => setCompileAllOpen(false)}
-          />
-        )}
         <div className="editor-toolbar" ref={toolbarRef}>
           {/* Active board context pill */}
           {activeBoard && (

@@ -3,6 +3,13 @@ import type { RPI2C } from 'rp2040js';
 import { PinManager } from './PinManager';
 import { bootromB1 } from './rp2040-bootrom';
 import { loadUF2, loadUserFiles, getFirmware } from './MicroPythonLoader';
+import {
+  Cyw43Emulator,
+  PioBusSniffer,
+  type Cyw43Bridge,
+  type LedEvent,
+  type PacketOutEvent,
+} from './cyw43';
 
 /**
  * RP2040Simulator — Emulates Raspberry Pi Pico (RP2040) using rp2040js
@@ -56,8 +63,19 @@ export class RP2040Simulator {
   private usbCDC: USBCDC | null = null;
   private micropythonMode = false;
 
+  // ── Pico W WiFi (CYW43439) — only attached when boardKind === 'pi-pico-w'.
+  private cyw43: Cyw43Emulator | null = null;
+  private cyw43Sniffer: PioBusSniffer | null = null;
+  private cyw43Bridge: Cyw43Bridge | null = null;
+  private cyw43HookedFifos: Array<{ restore: () => void }> = [];
+
   /** Serial output callback — fires for each byte the Pico sends on UART0 (or USBCDC in MicroPython mode) */
   public onSerialData: ((char: string) => void) | null = null;
+
+  /** Fires when the on-board LED on Pico W (driven through the CYW43, not GPIO 25) toggles. */
+  public onPicoWLed: ((on: boolean) => void) | null = null;
+  /** Fires whenever the chip emits a Wi-Fi link-up event for the synthetic AP. */
+  public onPicoWWifiUp: ((ssid: string) => void) | null = null;
 
   /**
    * Fires for every GPIO pin transition with a millisecond timestamp.
@@ -190,6 +208,136 @@ export class RP2040Simulator {
   /** Returns true if currently in MicroPython mode */
   isMicroPythonMode(): boolean {
     return this.micropythonMode;
+  }
+
+  // ── Pico W (CYW43439) attachment ────────────────────────────────────────
+
+  /**
+   * Wire a CYW43 chip emulator onto this RP2040 instance. Should only be
+   * called for ``pi-pico-w`` boards. Idempotent — calling twice is a no-op.
+   *
+   * The emulator observes outbound PIO TX FIFO writes (which the cyw43
+   * driver uses to bit-bang the gSPI bus) and feeds back synthesised
+   * responses. When a Cyw43Bridge is supplied, outbound Ethernet frames
+   * are forwarded to the backend network bridge and inbound packets
+   * coming back from the bridge are queued for the chip to deliver.
+   */
+  attachCyw43(bridge: Cyw43Bridge | null = null): Cyw43Emulator {
+    if (this.cyw43) return this.cyw43;
+    const emu = new Cyw43Emulator();
+    const sniffer = new PioBusSniffer();
+    this.cyw43 = emu;
+    this.cyw43Sniffer = sniffer;
+    this.cyw43Bridge = bridge;
+
+    emu.onLed((ev: LedEvent) => {
+      this.onPicoWLed?.(ev.on);
+    });
+    emu.onConnect((ev) => {
+      this.onPicoWWifiUp?.(ev.ssid);
+    });
+    emu.onPacketOut((ev: PacketOutEvent) => {
+      this.cyw43Bridge?.sendPacket(ev.ether);
+    });
+
+    if (bridge) {
+      bridge.onPacketIn = (p) => emu.injectPacket(p.ether);
+    }
+
+    this.installCyw43PioHooks();
+    return emu;
+  }
+
+  /** Detach the CYW43 emulator (called from teardown). */
+  detachCyw43(): void {
+    for (const h of this.cyw43HookedFifos) h.restore();
+    this.cyw43HookedFifos = [];
+    this.cyw43 = null;
+    this.cyw43Sniffer = null;
+    this.cyw43Bridge = null;
+  }
+
+  /** Read access for tests / debug panels. */
+  getCyw43(): Cyw43Emulator | null { return this.cyw43; }
+
+  /**
+   * Hook every PIO state machine's ``txFIFO.push`` so the CYW43 emulator
+   * sees every word the cyw43 driver bit-bangs onto the bus, and
+   * mirror responses back into ``rxFIFO`` so the driver's reads land
+   * without needing a real chip on the wire.
+   */
+  private installCyw43PioHooks(): void {
+    if (!this.rp2040 || !this.cyw43 || !this.cyw43Sniffer) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pios: any[] = (this.rp2040 as any).pio;
+    for (const pio of pios) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for (const sm of pio.machines as any[]) {
+        const tx = sm.txFIFO;
+        const rx = sm.rxFIFO;
+        if (!tx || !rx) continue;
+        const origPush: (v: number) => void = tx.push.bind(tx);
+        tx.push = (value: number) => {
+          // Feed the gSPI sniffer; if the command produces a response,
+          // surface it word-by-word into the rxFIFO so the driver's
+          // `pull` instruction reads it back.
+          this.feedCyw43Word(value);
+          return origPush(value);
+        };
+        this.cyw43HookedFifos.push({
+          restore: () => { tx.push = origPush; },
+        });
+      }
+    }
+  }
+
+  private cyw43RxQueue: number[] = [];
+  private feedCyw43Word(word: number): void {
+    if (!this.cyw43Sniffer || !this.cyw43) return;
+    for (const ev of this.cyw43Sniffer.feedWord(word)) {
+      if (ev.kind === 'payload') {
+        const reply = this.cyw43.onCommand(ev.cmd, ev.payload);
+        if (reply && reply.length > 0) this.queueCyw43Reply(reply);
+      }
+    }
+    // Drain queued reply words into any state machine that has space.
+    this.drainCyw43RxIntoSomeSM();
+  }
+
+  private queueCyw43Reply(reply: Uint8Array): void {
+    // 32-bit big-endian repacking with the same halfword swap the PIO
+    // program does on input. We push host-byte-order words; the SM's
+    // shift register puts them on the wire LSB-first per the gSPI spec.
+    for (let i = 0; i + 4 <= reply.length; i += 4) {
+      const w =
+        ((reply[i + 3] << 24) | (reply[i + 2] << 16) | (reply[i + 1] << 8) | reply[i]) >>> 0;
+      this.cyw43RxQueue.push(w);
+    }
+    if (reply.length % 4 !== 0) {
+      // Pad to 4 bytes with zeros — the driver discards trailing bytes
+      // it didn't request.
+      const tail = reply.subarray(reply.length - (reply.length % 4));
+      let w = 0;
+      for (let i = 0; i < tail.length; i++) w |= tail[i] << (i * 8);
+      this.cyw43RxQueue.push(w >>> 0);
+    }
+  }
+
+  private drainCyw43RxIntoSomeSM(): void {
+    if (!this.rp2040 || this.cyw43RxQueue.length === 0) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pios: any[] = (this.rp2040 as any).pio;
+    for (const pio of pios) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      for (const sm of pio.machines as any[]) {
+        const rx = sm.rxFIFO;
+        if (!rx) continue;
+        while (this.cyw43RxQueue.length > 0 && !rx.full) {
+          rx.push(this.cyw43RxQueue.shift());
+        }
+        if (this.cyw43RxQueue.length === 0) return;
+      }
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

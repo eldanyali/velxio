@@ -7,6 +7,7 @@
 import { circuitExamples } from './examples-circuits';
 import { analogExamples } from './examples-analog';
 import { hundredDaysExamples } from './examples-100-days';
+import { picowWifiExamples } from './examples-picow-wifi';
 
 /** Per-board setup for multi-board examples */
 export interface ExampleBoard {
@@ -32,6 +33,7 @@ export interface ExampleProject {
     | 'arduino-nano'
     | 'arduino-mega'
     | 'raspberry-pi-pico'
+    | 'pi-pico-w'
     | 'esp32'
     | 'esp32-c3';
   /** Board filter key used in the gallery board selector. Derived from boardType if omitted. */
@@ -6878,6 +6880,7 @@ export const exampleProjects: ExampleProject[] = [
   ...circuitExamples,
   ...analogExamples,
   ...hundredDaysExamples,
+  ...picowWifiExamples,
 ];
 
 // Get examples by category

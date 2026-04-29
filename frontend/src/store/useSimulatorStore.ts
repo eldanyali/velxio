@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { AVRSimulator } from '../simulation/AVRSimulator';
 import { RP2040Simulator } from '../simulation/RP2040Simulator';
+import { Cyw43Bridge } from '../simulation/cyw43';
 import { RiscVSimulator } from '../simulation/RiscVSimulator';
 import { Esp32C3Simulator } from '../simulation/Esp32C3Simulator';
 import { PinManager } from '../simulation/PinManager';
@@ -248,11 +249,14 @@ const simulatorMap = new Map<
 const pinManagerMap = new Map<string, PinManager>();
 const bridgeMap = new Map<string, RaspberryPi3Bridge>();
 const esp32BridgeMap = new Map<string, Esp32Bridge>();
+// Pico W WiFi (CYW43439) bridge — created lazily, only when boardKind === 'pi-pico-w'.
+const cyw43BridgeMap = new Map<string, Cyw43Bridge>();
 
 export const getBoardSimulator = (id: string) => simulatorMap.get(id);
 export const getBoardPinManager = (id: string) => pinManagerMap.get(id);
 export const getBoardBridge = (id: string) => bridgeMap.get(id);
 export const getEsp32Bridge = (id: string) => esp32BridgeMap.get(id);
+export const getCyw43Bridge = (id: string) => cyw43BridgeMap.get(id);
 
 // Xtensa-based ESP32 boards — use QEMU bridge (backend)
 const ESP32_KINDS = new Set<BoardKind>([
@@ -573,6 +577,20 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         );
         // Cross-board routing now handled by Interconnect (see bind below).
         simulatorMap.set(id, sim);
+
+        // ── Pico W: attach the CYW43 chip-side emulator + WS bridge ──
+        // Mirrors the ESP32 path (esp32BridgeMap) so the board has the
+        // same capability surface the rest of the app already understands.
+        if (boardKind === 'pi-pico-w' && sim instanceof RP2040Simulator) {
+          const bridge = new Cyw43Bridge(id);
+          bridge.onWifiStatus = (ws) => {
+            set((s) => ({
+              boards: s.boards.map((b) => (b.id === id ? { ...b, wifiStatus: ws } : b)),
+            }));
+          };
+          cyw43BridgeMap.set(id, bridge);
+          sim.attachCyw43(bridge);
+        }
       }
 
       const newBoard: BoardInstance = {
@@ -617,6 +635,13 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         esp32Bridge.disconnect();
         esp32BridgeMap.delete(boardId);
       }
+      const cyw43Bridge = getCyw43Bridge(boardId);
+      if (cyw43Bridge) {
+        cyw43Bridge.disconnect();
+        cyw43BridgeMap.delete(boardId);
+      }
+      const cyw43Sim = getBoardSimulator(boardId);
+      if (cyw43Sim instanceof RP2040Simulator) cyw43Sim.detachCyw43();
       set((s) => {
         const boards = s.boards.filter((b) => b.id !== boardId);
         const activeBoardId =
@@ -930,6 +955,26 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         }
       } else {
         getBoardSimulator(boardId)?.start();
+        // Pico W: open the network bridge here too, alongside the local
+        // RP2040 sim. Auto-detect WiFi from the board's source files.
+        if (board.boardKind === 'pi-pico-w') {
+          const cyw43 = getCyw43Bridge(boardId);
+          if (cyw43) {
+            const editorState = useEditorStore.getState();
+            const rawFiles = editorState.fileGroups[board.activeFileGroupId];
+            const boardFiles =
+              rawFiles && rawFiles.length > 0 ? rawFiles : editorState.files;
+            const hasWifi = boardFiles.some(
+              (f) =>
+                /import\s+network\b/.test(f.content) ||
+                /network\.WLAN/.test(f.content) ||
+                /#include\s*[<"]WiFi\.h[>"]/.test(f.content) ||
+                /WiFi\.begin\(/.test(f.content),
+            );
+            cyw43.wifiEnabled = hasWifi;
+            cyw43.connect();
+          }
+        }
       }
 
       set((s) => {
