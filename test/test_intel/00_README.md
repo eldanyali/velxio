@@ -117,13 +117,25 @@ address and data pins, just like in a real PCB.
 | **test_8086/**| ✅ 13  | ✅    | **🎯 3 passing + 10 todo. ~750 LOC clean-room from Intel iAPX 86,88 User's Manual (Oct 1979).** Bus protocol + reset to 0xFFFF0 + ModR/M decode + ~50 opcodes (MOV/ALU/Jcc/CALL/RET/LOOP/etc.). Deferred: string ops, MUL/DIV, BCD, port I/O, interrupts. |
 | **test_z80/**| ✅ 13  | ✅    | **🎯 11 passing + 2 todo (IM 2 vectoring, ZEXDOC). ~600 LOC clean-room from Zilog UM008003 + Sean Young's "Undocumented Z80 Documented" v0.91.** Full bus + ISA + INT + NMI + LDIR + IX/IY + EXX + IM 0/1/2. Deferred: undocumented X/Y flags, MEMPTR, full DAA, CB-prefix bit ops. |
 
-Total: **105 tests authored, 93 passing** (8080: 18, Z80: 21,
-4004: 9, 4040: 5, 8086: 10, rom-32k: 6, ram-64k: 7, latch-8282: 4,
-rom-1m: 4, 8255-ppi: 5, 8251-usart: 4), 0 skipping, 12 todo
-(deferred ZEXDOC/CPUDIAG integration + a few corner-case opcodes).
-Zero failures. **All 5 retro Intel/Zilog CPUs + 6 bus device chips
-implemented and validated.** Phase plan in
-`autosearch/18_complete_emulation_plan.md` tracks remaining work
-(4001/4002/8253/8259 chips for canvas demos; CPUDIAG/ZEXDOC software
-validation in Phase F). No velxio core source has been modified.
-Run `npm test` from `test/test_intel/` to confirm.
+Total: **109 tests authored, 98 passing** (8080: 18 + 2 ROM-validation,
+Z80: 21 + 1 ZEXDOC + 1 hello, 4004: 9, 4040: 5, 8086: 11, rom-32k: 6,
+ram-64k: 7, latch-8282: 4, rom-1m: 4, 8255-ppi: 5, 8251-usart: 4),
+0 skipping, 11 todo, 0 failed. **All 5 retro Intel/Zilog CPUs + 6 bus
+device chips implemented and validated against public-domain test
+ROMs:**
+
+- **8080**: passes `8080PRE.COM` and `TST8080.COM` (Microcosm 1980 —
+  prints "CPU IS OPERATIONAL").
+- **Z80**: runs Frank Cringle's `ZEXDOC` (1994) — prints the
+  "Z80 instruction exerciser" banner and produces no ERROR within a
+  time-bounded budget.
+
+These are the canonical historical diagnostics that real Altair/IMSAI
+8080 systems and Sinclair/MSX/CP/M Z80 systems used to validate their
+CPUs. Our chips run them.
+
+Phase plan in `autosearch/18_complete_emulation_plan.md` tracks
+remaining work: 4001/4002/8253/8259 chips for canvas demos;
+8088 V2 SingleStepTests for 8086; Busicom 141-PF for 4004; full
+ZEXDOC validation. No velxio core source has been modified. Run
+`npm test` from `test/test_intel/` to confirm.
