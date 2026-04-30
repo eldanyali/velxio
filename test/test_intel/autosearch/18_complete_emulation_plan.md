@@ -26,7 +26,7 @@ top of each phase reflects status.
 | --- | --- | --- | --- |
 | **A** | 8080 INTA bus cycle | low | ✅ done 2026-04-30 |
 | **B** | Z80 ISA polish for ZEXDOC | high | ✅ done 2026-04-30 (ZEXDOC ROM run deferred to Phase F) |
-| **C** | Support chip ecosystem (4001, 4002, 8259, 8253, 8255, 8251, rom-1m) | high | ⏸️ pending |
+| **C** | Support chip ecosystem (rom-1m, 8255, 8251 done; 4001/4002/8253/8259 deferred) | high | ⚠️ partial 2026-04-30 |
 | **D** | 4004/4040 I/O completion (uses chips from C) | medium | ⏸️ pending |
 | **E** | 8086 ISA completion | high | ⏸️ pending |
 | **F** | Real software validation (CPUDIAG, ZEXDOC, Busicom, 8088 V2) | medium | ⏸️ pending |
@@ -401,6 +401,74 @@ subject line (e.g. "test_intel: phase A — 8080 INTA bus protocol").
 
 ---
 
-## Phase C — Support chip ecosystem — STARTING
+## Phase C — partial completion (2026-04-30)
+
+### Delivered
+- **rom-1m** (`test_buses/rom-1m.c`, ~110 LOC) — 64 KB ROM mapped at
+  the top of the 8086's 1 MB space (0xF0000..0xFFFFF). Watches all 20
+  address pins; releases bus when address is outside the ROM range.
+  16-byte signature pre-loaded at the reset vector 0xFFFF0 for tests
+  to verify presence. 4/4 tests passing.
+- **8255 PPI** (`test_buses/8255-ppi.c`, ~200 LOC) — Mode 0 (basic
+  I/O) implementation with three 8-bit ports (A, B, C) and split
+  upper/lower port C. Control register parsing per the Intel
+  datasheet; bit set/reset on PC and Modes 1/2 deferred. 5/5 tests
+  passing including independent upper/lower PC halves.
+- **8251 USART** (`test_buses/8251-usart.c`, ~200 LOC) — Async-mode
+  UART using the runtime's `vx_uart_attach` for bit-level timing.
+  Mode word + command word + status byte interface implemented;
+  TxRDY/RxRDY/TxEMPTY status pins driven; modem-control DTR/RTS
+  pass-through. Internal-reset (command bit 6) returns to "expect
+  mode word" state. 4/4 tests passing.
+
+### Deferred to a follow-up iteration
+- **4001 ROM** (4-bit nibble bus for 4004): the multiplexed-bus phase
+  tracking is non-trivial. The 4001 needs to know which phase of the
+  4004's 8-phase frame is active, but our 4004 chip doesn't drive an
+  external clock signal — the natural sync points (CL = Φ2) come from
+  off-chip hardware we don't model. Workable solutions exist (one-shot
+  timer scheduled by CMROM rising; or modify 4004 to drive a phase
+  counter; or write a clock-gen chip to drive CLK1/CLK2). Picked the
+  pragmatic path: CPU unit tests use the JS-side `Bus4004` helper from
+  `test_4004/4004.test.js`, which already gives full 4001-equivalent
+  functionality for testing. Real on-canvas use needs the chip later.
+- **4002 RAM**: depends on 4001 being available.
+- **8253 PIT**: 6 modes plus countdown logic — moderate complexity.
+- **8259 PIC**: ICW1..ICW4 init state machine + cascade handling +
+  EOI tracking + INTA cycle. Highest complexity of the four; defer
+  until 8086 hardware-INTR is also wired (Phase E.E5).
+
+### Tests delta
+- `test_buses`: 17 → **30 passing** (+13: 4 rom-1m, 5 8255, 4 8251).
+- Total `test_intel`: 73 → **86 passing**, 17 todo, 0 failed.
+
+### Files touched
+- `test/test_intel/test_buses/rom-1m.{c,test.js}` (new)
+- `test/test_intel/test_buses/8255-ppi.{c,test.js}` (new)
+- `test/test_intel/test_buses/8251-usart.{c,test.js}` (new)
+
+### Lessons
+- 1 MiB malloc in a chip exceeds the WASM 16-page (1 MiB) memory cap
+  by the chip's own state size — clipped rom-1m to 64 KB at the top
+  of the address range, where real BIOSes live.
+- `vx_uart_attach` from the SDK abstracts away bit-level UART timing.
+  Far easier than implementing async TxD/RxD start/stop bits manually.
+- 8255 control byte's "set output direction" semantics also implicitly
+  reset the output latch to 0 — caught only after a test failed when
+  driving a port that had been an input previously.
+- The 8259 PIC and 4001/4002 ROM/RAM all hit similar timing-coordination
+  issues with their host CPU. Solving these properly probably needs a
+  small "clock generator" chip that drives the CPU's external clock
+  pins, but that's a larger architectural addition.
+
+### Sources cited
+- Intel 8255A Datasheet (public mirror, bitsavers.org)
+- Intel 8251A Datasheet (public mirror, bitsavers.org)
+- Existing `uart-rot13.c` example chip (in `test/test_custom_chips/`) as
+  template for `vx_uart_attach` usage
+
+---
+
+## Phase E — 8086 ISA completion — STARTING
 
 (Updates appended as work proceeds.)
