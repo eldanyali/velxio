@@ -316,6 +316,195 @@ describe('Zilog Z80 chip', () => {
     it.todo('IM 2 + INT̅ uses I:byte to vector through a table');
   });
 
+  describe('CB-prefix bit ops', () => {
+    const HALT = 0x76;
+    const LD_addr_A = 0x32;
+    const CB = 0xCB;
+    const LD_HL_nn = 0x21;
+    const LD_BC_nn = 0x01;
+
+    it.skipIf(skip)('SET n, A turns on the right bit', async () => {
+      // LD A, 0x00 ; SET 7, A ; LD (0x9000), A ; HALT
+      // Expected: A = 0x80, stored at 0x9000.
+      const program = new Uint8Array([
+        0x3E, 0x00,             // LD A, 0x00
+        CB, 0xFF,               // SET 7, A  (op = 11_111_111 = 0xFF)
+        LD_addr_A, 0x00, 0x90,  // LD (0x9000), A
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      for (let i = 0; i < 200; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x9000)).toBe(0x80);
+      board.dispose();
+    });
+
+    it.skipIf(skip)('RES n, A turns off the right bit', async () => {
+      // LD A, 0xFF ; RES 0, A ; LD (0x9000), A ; HALT
+      // Expected: A = 0xFE.
+      const program = new Uint8Array([
+        0x3E, 0xFF,
+        CB, 0x87,               // RES 0, A  (op = 10_000_111 = 0x87)
+        LD_addr_A, 0x00, 0x90,
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      for (let i = 0; i < 200; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x9000)).toBe(0xFE);
+      board.dispose();
+    });
+
+    it.skipIf(skip)('RLC A rotates left circular', async () => {
+      // LD A, 0x81 ; RLC A ; LD (0x9000), A ; HALT
+      // 0x81 = 1000_0001 → rotate left circular → 0000_0011 = 0x03 (bit 7
+      // wrapped to bit 0).
+      const program = new Uint8Array([
+        0x3E, 0x81,
+        CB, 0x07,               // RLC A
+        LD_addr_A, 0x00, 0x90,
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      for (let i = 0; i < 200; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x9000)).toBe(0x03);
+      board.dispose();
+    });
+
+    it.skipIf(skip)('SRL A shifts right logical with zero into MSB', async () => {
+      // LD A, 0x81 ; SRL A ; LD (0x9000), A ; HALT
+      // 0x81 → 0x40 (low bit 1 falls into CF; MSB filled with 0)
+      const program = new Uint8Array([
+        0x3E, 0x81,
+        CB, 0x3F,               // SRL A
+        LD_addr_A, 0x00, 0x90,
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      for (let i = 0; i < 200; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x9000)).toBe(0x40);
+      board.dispose();
+    });
+
+    it.skipIf(skip)('SRA A shifts right arithmetic, sign-extending', async () => {
+      // LD A, 0x80 ; SRA A ; LD (0x9000), A ; HALT
+      // 0x80 → 0xC0 (sign bit propagates)
+      const program = new Uint8Array([
+        0x3E, 0x80,
+        CB, 0x2F,               // SRA A
+        LD_addr_A, 0x00, 0x90,
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      for (let i = 0; i < 200; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x9000)).toBe(0xC0);
+      board.dispose();
+    });
+
+    it.skipIf(skip)('DAA after BCD ADD adjusts the result', async () => {
+      // LD A, 0x09 ; LD B, 0x07 ; ADD A, B ; DAA ; LD (0x9000), A ; HALT
+      // 9 + 7 = 16 (BCD): raw 0x10 + DAA correction 0x06 = 0x16.
+      const program = new Uint8Array([
+        0x3E, 0x09,             // LD A, 0x09
+        0x06, 0x07,             // LD B, 0x07
+        0x80,                   // ADD A, B
+        0x27,                   // DAA
+        LD_addr_A, 0x00, 0x90,
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      for (let i = 0; i < 200; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x9000)).toBe(0x16);
+      board.dispose();
+    });
+
+    it.skipIf(skip)('ADC HL, BC adds register pair with carry', async () => {
+      // LD HL, 0x1000 ; LD BC, 0x2000 ; OR A,A (clear CF) ; ADC HL,BC ;
+      // LD A, H ; LD (0x9000), A ; LD A, L ; LD (0x9001), A ; HALT
+      // After ADC HL=0x3000. Store H and L separately.
+      const program = new Uint8Array([
+        LD_HL_nn, 0x00, 0x10,   // LD HL, 0x1000
+        LD_BC_nn, 0x00, 0x20,   // LD BC, 0x2000
+        0xB7,                   // OR A — clears CF (and other flags except SZP)
+        0xED, 0x4A,             // ADC HL, BC
+        0x7C,                   // LD A, H
+        LD_addr_A, 0x00, 0x90,  // LD (0x9000), A
+        0x7D,                   // LD A, L
+        LD_addr_A, 0x01, 0x90,  // LD (0x9001), A
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      for (let i = 0; i < 400; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x9000)).toBe(0x30);   // H
+      expect(ram.peek(0x9001)).toBe(0x00);   // L
+      board.dispose();
+    });
+
+    it.skipIf(skip)('RLD rotates a low nibble between A and (HL)', async () => {
+      // LD A, 0x12 ; LD HL, 0xC000 ; (ram[0xC000] poked to 0x34) ; RLD ;
+      // LD (0x9000), A ; HALT
+      // Before: A = 0x12, mem = 0x34
+      // RLD: A_low (0x2) → mem_low; mem_high (0x3) → A_low; mem_low (0x4) → mem_high.
+      // After: A = 0x13, mem = 0x42.
+      const program = new Uint8Array([
+        0x3E, 0x12,             // LD A, 0x12
+        LD_HL_nn, 0x00, 0xC0,   // LD HL, 0xC000
+        0xED, 0x6F,             // RLD
+        LD_addr_A, 0x00, 0x90,  // LD (0x9000), A
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      ram.poke(0xC000, 0x34);
+      for (let i = 0; i < 300; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x9000)).toBe(0x13);   // A
+      expect(ram.peek(0xC000)).toBe(0x42);   // mem
+      board.dispose();
+    });
+
+    it.skipIf(skip)('CPIR scans memory for accumulator match', async () => {
+      // Pre-poke 0x9100=0x11, 0x9101=0x22, 0x9102=0x33, 0x9103=0x44.
+      // LD A, 0x33 ; LD HL, 0x9100 ; LD BC, 0x0004 ; CPIR ;
+      // After CPIR: HL stops one past 0x9102 (the match position). HL=0x9103.
+      // Store H and L to verify HL.
+      const program = new Uint8Array([
+        0x3E, 0x33,             // LD A, 0x33
+        LD_HL_nn, 0x00, 0x91,   // LD HL, 0x9100
+        LD_BC_nn, 0x04, 0x00,   // LD BC, 0x0004
+        0xED, 0xB1,             // CPIR
+        0x7C,                   // LD A, H
+        LD_addr_A, 0x00, 0x80,  // LD (0x8000), A
+        0x7D,                   // LD A, L
+        LD_addr_A, 0x01, 0x80,  // LD (0x8001), A
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      ram.poke(0x9100, 0x11);
+      ram.poke(0x9101, 0x22);
+      ram.poke(0x9102, 0x33);
+      ram.poke(0x9103, 0x44);
+      for (let i = 0; i < 600; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x8000)).toBe(0x91);   // H
+      expect(ram.peek(0x8001)).toBe(0x03);   // L = 0x03 (one past match)
+      board.dispose();
+    });
+
+    it.skipIf(skip)('BIT 7, A sets ZF when bit clear, clears when bit set', async () => {
+      // LD A, 0x00 ; BIT 7, A ; JR Z, +taken ; LD A, 0xFF (should NOT run)
+      // taken: LD A, 0xAA ; LD (0x9000), A ; HALT
+      const program = new Uint8Array([
+        0x3E, 0x00,             // LD A, 0x00
+        CB, 0x7F,               // BIT 7, A — ZF=1
+        0x28, 0x02,             // JR Z, +2 (skip the next 2 bytes)
+        0x3E, 0xFF,             // (skipped) LD A, 0xFF
+        0x3E, 0xAA,             // taken: LD A, 0xAA
+        LD_addr_A, 0x00, 0x90,  // LD (0x9000), A
+        HALT,
+      ]);
+      const { board, ram } = await bootZ80(program);
+      for (let i = 0; i < 300; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x9000)).toBe(0xAA);
+      board.dispose();
+    });
+  });
+
   describe('integration', () => {
     it.todo('runs the public-domain ZEXDOC test ROM (documented flags)');
   });

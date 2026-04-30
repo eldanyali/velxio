@@ -25,7 +25,7 @@ top of each phase reflects status.
 | Phase | Scope | Effort | Status |
 | --- | --- | --- | --- |
 | **A** | 8080 INTA bus cycle | low | ✅ done 2026-04-30 |
-| **B** | Z80 ISA polish for ZEXDOC | high | ⏸️ pending |
+| **B** | Z80 ISA polish for ZEXDOC | high | ✅ done 2026-04-30 (ZEXDOC ROM run deferred to Phase F) |
 | **C** | Support chip ecosystem (4001, 4002, 8259, 8253, 8255, 8251, rom-1m) | high | ⏸️ pending |
 | **D** | 4004/4040 I/O completion (uses chips from C) | medium | ⏸️ pending |
 | **E** | 8086 ISA completion | high | ⏸️ pending |
@@ -324,6 +324,83 @@ subject line (e.g. "test_intel: phase A — 8080 INTA bus protocol").
 
 ---
 
-## Phase B — Z80 ISA polish for ZEXDOC — STARTING
+## Phase B — completed (2026-04-30)
+
+### Delivered
+- **B.1 CB prefix** — 256 ops: BIT n,r / SET n,r / RES n,r and rotates
+  RLC/RRC/RL/RR/SLA/SRA/SLL/SRL on r ∈ B/C/D/E/H/L/(HL)/A. New
+  `execute_cb()` function in `z80.c` (~80 LOC).
+- **B.2 DDCB / FDCB** — indexed bit ops with displacement byte before
+  inner opcode. `execute_indexed()` now intercepts CB sub-prefix and
+  routes to `execute_cb` with `indexed=true`. The Sean Young "store-
+  back-to-register" undocumented variant for non-(HL) reg_code is
+  honoured (writes to plain B/C/D/E/H/L/A, not IXH/IXL).
+- **B.3 X (bit 3) and Y (bit 5) undocumented flag bits** — `set_sz`
+  and `set_szp` now copy result bits 3/5 into F. `add_hl` and `cpl`
+  also updated to set X/Y from the result high byte / new A. Required
+  for ZEXALL compatibility.
+- **B.5 Z80-specific DAA** — new `daa_z80()` honours the N flag to
+  pick subtractive vs additive correction. Algorithm sourced from
+  Sean Young §4.7 (passes ZEXALL when paired with X/Y flags).
+- **B.7 CPI / CPD / CPIR / CPDR** — block-compare ops with the X/Y
+  bits computed from `(A − (HL) − H)` per Sean Young §4.2.
+- **B.8 RLD / RRD** — 12-bit ring rotate between A's low nibble and
+  the byte at (HL).
+- **B.9 16-bit ADC HL,rr / SBC HL,rr** — full flag effects (S/Z/PV/H/
+  N/C/X/Y) with bit-12 half-carry and 16-bit overflow.
+
+### Deferred to later phases
+- **B.4 MEMPTR (WZ) register** — affects bits 3/5 of F after
+  `BIT n,(HL)` and DD/FD-prefixed BIT. Approximated using the
+  operand bits for now. Full MEMPTR map is a Phase F polish item
+  (only matters for the strictest ZEXALL cases).
+- **B.6 Block I/O exact flags** (INI/IND/INIR/INDR/OUTI/OUTD/OTIR/
+  OTDR) — instructions exist as ED-prefix stubs in the chip; Sean
+  Young §4.3 fully-deterministic flag formulas not yet applied.
+  Defer to Phase E or F.
+- **B.10 NEG aliases** — already had all 8 from earlier work.
+- **ZEXDOC integration test** — runs the full 9 KB Frank Cringle ROM.
+  Requires Phase F (real software validation infrastructure).
+
+### Tests delta
+- `test_z80`: 11 passing → **21 passing** (+10: 6 CB tests, DAA, ADC
+  HL, RLD, CPIR). Total tests in file went from 13 to 23.
+- Total `test_intel`: 64 → **73 passing**, 17 todo, 0 failed.
+
+### Files touched
+- `test/test_intel/test_z80/z80.c` — added F_X/F_Y/F_XY constants;
+  rewrote set_sz/set_szp; added execute_cb, daa_z80, adc_hl, sbc_hl,
+  rld_op, rrd_op, cp_block; wired CB / DDCB / FDCB into prefix
+  dispatch; added DAA at 0x27 in execute_main; added 8 new ED-prefix
+  cases (4A/5A/6A/7A/42/52/62/72/6F/67/A1/A9/B1/B9).
+- `test/test_intel/test_z80/z80.test.js` — added "CB-prefix bit ops"
+  describe block with 10 tests covering SET, RES, RLC, SRL, SRA,
+  BIT, DAA, ADC HL, RLD, CPIR.
+
+### Lessons
+- `set_sz` / `set_szp` are called from many opcodes — adding X/Y in
+  one place propagates correctly to most flag-setting instructions.
+  CPL is the exception: it doesn't touch S/Z/P, so X/Y must be set
+  manually.
+- For DDCB / FDCB: the inner opcode byte is **NOT** an M1 fetch (per
+  Sean Young §6.1), so R is not incremented for it. Important when
+  software relies on R for DRAM refresh emulation.
+- Z80 DAA uses N flag for direction. The H-flag-after rule for the
+  subtractive case (`old_low_nibble < 6`) is from Sean Young — not
+  in the Zilog manual, but ZEXALL validates it.
+- 16-bit ADC/SBC HL,rr take three operands' worth of state (the two
+  16-bit values plus CF from F) — bit-12 half-carry needs careful
+  cin handling.
+
+### Sources cited
+- `pdfs/z80_user_manual.pdf` (Zilog UM008003-1202)
+- `pdfs/z80_undocumented.pdf` (Sean Young v0.91): §4.1 (BIT flags),
+  §4.2 (CPI/CPD), §4.7 (DAA), §6.1 (DDCB R-register)
+- Cross-check (no copy): `floooh/chips/z80.h` for CB rotate ops,
+  `superzazu/z80` for DAA edge cases.
+
+---
+
+## Phase C — Support chip ecosystem — STARTING
 
 (Updates appended as work proceeds.)
