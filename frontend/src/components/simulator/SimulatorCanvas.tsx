@@ -958,8 +958,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
         if (selectedComponentId) {
           removeComponent(selectedComponentId);
           setSelectedComponentId(null);
-        } else if (activeBoardId && boards.length > 1) {
-          // Only allow deleting boards if more than one exists
+        } else if (activeBoardId) {
           setBoardToRemove(activeBoardId);
         }
       }
@@ -967,7 +966,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedComponentId, removeComponent, activeBoardId, boards.length]);
+  }, [selectedComponentId, removeComponent, activeBoardId]);
 
   // Handle component selection from modal
   const handleSelectComponent = (metadata: ComponentMetadata) => {
@@ -2172,15 +2171,13 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                     padding: '7px 14px',
                     background: 'none',
                     border: 'none',
-                    color: boards.length <= 1 ? '#555' : '#e06c75',
-                    cursor: boards.length <= 1 ? 'default' : 'pointer',
+                    color: '#e06c75',
+                    cursor: 'pointer',
                     fontSize: 13,
                     textAlign: 'left',
                   }}
-                  disabled={boards.length <= 1}
-                  title={boards.length <= 1 ? 'Cannot remove the last board' : undefined}
                   onMouseEnter={(e) => {
-                    if (boards.length > 1) e.currentTarget.style.background = '#2a2d2e';
+                    e.currentTarget.style.background = '#2a2d2e';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = 'none';

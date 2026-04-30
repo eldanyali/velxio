@@ -24,9 +24,10 @@ import { AppHeader } from '../components/layout/AppHeader';
 import { SaveProjectModal } from '../components/layout/SaveProjectModal';
 import { LoginPromptModal } from '../components/layout/LoginPromptModal';
 import { GitHubStarBanner } from '../components/layout/GitHubStarBanner';
-import { useSimulatorStore } from '../store/useSimulatorStore';
+import { useSimulatorStore, DEFAULT_BOARD_POSITION } from '../store/useSimulatorStore';
 import { useOscilloscopeStore } from '../store/useOscilloscopeStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { useProjectStore } from '../store/useProjectStore';
 import type { CompilationLog } from '../utils/compilationLogger';
 import '../App.css';
 
@@ -139,6 +140,27 @@ export const EditorPage: React.FC = () => {
       setSaveModalOpen(true);
     }
   }, [user]);
+
+  const handleNewClick = useCallback(() => {
+    if (
+      !window.confirm(
+        'Start a new workspace? This clears every board, component, wire and file. This cannot be undone.',
+      )
+    ) {
+      return;
+    }
+    const sim = useSimulatorStore.getState();
+    sim.boards.forEach((b) => sim.stopBoard(b.id));
+    const ids = sim.boards.map((b) => b.id);
+    ids.forEach((id) => sim.removeBoard(id));
+    sim.setComponents([]);
+    sim.setWires([]);
+    useProjectStore.getState().clearCurrentProject();
+    const newId = useSimulatorStore
+      .getState()
+      .addBoard('arduino-uno', DEFAULT_BOARD_POSITION.x, DEFAULT_BOARD_POSITION.y);
+    useSimulatorStore.getState().setActiveBoardId(newId);
+  }, []);
 
   // Track mobile breakpoint
   useEffect(() => {
@@ -357,7 +379,7 @@ export const EditorPage: React.FC = () => {
               <div
                 style={{ width: explorerWidth, flexShrink: 0, display: 'flex', overflow: 'hidden' }}
               >
-                <FileExplorer onSaveClick={handleSaveClick} />
+                <FileExplorer onSaveClick={handleSaveClick} onNewClick={handleNewClick} />
               </div>
               {!isMobile && (
                 <div
