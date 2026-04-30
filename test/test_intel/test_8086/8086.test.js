@@ -179,7 +179,23 @@ describe('Intel 8086 chip (minimum mode)', () => {
       expect(ram.peek(0x8001)).toBe(0xAA);
     });
 
-    it.todo('CALL pushes return address; RET pops it (debug pending — chip seems to take an unintended path after the CALL push, investigate fetch sequence)');
+    it.skipIf(skip)('CALL pushes return address; RET pops it', async () => {
+      // MOV SP, 0xFE00 ; CALL +6 ; MOV [0x8000], 0xAA ; HLT ;
+      // (subroutine):  MOV byte [0x8002], 0x55 ; RET
+      const program = [
+        0xBC, 0x00, 0xFE,           // MOV SP, 0xFE00
+        0xE8, 0x06, 0x00,           // CALL +6
+        0xC6, 0x06, 0x00, 0x80, 0xAA, // MOV byte [0x8000], 0xAA (after RET)
+        0xF4,                        // HLT
+        // subroutine at offset 12:
+        0xC6, 0x06, 0x02, 0x80, 0x55, // MOV byte [0x8002], 0x55
+        0xC3,                        // RET
+      ];
+      const { board, ram } = await boot8086(program);
+      for (let i = 0; i < 12000; i++) board.advanceNanos(CLOCK_NS);
+      expect(ram.peek(0x8000)).toBe(0xAA);
+      expect(ram.peek(0x8002)).toBe(0x55);
+    });
 
     it.skipIf(skip)('SHL AX, 1 doubles a value and updates CF', async () => {
       // MOV AX, 0x4001 ; SHL AX, 1 ; MOV [0x8000], AX ;

@@ -1089,6 +1089,39 @@ static void step(void) {
         case 0x89: { uint8_t modrm = fetch_byte(); rm16_write(modrm, *reg16_ptr((modrm >> 3) & 7)); break; }
         case 0x8A: { uint8_t modrm = fetch_byte(); *reg8_ptr((modrm >> 3) & 7) = rm8_read(modrm); break; }
         case 0x8B: { uint8_t modrm = fetch_byte(); *reg16_ptr((modrm >> 3) & 7) = rm16_read(modrm); break; }
+        /* MOV r/m, imm — 0xC6 / 0xC7. Encoding: opcode + modrm + disp + imm.
+           Crucially the disp bytes (consumed by calc_ea) come BEFORE the
+           immediate, so we must compute the EA first, then fetch imm. */
+        case 0xC6: {
+            uint8_t modrm = fetch_byte();
+            uint8_t mod = (modrm >> 6) & 3;
+            uint8_t rm  = modrm & 7;
+            if (mod == 3) {
+                uint8_t imm = fetch_byte();
+                *reg8_ptr(rm) = imm;
+            } else {
+                int seg;
+                uint16_t ea = calc_ea(mod, rm, &seg);
+                uint8_t imm = fetch_byte();
+                mem_write_byte(seg, ea, imm);
+            }
+            break;
+        }
+        case 0xC7: {
+            uint8_t modrm = fetch_byte();
+            uint8_t mod = (modrm >> 6) & 3;
+            uint8_t rm  = modrm & 7;
+            if (mod == 3) {
+                uint16_t imm = fetch_word();
+                *reg16_ptr(rm) = imm;
+            } else {
+                int seg;
+                uint16_t ea = calc_ea(mod, rm, &seg);
+                uint16_t imm = fetch_word();
+                mem_write_word(seg, ea, imm);
+            }
+            break;
+        }
         /* MOV r/m16, sreg — 0x8C  /  MOV sreg, r/m16 — 0x8E */
         case 0x8C: { uint8_t modrm = fetch_byte(); rm16_write(modrm, *seg_reg((modrm >> 3) & 3)); break; }
         case 0x8E: { uint8_t modrm = fetch_byte(); *seg_reg((modrm >> 3) & 3) = rm16_read(modrm); break; }
