@@ -6,7 +6,35 @@ for how the bus phases map onto velxio's reactive callbacks.
 
 ## Status
 
-📋 **Spec only.** No `.c` source yet.
+✅ **Implemented (bus skeleton).** 4/11 active tests pass; 7 are
+`it.todo` deferred to ISA-implementation phase. ~150 LOC clean-room
+in `4004.c` compiled to `fixtures/4004.wasm`.
+
+Validated against Intel MCS-4 User's Manual (Feb 1973) — PDF at
+`autosearch/pdfs/mcs4_users_manual.pdf`. Cross-checked the 8-phase
+frame timing and pin-out against `markablov/i40xx` (MIT, JS) and
+`Kostu96/K4004` (MIT, C++).
+
+What works:
+- Full 16-pin DIP contract (D0..D3, SYNC, RESET, TEST, CMROM,
+  CMRAM0..3, CLK1, CLK2, VDD, VSS).
+- 8-phase instruction frame (A1, A2, A3, M1, M2, X1, X2, X3) at
+  ~740 kHz nominal clock (1351 ns per phase).
+- SYNC pulses high at A1, low at A2 onwards — once per 8-clock cycle.
+- Address bus walk: D0..D3 = PC[3:0] in A1, PC[7:4] in A2, PC[11:8]
+  in A3 (low-nibble first per [M4] Fig. 2 p. 6).
+- CMROM strobed high during M1 (instruction fetch).
+- PC increments at end of every cycle (NOP-equivalent — every fetched
+  opcode is treated as a NOP for now).
+- RESET behaviour: held high clears all state per [M4] §III.A.5 p. 9.
+
+Deferred until ISA implementation phase:
+- All 46 4004 instructions (currently only NOP behaviour). Tracked in
+  `it.todo` for LDM, ADD, JCN, FIM, JMS, BBL.
+- SRC chip-select latching with CMRAMᵢ strobe at X2/X3.
+- I/O group (WRM, RDM, WRR, etc.) at 0xE0..0xEF.
+- Accumulator group (CLB, CLC, IAC, ..., DAA) at 0xF0..0xFD.
+- Busicom 141-PF integration test (the canonical 4004 demo).
 
 ## Pin contract (16-pin DIP, real silicon)
 

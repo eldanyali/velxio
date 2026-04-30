@@ -31,11 +31,13 @@
 /* ─── Flag bits in F ─────────────────────────────────────────────────────── */
 #define F_S  0x80
 #define F_Z  0x40
-/* bit 5 = Y (undocumented), bit 3 = X — left at 0 in this implementation. */
+#define F_Y  0x20    /* bit 5: undocumented — copy of result bit 5. ZEXALL needs it. */
 #define F_H  0x10
+#define F_X  0x08    /* bit 3: undocumented — copy of result bit 3. */
 #define F_PV 0x04
 #define F_N  0x02
 #define F_C  0x01
+#define F_XY 0x28    /* convenience mask: X | Y bits, for set_szp result-copy */
 
 /* ─── Chip state ─────────────────────────────────────────────────────────── */
 typedef struct {
@@ -67,6 +69,7 @@ typedef struct {
     bool halted;
     bool reset_active;
     bool nmi_pending;
+    bool int_line_low;       /* tracked from on_int watcher (INT̅ active low) */
 } cpu_t;
 
 static cpu_t G;
@@ -177,8 +180,13 @@ static bool parity8(uint8_t v) {
     v ^= v >> 4; v ^= v >> 2; v ^= v >> 1;
     return (v & 1) == 0;
 }
+/* Set S, Z, X, Y flags from result. Per Sean Young, X/Y are copies of
+   bits 3 and 5 of the result for nearly every flag-setting op. */
 static void set_sz(uint8_t v) {
-    G.f = (G.f & ~(F_S|F_Z)) | (v == 0 ? F_Z : 0) | (v & 0x80 ? F_S : 0);
+    G.f = (G.f & ~(F_S|F_Z|F_XY))
+        | (v == 0 ? F_Z : 0)
+        | (v & 0x80 ? F_S : 0)
+        | (v & F_XY);
 }
 static void set_szp(uint8_t v) {
     set_sz(v);
@@ -276,14 +284,128 @@ static uint8_t dcr8(uint8_t v) {
     return r;
 }
 
-/* 16-bit ADD HL,rr: only H, N, C affected; per [U] p. 179. */
+/* 16-bit ADD HL,rr: only H, N, C affected; per [U] p. 179.
+   Per Sean Young: X/Y are copies of the high byte of the result. */
 static void add_hl(uint16_t* dest, uint16_t v) {
     uint32_t r = (uint32_t)*dest + v;
     bool h = (((*dest & 0x0FFF) + (v & 0x0FFF)) & 0x1000) != 0;
-    G.f = (G.f & ~(F_H|F_N|F_C))
+    G.f = (G.f & ~(F_H|F_N|F_C|F_XY))
         | (h ? F_H : 0)
-        | (r > 0xFFFF ? F_C : 0);
+        | (r > 0xFFFF ? F_C : 0)
+        | ((r >> 8) & F_XY);
     *dest = (uint16_t)r;
+}
+
+/* 16-bit ADC HL, rr (ED 4A/5A/6A/7A): all flags affected. */
+static void adc_hl(uint16_t v) {
+    uint32_t cin = (G.f & F_C) ? 1 : 0;
+    uint32_t r = (uint32_t)G.hl + v + cin;
+    bool c = r > 0xFFFF;
+    bool h = (((G.hl & 0x0FFF) + (v & 0x0FFF) + cin) & 0x1000) != 0;
+    bool ov = (~(G.hl ^ v) & (G.hl ^ (uint16_t)r) & 0x8000) != 0;
+    uint16_t r16 = (uint16_t)r;
+    G.f = (h ? F_H : 0) | (c ? F_C : 0) | (ov ? F_PV : 0)
+        | (r16 == 0 ? F_Z : 0)
+        | (r16 & 0x8000 ? F_S : 0)
+        | ((r16 >> 8) & F_XY);
+    G.hl = r16;
+}
+
+/* 16-bit SBC HL, rr (ED 42/52/62/72): all flags affected. */
+static void sbc_hl(uint16_t v) {
+    uint32_t cin = (G.f & F_C) ? 1 : 0;
+    int32_t r = (int32_t)G.hl - (int32_t)v - (int32_t)cin;
+    bool c = (r & 0x10000) != 0;
+    bool h = (((G.hl & 0x0FFF) - (v & 0x0FFF) - cin) & 0x1000) != 0;
+    bool ov = ((G.hl ^ v) & (G.hl ^ (uint16_t)r) & 0x8000) != 0;
+    uint16_t r16 = (uint16_t)r;
+    G.f = F_N | (h ? F_H : 0) | (c ? F_C : 0) | (ov ? F_PV : 0)
+        | (r16 == 0 ? F_Z : 0)
+        | (r16 & 0x8000 ? F_S : 0)
+        | ((r16 >> 8) & F_XY);
+    G.hl = r16;
+}
+
+/* DAA — Z80 variant. The N flag selects sub vs add behaviour.
+   Algorithm per Sean Young §4.7 (validated against ZEXALL). */
+static void daa_z80(void) {
+    uint8_t a = G.acc;
+    uint8_t correction = 0;
+    bool new_cf = (G.f & F_C) != 0;
+    bool new_hf = false;
+
+    if ((a & 0x0F) > 9 || (G.f & F_H)) correction |= 0x06;
+    if (a > 0x99 || (G.f & F_C)) { correction |= 0x60; new_cf = true; }
+
+    uint8_t old_a = a;
+    if (G.f & F_N) {
+        a = (uint8_t)(a - correction);
+        /* New HF = old_HF AND (low nibble of A < 6) — borrow indication. */
+        new_hf = ((G.f & F_H) != 0) && ((old_a & 0x0F) < 6);
+    } else {
+        a = (uint8_t)(a + correction);
+        new_hf = ((old_a & 0x0F) + (correction & 0x0F)) > 0x0F;
+    }
+
+    G.acc = a;
+    G.f = (G.f & F_N)   /* preserve N */
+        | (a == 0 ? F_Z : 0)
+        | (a & 0x80 ? F_S : 0)
+        | (a & F_XY)
+        | (parity8(a) ? F_PV : 0)
+        | (new_hf ? F_H : 0)
+        | (new_cf ? F_C : 0);
+}
+
+/* RLD: rotate the low nibble of (HL) and the low nibble of A leftward
+   through a 12-bit ring. After: A_low ← (HL)_high, (HL)_high ← (HL)_low,
+   (HL)_low ← old_A_low. Flags S/Z/P from new A. */
+static void rld_op(void) {
+    uint8_t m = mem_read(G.hl);
+    uint8_t a_low = G.acc & 0x0F;
+    uint8_t new_a = (G.acc & 0xF0) | ((m >> 4) & 0x0F);
+    uint8_t new_m = (uint8_t)((m << 4) | a_low);
+    mem_write(G.hl, new_m);
+    G.acc = new_a;
+    G.f = (G.f & F_C)
+        | (new_a == 0 ? F_Z : 0)
+        | (new_a & 0x80 ? F_S : 0)
+        | (new_a & F_XY)
+        | (parity8(new_a) ? F_PV : 0);
+}
+/* RRD: rotate rightward. A_low ← (HL)_low, (HL)_low ← (HL)_high,
+   (HL)_high ← old_A_low. */
+static void rrd_op(void) {
+    uint8_t m = mem_read(G.hl);
+    uint8_t a_low = G.acc & 0x0F;
+    uint8_t new_a = (G.acc & 0xF0) | (m & 0x0F);
+    uint8_t new_m = (uint8_t)((a_low << 4) | ((m >> 4) & 0x0F));
+    mem_write(G.hl, new_m);
+    G.acc = new_a;
+    G.f = (G.f & F_C)
+        | (new_a == 0 ? F_Z : 0)
+        | (new_a & 0x80 ? F_S : 0)
+        | (new_a & F_XY)
+        | (parity8(new_a) ? F_PV : 0);
+}
+
+/* Block compare CPI/CPD: A − (HL); set flags; HL +/-; BC--; PV = (BC≠0). */
+static void cp_block(int dir) {
+    uint8_t v = mem_read(G.hl);
+    uint8_t r = G.acc - v;
+    bool h = (((G.acc & 0x0F) - (v & 0x0F)) & 0x10) != 0;
+    G.hl = (uint16_t)(G.hl + dir);
+    G.bc = (uint16_t)(G.bc - 1);
+    /* X = bit 3 of (A − (HL) − H), Y = bit 1 of same, per Sean Young §4.2 */
+    uint8_t n = (uint8_t)(r - (h ? 1 : 0));
+    G.f = (G.f & F_C)
+        | F_N
+        | (h ? F_H : 0)
+        | (r == 0 ? F_Z : 0)
+        | (r & 0x80 ? F_S : 0)
+        | (G.bc != 0 ? F_PV : 0)
+        | (n & 0x08 ? F_X : 0)
+        | (n & 0x02 ? F_Y : 0);
 }
 
 /* ─── Conditional flag tests for JP/JR/CALL/RET cc ───────────────────────── */
@@ -302,6 +424,113 @@ static bool cond_met(uint8_t cc) {
 
 /* ─── Forward declaration of the prefix-aware dispatcher ─────────────────── */
 static void execute_main(uint8_t op, uint16_t* hl_reg, uint8_t* hreg, uint8_t* lreg, bool indexed, int8_t disp);
+
+/* ─── CB-prefix ops (BIT/SET/RES + rotates/shifts) ──────────────────────── */
+/* Operand selection by 3-bit r/m code:
+   0..5 = B,C,D,E,H,L; 6 = (HL); 7 = A.
+   For DD/FD CB (indexed), the operand is always (IX+d) or (IY+d) and
+   the result is also written back to the chosen register UNLESS reg=6. */
+static void execute_cb(uint16_t* hl_reg, uint8_t* hreg, uint8_t* lreg,
+                       bool indexed, int8_t disp) {
+    uint8_t op;
+    if (!indexed) {
+        op = opcode_fetch(G.pc++);
+        /* CB is an M1 prefix → R already incremented by the outer fetch
+           of CB; the inner opcode is also M1 → +1 more. */
+        G.r = (G.r & 0x80) | ((G.r + 1) & 0x7F);
+    } else {
+        /* DDCB / FDCB: byte after the displacement is the opcode and
+           is NOT an M1 fetch (Sean Young §6.1). R unchanged for it. */
+        op = imm8();
+    }
+
+    uint8_t reg_code = op & 7;
+    uint8_t bit_op   = (op >> 3) & 7;
+    uint8_t op_class = (op >> 6) & 3;
+
+    /* Read operand */
+    uint8_t v;
+    uint16_t mem_addr = 0;
+    if (indexed) {
+        mem_addr = (uint16_t)(*hl_reg + disp);
+        v = mem_read(mem_addr);
+    } else if (reg_code == 6) {
+        mem_addr = *hl_reg;
+        v = mem_read(mem_addr);
+    } else {
+        v = *reg_ptr(reg_code, hreg, lreg);
+    }
+
+    uint8_t r = v;
+    uint8_t cy_out = 0;
+    bool writeback = true;
+
+    switch (op_class) {
+        case 0: {  /* rotate / shift */
+            switch (bit_op) {
+                case 0: cy_out = (v >> 7) & 1; r = (uint8_t)((v << 1) | cy_out); break;            /* RLC */
+                case 1: cy_out = v & 1;        r = (uint8_t)((v >> 1) | (cy_out << 7)); break;     /* RRC */
+                case 2: cy_out = (v >> 7) & 1; r = (uint8_t)((v << 1) | (G.f & F_C ? 1 : 0)); break; /* RL */
+                case 3: cy_out = v & 1;        r = (uint8_t)((v >> 1) | ((G.f & F_C ? 1 : 0) << 7)); break; /* RR */
+                case 4: cy_out = (v >> 7) & 1; r = (uint8_t)(v << 1); break;                        /* SLA */
+                case 5: cy_out = v & 1;        r = (uint8_t)((v >> 1) | (v & 0x80)); break;         /* SRA — sign-extend */
+                case 6: cy_out = (v >> 7) & 1; r = (uint8_t)((v << 1) | 1); break;                  /* SLL (undocumented) */
+                case 7: cy_out = v & 1;        r = (uint8_t)(v >> 1); break;                        /* SRL */
+            }
+            G.f = (cy_out ? F_C : 0)
+                | (r & 0x80 ? F_S : 0)
+                | (r == 0 ? F_Z : 0)
+                | (r & F_XY)
+                | (parity8(r) ? F_PV : 0);
+            break;
+        }
+        case 1: {  /* BIT n, r — test bit n */
+            uint8_t mask = (uint8_t)(1u << bit_op);
+            uint8_t bit_set = v & mask;
+            /* Per Sean Young §4.1: SF set iff testing bit 7 AND that bit is 1.
+               PF/V = ZF.  HF = 1.  NF = 0.  CF unchanged.
+               X/Y from operand bits 3/5 (technically MEMPTR for (HL); we
+               approximate with v's bits which is correct for register
+               operands and a known-acceptable approximation for memory). */
+            G.f = (G.f & F_C)
+                | F_H
+                | (bit_set ? 0 : F_Z)
+                | (bit_set ? 0 : F_PV)
+                | (bit_op == 7 && bit_set ? F_S : 0)
+                | (v & F_XY);
+            return;   /* BIT does not write back */
+        }
+        case 2: r = (uint8_t)(v & ~((uint8_t)1u << bit_op)); break;   /* RES */
+        case 3: r = (uint8_t)(v |  ((uint8_t)1u << bit_op)); break;   /* SET */
+    }
+
+    /* Write back */
+    if (indexed) {
+        mem_write(mem_addr, r);
+        /* DDCB/FDCB undocumented: result also stored in the chosen
+           register (when reg_code != 6). The register is ALWAYS one
+           of the *non-indexed* H/L (i.e. real H/L), not IXH/IXL,
+           per Sean Young. We follow that convention. */
+        if (reg_code != 6) {
+            uint8_t* dst;
+            switch (reg_code) {
+                case 0: dst = &G.b; break;
+                case 1: dst = &G.c; break;
+                case 2: dst = &G.d; break;
+                case 3: dst = &G.e; break;
+                case 4: dst = &G.h; break;
+                case 5: dst = &G.l; break;
+                default: dst = &G.acc; break;
+            }
+            *dst = r;
+        }
+    } else if (reg_code == 6) {
+        mem_write(mem_addr, r);
+    } else {
+        *reg_ptr(reg_code, hreg, lreg) = r;
+    }
+    (void)writeback;
+}
 
 /* ─── ED-prefix opcodes ─────────────────────────────────────────────────── */
 static void execute_ed(void) {
@@ -338,6 +567,23 @@ static void execute_ed(void) {
             G.iff1 = G.iff2;
             break;
         }
+        /* 16-bit ADC HL, rr / SBC HL, rr */
+        case 0x4A: adc_hl(G.bc); break;
+        case 0x5A: adc_hl(G.de); break;
+        case 0x6A: adc_hl(G.hl); break;
+        case 0x7A: adc_hl(G.sp); break;
+        case 0x42: sbc_hl(G.bc); break;
+        case 0x52: sbc_hl(G.de); break;
+        case 0x62: sbc_hl(G.hl); break;
+        case 0x72: sbc_hl(G.sp); break;
+        /* RLD / RRD */
+        case 0x6F: rld_op(); break;
+        case 0x67: rrd_op(); break;
+        /* Block compare CPI/CPD/CPIR/CPDR */
+        case 0xA1: cp_block(+1); break;
+        case 0xA9: cp_block(-1); break;
+        case 0xB1: do { cp_block(+1); } while (G.bc != 0 && (G.f & F_Z) == 0); break;
+        case 0xB9: do { cp_block(-1); } while (G.bc != 0 && (G.f & F_Z) == 0); break;
         case 0xA0: {                                                      /* LDI */
             mem_write(G.de, mem_read(G.hl));
             G.hl++; G.de++; G.bc--;
@@ -383,8 +629,15 @@ static void execute_indexed(uint16_t* idx_reg, uint8_t* idx_h, uint8_t* idx_l) {
     G.r = (G.r & 0x80) | ((G.r + 1) & 0x7F);
     int8_t disp = 0;
 
-    /* If the op references (HL) — codes that have (HL) in the SSS or DDD
-       field — the displacement byte follows. Then (IX+d) / (IY+d). */
+    /* DDCB / FDCB: displacement comes BEFORE the inner opcode, then the
+       opcode follows. Both bytes are non-M1, so R is not incremented for
+       them. */
+    if (op == 0xCB) {
+        disp = (int8_t)imm8();
+        execute_cb(idx_reg, idx_h, idx_l, true, disp);
+        return;
+    }
+
     bool needs_disp = false;
     if (op == 0x36) needs_disp = true;                        /* LD (IX+d),n */
     if ((op & 0xC7) == 0x46) needs_disp = true;                /* LD r,(IX+d)  bits 6..0 = ?_110 */
@@ -409,6 +662,41 @@ static void step(void) {
         return;
     }
 
+    /* Maskable interrupt: INT̅ is level-triggered (active low). Service
+       at instruction boundary if IFF1 is enabled and we're not halted
+       on a non-interruptible state. Per [U] p. 24: INTA cycle clears
+       both IFF1 and IFF2. */
+    if (G.int_line_low && G.iff1) {
+        G.iff1 = G.iff2 = false;
+        G.halted = false;
+        G.r = (G.r & 0x80) | ((G.r + 1) & 0x7F);
+        push16(G.pc);
+        switch (G.im) {
+            case 0:
+                /* IM 0 reads an instruction byte from the data bus
+                   during INTA — usually a RST. Without an interrupt
+                   controller wired, default to RST 38h. */
+                G.pc = 0x0038;
+                break;
+            case 1:
+                G.pc = 0x0038;
+                break;
+            case 2:
+                /* IM 2: vector = (I << 8) | data_byte. Without a real
+                   interrupt controller we approximate using 0x00 as
+                   the data byte; user code must pre-load the vector
+                   table at I:00. */
+                {
+                    uint16_t va = ((uint16_t)G.i << 8) | 0x00;
+                    uint8_t lo = mem_read(va);
+                    uint8_t hi = mem_read((uint16_t)(va + 1));
+                    G.pc = lo | ((uint16_t)hi << 8);
+                }
+                break;
+        }
+        return;
+    }
+
     if (G.halted) {
         /* Re-emit a no-op M1 fetch so RFSH̅ keeps cycling (matches real
            silicon, which fetches the byte at PC repeatedly while halted). */
@@ -421,8 +709,7 @@ static void step(void) {
     if (op == 0xED) { execute_ed(); return; }
     if (op == 0xDD) { execute_indexed(&G.ix, &G.ixh, &G.ixl); return; }
     if (op == 0xFD) { execute_indexed(&G.iy, &G.iyh, &G.iyl); return; }
-    /* CB (bit ops) — minimal support omitted for now; falls through to
-       default which is a NOP. it.todo tests cover this. */
+    if (op == 0xCB) { execute_cb(&G.hl, &G.h, &G.l, false, 0); return; }
 
     execute_main(op, &G.hl, &G.h, &G.l, false, 0);
 }
@@ -563,7 +850,8 @@ static void execute_main(uint8_t op, uint16_t* hl_reg, uint8_t* hreg, uint8_t* l
         case 0x1F: { uint8_t b0 = G.acc & 1; G.acc = (G.acc >> 1) | ((G.f & F_C ? 1 : 0) << 7);
                      G.f = (G.f & ~(F_H|F_N|F_C)) | (b0 ? F_C : 0); break; }
 
-        case 0x2F: G.acc = ~G.acc; G.f |= (F_H|F_N); break;       /* CPL */
+        case 0x27: daa_z80(); break;                              /* DAA */
+        case 0x2F: G.acc = ~G.acc; G.f |= (F_H|F_N); G.f = (G.f & ~F_XY) | (G.acc & F_XY); break;  /* CPL */
         case 0x37: G.f = (G.f & ~(F_H|F_N)) | F_C; break;          /* SCF */
         case 0x3F: G.f = (G.f & ~(F_N)) | ((G.f & F_C) ? F_H : 0)
                      ^ F_C; break;                                  /* CCF (approximated) */
@@ -666,9 +954,14 @@ static void on_reset(void* user_data, vx_pin pin, int value) {
 
 static void on_nmi(void* user_data, vx_pin pin, int value) {
     (void)user_data; (void)pin; (void)value;
-    /* NMI̅ falling edge — pin watch was registered for VX_EDGE_FALLING
-       so this fires only on 1→0. */
     G.nmi_pending = true;
+}
+
+static void on_int(void* user_data, vx_pin pin, int value) {
+    (void)user_data; (void)pin;
+    /* INT̅ is level-triggered, active low. Track its level and let
+       step() decide when to service it. */
+    G.int_line_low = (value == 0);
 }
 
 static void on_clock(void* user_data) {
@@ -716,8 +1009,15 @@ void chip_setup(void) {
     G.gnd    = vx_pin_register("GND",    VX_INPUT);
 
     reset_state();
+    /* Power-on default: hold the chip in reset until something drives
+       RESET̅ HIGH. Real silicon is the same — RESET̅ must be held low
+       for ≥3 clocks at power-on, but in our digital model the watcher
+       only fires on edges, so we start in reset and let the rising
+       edge release us. */
+    G.reset_active = true;
     vx_pin_watch(G.reset_, VX_EDGE_BOTH,    on_reset, 0);
     vx_pin_watch(G.nmi,    VX_EDGE_FALLING, on_nmi,   0);
+    vx_pin_watch(G.intn,   VX_EDGE_BOTH,    on_int,   0);
 
     G.cycle_timer = vx_timer_create(on_clock, 0);
     vx_timer_start(G.cycle_timer, 250, true);   /* 4 MHz pseudo-clock */

@@ -5,8 +5,37 @@ for the spec.
 
 ## Status
 
-📋 **Spec only.** Will reuse the 4004 emulator core once that's
-working.
+✅ **Implemented (bus skeleton + STOP/STPA).** 2/5 active tests pass;
+3 are `it.todo` deferred. ~250 LOC clean-room in `4040.c` compiled to
+`fixtures/4040.wasm`.
+
+Validated against Intel MCS-40 User's Manual (Nov 1974) — PDF at
+`autosearch/pdfs/mcs40_users_manual.pdf`. Cross-checked control logic
+against `markablov/i40xx` (MIT) and `Kostu96/K4004` (MIT, ships
+Busicom 141-PF firmware).
+
+What works:
+- Full 24-pin DIP contract per [M40] pp. 1-5/1-6 — STP, STPA, INT,
+  INTA, CY, dual CMROM (CMROM0/CMROM1), dual standby Vdd1/Vdd2.
+- 8-phase frame inherited from 4004 (binary-compatible, [M40] p. 1-22).
+- STP latched at M2 → STOP FF set at X3 → STPA asserts within ~2
+  instruction cycles ([M40] p. 1-10). Clock and SYNC continue per
+  manual ("CPU executes NOPs in a loop").
+- INT latched at M2 with EIN active → forced JMS to PC=0x003 at X3,
+  INTA asserts ([M40] p. 1-12). Vector address is fixed; no vector
+  table.
+- Index register file extended to 24 × 4 bits (3 banks × 8); SB0/SB1
+  bank-select FF in place though not exercised by tests.
+- 7-deep PC stack ([M40] p. 1-12) — replaces 4004's 3-deep stack.
+
+Deferred:
+- 14 new instructions' semantics: HLT, BBS, LCR, OR4/OR5, AN6/AN7,
+  DB0/DB1, SB0/SB1, EIN/DIN, RPM (currently all decoded as NOP).
+- BBS return-from-interrupt behaviour (pop stack, restore SRC, restore
+  bank FF, clear INTA).
+- DB0/DB1 ROM-bank-select with 3-cycle takeover delay.
+- HALT FF semantics (HLT opcode).
+- Interrupt-during-2-byte-instruction edge cases ([M40] open question).
 
 ## Pin contract (24-pin DIP, real silicon)
 

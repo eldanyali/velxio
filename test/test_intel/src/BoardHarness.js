@@ -195,7 +195,11 @@ export class BoardHarness {
       mem[addr - baseAddr] = byte & 0xff;
     });
 
-    return { mem, peek: (a) => mem[a - baseAddr], poke: (a, v) => { mem[a - baseAddr] = v & 0xff; } };
+    return {
+      mem,
+      peek: (a) => mem[a - baseAddr],
+      poke: (a, v) => { mem[a - baseAddr] = v & 0xff; },
+    };
   }
 
   /**
