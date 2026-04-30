@@ -666,11 +666,43 @@ SYNC rising. Documented in `4001-rom.c`.
 
 ---
 
-## Phase C deferred items — still pending
-- **8253 PIT** (programmable interval timer) — 3 channels of 16-bit
-  countdown timers, 6 modes. Needed for system-tick interrupts and PC
-  speaker tone generation.
-- **8259 PIC** (programmable interrupt controller) — needed for
-  actual hardware interrupt routing on 8080/Z80/8086 demos.
+## Phase C extension — completed (2026-04-30)
+
+### Delivered (the two deferred chips from Phase C)
+
+**8259 PIC** (`test_buses/8259-pic.c`, ~280 LOC). Single-master mode:
+- ICW1..ICW4 init sequence with branching on the "single" and
+  "ICW4 needed" flags (ICW1 bits 1 and 0).
+- IRR / ISR / IMR registers + read-back via OCW3.
+- Priority-based INT assertion (lower IRQ# = higher priority,
+  fully-nested mode).
+- INTA cycle drives `vector_base + IRQ#` on D bus.
+- Non-specific (0x20) and specific (0x60..0x67) EOI commands.
+- Pre-emption: a higher-priority IRQ during a lower-priority ISR
+  re-asserts INT.
+- 7/7 tests pass: pin contract, IRQ→INT, INTA→vector for IRQ0/3,
+  IMR mask, EOI, pre-emption.
+- **Cascade mode and slave-PIC routing NOT implemented** (single
+  master is enough for 95% of demos).
+
+**8253 PIT** (`test_buses/8253-pit.c`, ~210 LOC). Three channels with
+- Mode 0 (interrupt on terminal count): OUT low after control, high
+  when count hits 0.
+- Mode 2 (rate generator): OUT pulses low for one CLK then auto-
+  reloads — used for system tick.
+- Mode 3 (square wave): OUT toggles every (count/2) CLKs — used for
+  PC speaker tone.
+- Modes 1, 4, 5 NOT implemented; control writes selecting them
+  silently coerce to Mode 0.
+- LSB-only / MSB-only / LSB-then-MSB read/write modes all work; the
+  "latch counter" rw mode (00) snapshots the current count for the
+  next read.
+- GATE pin pauses counting when low.
+- 4/4 tests pass.
+
+### Tests delta
+- Total test_intel: 99 → **110 passing**, 11 todo, 0 failed (+11).
+
+## Phase G — still deferred (cycle accuracy)
 
 ## Phase G — still deferred (cycle accuracy)
