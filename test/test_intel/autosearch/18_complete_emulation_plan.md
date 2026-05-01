@@ -782,6 +782,60 @@ only needs a sourceable ROM image plus 4 4001 chip-id variants.
 
 ---
 
+## Phase F-extension — historic ROM boots (2026-05-01)
+
+Three public-domain ROMs from the actual silicon era now boot end-
+to-end on our clean-room chip implementations:
+
+### Galaksija ROM A (Z80, 4 KB) — `test_z80/galaksija.test.js`
+- **Source:** mejs/galaksija on GitHub, ROM_A_with_ROM_B_init_ver_29.bin
+- **License:** Voja Antonić explicitly placed the design + ROM in the
+  public domain (Galaksija magazine #6, 1984).
+- **Setup:** ROM A+B image at 0x0000..0x1FFF, fake RAM at 0x2000..
+  0x3FFF (system stack + video buffer + user RAM).
+- **Verifies:** PC visits the JP-from-reset target 0x03DA, runs
+  >1000 M1 fetches, and the ASCII string "READY" appears in RAM
+  after init — the canonical Galaksija prompt.
+
+### Busicom 141-PF firmware (4004, 1 KB) — `test_4004/busicom.test.js`
+- **Source:** carlini/intel-4004-in-4004-bytes-of-c on GitHub
+  (originally Tim McNerney's 4004.com restoration).
+- **License:** Intel released the firmware to public domain in 2009.
+- **Setup:** Real 4004 + real 4002 chips wired on the multiplexed
+  nibble bus; JS-side bus driver feeds bytes from the firmware
+  image during M1/M2.
+- **TEST pin handling:** the very first opcode is `JCN c4=1`
+  waiting for the printer-drum encoder pulse. We toggle TEST every
+  ~400 phases to mimic the rotating drum, otherwise the firmware
+  spins forever on the first JCN.
+- **Verifies:** >2000 opcode-fetch cycles, >15 unique PC addresses
+  visited, CMROM strobed >100 times, CMRAM strobed at least once
+  (firmware genuinely talks to RAM during init).
+
+### Palo Alto Tiny BASIC v2 (8080, 1.9 KB) — `test_8080/tinybasic.test.js`
+- **Source:** CPUville port of Li-Chen Wang's 1976 Tiny BASIC,
+  distributed as Intel HEX at cpuville.com/Code/.
+- **License:** Wang's original carries the famous "@COPYLEFT, ALL
+  WRONGS RESERVED" notice (PCC, May 1976) — universally treated as
+  public domain.
+- **Setup:** ROM at 0x0000..0x07FF, RAM at 0x0800..0x0FFF (stack
+  init `LXI SP, 1000h`), fake polled 8251A UART at I/O port 0x02
+  (data) / 0x03 (status).
+- **Verifies:** the chip drives `OUT 0x03` (UART mode init) and
+  `OUT 0x02` (TX), and the captured TX stream contains the ASCII
+  "OK" prompt — proving Wang's BASIC interpreter reached its main
+  REPL loop.
+
+### Tests delta
+- Total test_intel: 126 → **129 passing**, 0 todo, 0 failed.
+- New files: `test_4004/busicom.test.js`,
+  `test_8080/tinybasic.test.js`, `test_z80/galaksija.test.js`.
+- New ROMs under `roms/` (gitignored): `4004/busicom_141pf.bin`
+  (1280 B), `8080/tinybasic.hex` (5235 B), `z80/galaksija_rom_a.bin`
+  (4096 B), `z80/galaksija_rom_b.bin` (4096 B).
+
+---
+
 ## Phase C extension — completed (2026-04-30)
 
 ### Delivered (the two deferred chips from Phase C)

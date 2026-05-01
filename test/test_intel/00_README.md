@@ -117,8 +117,13 @@ address and data pins, just like in a real PCB.
 | **test_8086/**| ✅ 16  | ✅    | **🎯 7 passing + 9 deferred (skipIf TODO areas). ~800 LOC clean-room from Intel iAPX 86,88 User's Manual (Oct 1979).** Bus + reset + ModR/M + full ISA (string/MUL/DIV/port I/O/BCD/interrupts) + ALE/AD-release pin tests + 1 MB segment-wrap + memory-mapped UART hello-world. |
 | **test_z80/**| ✅ 22  | ✅    | **🎯 22 passing. ~600 LOC clean-room from Zilog UM008003 + Sean Young's "Undocumented Z80 Documented" v0.91.** Full bus + ISA + INT (IM 0/1/2 incl. vector-table lookup) + NMI + LDIR + IX/IY + EXX. ZEXDOC end-to-end run lives in zexdoc.test.js. |
 
-Total: **126 tests authored, 126 passing** across 19 test files,
-0 skipping, 0 todo, 0 failed.
+Total: **129 tests authored, 129 passing** across 22 test files,
+0 skipping, 0 todo, 0 failed. **Three historic public-domain ROMs
+boot end-to-end on our chips:** Busicom 141-PF (4004, 1 KB, Intel
+PD 2009), Palo Alto Tiny BASIC v2 (8080, 1.9 KB, Wang 1976 PD), and
+Galaksija ROM A (Z80, 4 KB, Voja Antonić PD 1984). Each test wires
+the real chip + RAM/UART/etc. and asserts on a real boot artifact
+(printer-drum scan loop, "OK" prompt via 8251 UART, "READY" in RAM).
 
 | Chip | Type | Tests | LOC | Validation |
 | --- | --- | --- | --- | --- |
