@@ -129,3 +129,8 @@ frontend/src/__tests__/fixtures/rp2040-blink/
 **/*.ino.map
 **/*.ino.uf2
 .claude/scheduled_tasks.lock
+
+# Database / volume backups — contain user PII, never commit
+backups/
+*.tar.gz
+*.sqlite-backup
