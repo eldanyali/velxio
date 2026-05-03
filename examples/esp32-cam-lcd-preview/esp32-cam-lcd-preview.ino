@@ -72,25 +72,21 @@
 SPIClass tftSPI(VSPI);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(&tftSPI, TFT_DC, TFT_CS, TFT_RST);
 
-// Preview is scaled 1/4 from the QVGA capture (320×240 → 80×60).
-// 80 × 60 × 2 bytes = 9 600 bytes — minimal SPI traffic per frame.
-// Centered in the 320×240 landscape TFT.
-//
-// Why so small: every SPI byte takes a full QEMU→worker→backend→
-// frontend round-trip. drawRGBBitmap pushes width×height×2 bytes;
-// at 80×60 that's 9 600 SPI events per frame vs 38 400 at 160×120.
-// Net effect on the user: roughly 4× faster perceived FPS in the
-// emulator. Real hardware doesn't care — its SPI runs at 80 MHz.
-#define PREVIEW_W   80
-#define PREVIEW_H   60
-#define PREVIEW_X  120   // (320 - 80) / 2
-#define PREVIEW_Y   90   // (240 - 60) / 2
+// Preview at 1/2 the QVGA capture (320×240 → 160×120). Centered in the
+// 320×240 landscape TFT at offset (80, 60). 160 × 120 × 2 bytes =
+// 38 400 bytes — used to be the dominant cost in the emulator until
+// the worker started batching SPI bytes (one WS message per
+// transaction instead of per byte). Now real hardware speed is the
+// only practical limit; QEMU emulates ~5-10 fps for this preview.
+#define PREVIEW_W  160
+#define PREVIEW_H  120
+#define PREVIEW_X   80
+#define PREVIEW_Y   60
 static uint8_t rgbBuf[PREVIEW_W * PREVIEW_H * 2];
 
-// Throttle the status-bar redraw — text writes hit SPI too. Updating
-// the bar once every STATUS_REFRESH_EVERY frames keeps the headline
-// numbers visible without burning bandwidth on every loop iteration.
-#define STATUS_REFRESH_EVERY  10
+// Refresh the status bar every Nth frame — still nice to keep the
+// pixel-update bandwidth dominant over text overhead.
+#define STATUS_REFRESH_EVERY  5
 
 // Counters for status overlay
 uint32_t frame_count   = 0;
@@ -234,8 +230,8 @@ void loop() {
   frame_count++;
   size_t fb_len = fb->len;
 
-  // Decode the JPEG into RGB565 at 1/4 resolution (80×60).
-  bool ok = jpg2rgb565(fb->buf, fb->len, rgbBuf, JPG_SCALE_4X);
+  // Decode the JPEG into RGB565 at 1/2 resolution (160×120).
+  bool ok = jpg2rgb565(fb->buf, fb->len, rgbBuf, JPG_SCALE_2X);
   esp_camera_fb_return(fb);
 
   if (ok) {

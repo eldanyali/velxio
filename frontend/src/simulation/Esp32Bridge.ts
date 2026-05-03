@@ -292,11 +292,36 @@ export class Esp32Bridge {
           this.onI2cTransaction?.(addr, data);
           break;
         }
+        case 'spi_batch': {
+          // Worker batches consecutive MOSI bytes from a single SPI
+          // transaction into one base64-encoded message. Replays each
+          // byte through the same callbacks the per-byte spi_event path
+          // uses — parts that subscribed to onSpiByte don't notice. See
+          // backend/app/services/esp32_worker.py::_on_spi_event for the
+          // batching policy (flush on CS HIGH or buffer cap).
+          const b64 = msg.data.b64 as string;
+          if (b64) {
+            const bin = atob(b64);
+            const handler = this.onSpiByte ?? this.onSpiEvent;
+            if (handler) {
+              for (let i = 0; i < bin.length; i++) {
+                const m = bin.charCodeAt(i);
+                handler(m);
+              }
+            }
+          }
+          break;
+        }
         case 'spi_event': {
           // Worker emits {bus, event, response}. The 'event' field encodes:
           //   event = mosi << 8        (op = event & 0xFF == 0x00) → byte transfer
           //   event = ((cs<<1)|level) << 8 | 0x01 (op == 0x01)     → CS line change
           // See backend/app/services/esp32_worker.py::_on_spi_event.
+          //
+          // After the batching change, the byte transfer path goes
+          // through 'spi_batch' instead. This branch now only fires for
+          // CS-line changes (op == 0x01), but we keep the byte branch
+          // for backwards compatibility with older worker builds.
           const event = msg.data.event as number;
           const op    = (event ?? 0) & 0xFF;
           if (op === 0x00) {

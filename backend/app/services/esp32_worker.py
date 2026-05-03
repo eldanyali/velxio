@@ -865,6 +865,25 @@ def main() -> None:  # noqa: C901  (complexity OK for inline worker)
             return 1
         return resp
 
+    # SPI byte batching — emitting one WS message per byte saturates the
+    # uvicorn → frontend pipe and caps tft.drawRGBBitmap at < 1 fps even
+    # for tiny previews. Buffer the MOSI bytes here and flush as a single
+    # base64-encoded `spi_batch` message when CS goes HIGH (transaction
+    # ended) or the buffer crosses a soft cap. The MISO response is still
+    # returned synchronously per byte from `_spi_response[0]` because the
+    # QEMU master writes can't wait. Frontend Esp32Bridge unpacks the batch
+    # and replays each byte through onSpiByte. ~9600 events/frame → ~3
+    # batched messages/frame, ~50× faster TFT throughput in the emulator.
+    _spi_byte_buf      = bytearray()
+    _spi_buf_lock      = threading.Lock()
+    _SPI_BATCH_FLUSH_AT = 4096   # flush early if a single transaction is huge
+
+    def _flush_spi_batch_locked():
+        if _spi_byte_buf and not _stopped.is_set():
+            b64 = base64.b64encode(bytes(_spi_byte_buf)).decode('ascii')
+            _emit({'type': 'spi_batch', 'b64': b64})
+            _spi_byte_buf.clear()
+
     def _on_spi_event(bus_id: int, event: int) -> int:
         """Synchronous — must return immediately; called from QEMU thread.
 
@@ -909,7 +928,23 @@ def main() -> None:  # noqa: C901  (complexity OK for inline worker)
             if any_active:
                 return 0xFF
         resp = _spi_response[0]
-        if not _stopped.is_set():
+        if _stopped.is_set():
+            return resp
+        # ── Batching path (replaces the per-byte _emit) ─────────────────
+        if op == 0x00:
+            # Byte transfer — append to buffer, flush if oversized.
+            with _spi_buf_lock:
+                _spi_byte_buf.append(mosi)
+                if len(_spi_byte_buf) >= _SPI_BATCH_FLUSH_AT:
+                    _flush_spi_batch_locked()
+        else:
+            # CS-line change. Flush any pending bytes from the previous
+            # transaction so the frontend processes them before the
+            # (rare) CS-state event itself. Then forward the CS event
+            # via the legacy spi_event channel for chips that observe
+            # CS state (e.g. ePaper, custom chips that subscribe to it).
+            with _spi_buf_lock:
+                _flush_spi_batch_locked()
             _emit({'type': 'spi_event', 'bus': bus_id, 'event': event, 'response': resp})
         return resp
 

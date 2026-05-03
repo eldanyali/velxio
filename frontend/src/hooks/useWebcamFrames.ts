@@ -44,22 +44,13 @@ export interface UseWebcamFramesResult {
 const FRAME_WIDTH = 320;
 const FRAME_HEIGHT = 240;
 const FRAME_INTERVAL_MS = 100; // 10 fps
-// Keep JPEGs comfortably under the QEMU emulator's 8 KiB-per-frame
-// deliverable budget (8 EOFs × 1024 bytes from the cam_hal default
-// 16-descriptor ring). Quality 0.6 produces ~10-12 KiB which gets
-// truncated mid-stream in the firmware framebuffer — cam_verify_jpeg_eoi
-// accepts the frame because we inject FF D9 at byte 8190, but
-// jpg2rgb565() (the upstream decoder) rejects the truncated JPEG with
-// "JPG Decompression Failed! Data format error".
-//
-// Quality 0.25 produces ~3-5 KiB JPEGs that fit the budget entirely
-// AND decode cleanly because the natural EOI marker lands well before
-// our injection point. Visual quality is roughly equivalent to a
-// VGA-era webcam capture — totally serviceable for an emulator preview.
-//
-// See test/test-esp32-cam/autosearch/14_complete_emulation.md "Bug #9"
-// for the full forensic trace of the truncation issue.
-const JPEG_QUALITY = 0.25;
+// JPEG must fit in the QEMU emulator's 8 KiB-per-frame deliverable
+// budget (8 EOFs × 1024 bytes from the cam_hal default 16-descriptor
+// ring) — beyond that the firmware sees a truncated JPEG and
+// jpg2rgb565() rejects it with "Data format error". 0.35 produces
+// ~6-7 KiB JPEGs at QVGA which fit comfortably, with clearly more
+// detail than the 0.25 fallback we used pre-batching.
+const JPEG_QUALITY = 0.35;
 
 export function useWebcamFrames(): UseWebcamFramesResult {
   const [status, setStatus] = useState<WebcamStatus>('idle');

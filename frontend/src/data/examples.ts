@@ -7029,18 +7029,16 @@ void loop() {
 SPIClass tftSPI(VSPI);
 Adafruit_ILI9341 tft = Adafruit_ILI9341(&tftSPI, TFT_DC, TFT_CS, TFT_RST);
 
-// 1/4 scale (80×60) — minimises SPI traffic in the emulator.
-// Each SPI byte goes through QEMU→worker→backend→frontend, so
-// drawRGBBitmap dominates the loop. 80×60 = 9600 bytes/frame vs
-// 160×120 = 38400 — roughly 4× faster perceived FPS.
-#define PREVIEW_W  80
-#define PREVIEW_H  60
-#define PREVIEW_X 120
-#define PREVIEW_Y  90
+// 160×120 preview centered in the 320×240 TFT. After the worker
+// added batched spi_batch WS messages, transferring 38 KB/frame is
+// no longer the dominant cost in the emulator.
+#define PREVIEW_W 160
+#define PREVIEW_H 120
+#define PREVIEW_X  80
+#define PREVIEW_Y  60
 static uint8_t rgbBuf[PREVIEW_W * PREVIEW_H * 2];
 
-// Throttle status-bar redraw — text writes hit SPI too.
-#define STATUS_REFRESH_EVERY 10
+#define STATUS_REFRESH_EVERY 5
 
 uint32_t frame_count = 0, decode_fails = 0, null_fb = 0;
 unsigned long start_ms = 0;
@@ -7133,7 +7131,7 @@ void loop() {
   }
   frame_count++;
   size_t fb_len = fb->len;
-  bool ok = jpg2rgb565(fb->buf, fb->len, rgbBuf, JPG_SCALE_4X);
+  bool ok = jpg2rgb565(fb->buf, fb->len, rgbBuf, JPG_SCALE_2X);
   esp_camera_fb_return(fb);
   if (ok) {
     tft.drawRGBBitmap(PREVIEW_X, PREVIEW_Y,
