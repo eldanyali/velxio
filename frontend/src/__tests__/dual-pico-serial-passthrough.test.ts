@@ -67,6 +67,8 @@ vi.mock('../simulation/RP2040Simulator', () => ({
     this.feedUart = vi.fn();
     this.addI2CDevice = vi.fn();
     this.setPinState = vi.fn();
+    this.attachCyw43 = vi.fn();
+    this.spi = { onByte: null, completeTransfer: vi.fn() };
   }),
 }));
 

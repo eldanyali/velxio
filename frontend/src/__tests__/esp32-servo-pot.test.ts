@@ -54,7 +54,10 @@ vi.mock('../simulation/RP2040Simulator', () => ({
     this.isRunning = vi.fn().mockReturnValue(true);
     this.registerSensor = vi.fn().mockReturnValue(false);
     this.pinManager = {
-      onPinChange: vi.fn().mockReturnValue(() => {}),
+      onPinChange: vi.fn().mockReturnValue(() => {
+    this.attachCyw43 = vi.fn();
+    this.spi = { onByte: null, completeTransfer: vi.fn() };
+  }),
       onPwmChange: vi.fn().mockReturnValue(() => {}),
       updatePwm: vi.fn(),
     };

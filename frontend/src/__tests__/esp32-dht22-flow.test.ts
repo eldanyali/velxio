@@ -47,6 +47,8 @@ vi.mock('../simulation/RP2040Simulator', () => ({
     this.registerSensor = vi.fn().mockReturnValue(false);
     this.updateSensor = vi.fn();
     this.unregisterSensor = vi.fn();
+    this.attachCyw43 = vi.fn();
+    this.spi = { onByte: null, completeTransfer: vi.fn() };
   }),
 }));
 
