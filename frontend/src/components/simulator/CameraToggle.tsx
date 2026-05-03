@@ -22,8 +22,16 @@ interface CameraToggleProps {
 }
 
 export const CameraToggle: React.FC<CameraToggleProps> = ({ boardId }) => {
-  const { status, errorMessage, framesSent, lastFrameBytes, start, stop } =
-    useWebcamFrames();
+  const {
+    status,
+    errorMessage,
+    framesSent,
+    lastFrameBytes,
+    lastQualityUsed,
+    lastDownscaled,
+    start,
+    stop,
+  } = useWebcamFrames();
 
   const handleClick = () => {
     if (!boardId) return;
@@ -35,9 +43,24 @@ export const CameraToggle: React.FC<CameraToggleProps> = ({ boardId }) => {
   };
 
   const isOn = status === 'streaming';
+
+  // Build a streaming tooltip that exposes the adaptive encoder state.
+  // Users see "auto-tuned" hints when the encoder had to drop quality
+  // or downscale — useful diagnostic for HD/4K webcams.
+  const streamingTooltip = () => {
+    const kb = (lastFrameBytes / 1024).toFixed(1);
+    const q = lastQualityUsed.toFixed(2);
+    const tuneNote = lastDownscaled
+      ? ` (auto-downscaled, q=${q})`
+      : lastQualityUsed < 0.3
+        ? ` (auto-tuned to q=${q})`
+        : ` (q=${q})`;
+    return `Streaming webcam (${framesSent} frames, last=${kb} KB${tuneNote}) — click to stop`;
+  };
+
   const tooltip =
     status === 'streaming'
-      ? `Streaming webcam (${framesSent} frames, last=${(lastFrameBytes / 1024).toFixed(1)} KB) — click to stop`
+      ? streamingTooltip()
       : status === 'requesting'
         ? 'Asking for camera permission…'
         : status === 'denied'
