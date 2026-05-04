@@ -473,7 +473,11 @@ class ESPIDFCompiler:
                         return False
                     if has_src_layout:
                         return parts[0] == 'src' or len(parts) == 1
-                    return len(parts) == 1 or parts[0].lower() == 'utility'
+                    # Non-src-layout libs (Adafruit_GFX, etc.) keep auxiliary
+                    # headers in subdirs like Fonts/ or gfxfont/. Anything not
+                    # already excluded (docs/examples/tests handled above) is
+                    # presumed to be buildable source.
+                    return True
 
                 for f in lib_root.rglob('*'):
                     if not f.is_file():
