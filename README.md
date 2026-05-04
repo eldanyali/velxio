@@ -244,25 +244,46 @@ See [docs/RASPBERRYPI3_EMULATION.md](docs/RASPBERRYPI3_EMULATION.md) for full te
 
 ## Self-Hosting
 
-### Option A: Docker (single container, recommended)
+Pick the install path that matches your appetite for setup. **All three
+work out-of-the-box without an `.env` file** — defaults are picked
+automatically.
+
+| Path | Boards available | Build time | Best for |
+| --- | --- | --- | --- |
+| **A. Docker (prebuilt image)** | All 19 (AVR, RP2040, RISC-V, **ESP32**, Raspberry Pi 3) | ~30 s download | Just want it running |
+| **B. Docker Compose (build from source)** | All 19 | ~10–15 min first build | Want to modify the code |
+| **C. Manual install** | Browser-only boards (AVR, RP2040, RISC-V) | ~5 min | Frontend / backend dev |
+
+> ESP32 (Xtensa) and Raspberry Pi 3 emulation rely on QEMU `.so` libraries
+> that ship inside the Docker image. Manual installs get the browser-side
+> boards out of the box — **for ESP32 you'll want Docker** (or follow
+> [docs/ESP32_EMULATION.md](docs/ESP32_EMULATION.md) to wire up the QEMU
+> binaries by hand).
+
+---
+
+### Option A: Docker (prebuilt image)
 
 ```bash
-# Pull and run
 docker run -d \
   --name velxio \
   -p 3080:80 \
-  -v $(pwd)/data:/app/data \
+  -v velxio-data:/app/data \
+  -v velxio-arduino-libs:/root/.arduino15 \
   ghcr.io/davidmonterocrespo24/velxio:master
 ```
 
 Open <http://localhost:3080>.
 
-The `/app/data` volume contains:
+The two named volumes persist:
 
-- `velxio.db` — SQLite database (users, projects metadata)
-- `projects/{id}/` — sketch files per project
+- `velxio-data` → `/app/data`: SQLite DB, project sketch files, auto-generated `SECRET_KEY`
+- `velxio-arduino-libs` → `/root/.arduino15`: arduino-cli config + installed
+  cores (saves a 5–10 min reinstall on every container restart)
 
-### Option B: Docker Compose
+---
+
+### Option B: Docker Compose (build from source)
 
 ```bash
 git clone https://github.com/davidmonterocrespo24/velxio.git
@@ -270,15 +291,18 @@ cd velxio
 docker compose up -d --build
 ```
 
-That's it — open <http://localhost:3080>. The container generates a random
-`SECRET_KEY` on first boot and persists it in `./data/`, so no `.env` is
-required to get going.
+First build takes ~10–15 minutes (downloads ESP-IDF, builds the frontend).
+Subsequent builds are cached and take ~1 min.
+
+Then open <http://localhost:3080>. The container generates a random
+`SECRET_KEY` on first boot and persists it in `./data/`, so **no `.env` is
+required** to get going.
 
 #### Optional: customize environment
 
 Create `backend/.env` (copy from `backend/.env.example`) only when you need
-OAuth, a fixed `SECRET_KEY`, or HTTPS-only cookies. The compose file picks it
-up automatically if it exists.
+OAuth, a fixed `SECRET_KEY`, or HTTPS-only cookies. The compose file picks
+it up automatically if it exists.
 
 | Variable | Default | Description |
 | --- | --- | --- |
@@ -292,50 +316,40 @@ up automatically if it exists.
 | `COOKIE_SECURE` | `false` | Set `true` when serving over HTTPS |
 
 > **Deploying behind a reverse proxy?** The container listens on plain HTTP
-> on port 80 and accepts any `Host` header. If you used to get the
-> "Welcome to nginx" page through your proxy, that bug was fixed in the
-> master image.
+> on port 80 and accepts any `Host` header — no `server_name` whitelist.
 
 > **Running velxio.dev itself?** Production-only configuration (host nginx
 > + HTTPS, backups, pinned upstream commit) lives in its own repo:
 > [github.com/velxio/velxio-prod](https://github.com/velxio/velxio-prod).
 
-### Option C: Manual Setup
+---
+
+### Option C: Manual Setup (frontend + backend separately)
 
 **Prerequisites:** Node.js 18+, Python 3.12+, arduino-cli
 
 ```bash
-git clone --recurse-submodules https://github.com/davidmonterocrespo24/velxio.git
+git clone https://github.com/davidmonterocrespo24/velxio.git
 cd velxio
 ```
 
-> **Heads-up about `third-party/`:** `avr8js`, `rp2040js` and
-> `@wokwi/elements` are now resolved from the npm registry — `npm install`
-> in `frontend/` pulls them automatically, no clone or build of upstream
-> repos is required. The folders under `third-party/` are kept as
-> reference-only credits for the upstream projects; you only need to clone
-> them if you are *adding new components to wokwi-elements* (the metadata
-> generator scans its `src/`).
->
-> Board SVGs live directly in `frontend/public/boards/`, so `wokwi-boards`
-> is also not required to clone.
->
-> The one third-party folder that DOES need to be present for ESP32
-> emulation is `qemu-lcgamboa` — but only if you're rebuilding QEMU from
-> source. Otherwise the prebuilt `.so` files come from the
-> [qemu-prebuilt release](https://github.com/davidmonterocrespo24/velxio/releases/tag/qemu-prebuilt).
->
-> Older guides may mention a `wokwi-libs/` directory; that was renamed to
-> `third-party/` long ago, so any path containing `wokwi-libs/` is stale.
+> No `--recurse-submodules` needed. `@wokwi/elements`, `avr8js` and
+> `rp2040js` come from the npm registry. Board SVGs live in
+> `frontend/public/boards/`. The folders under `third-party/` are
+> reference-only — you only need to clone wokwi-elements if you're adding
+> a new component to the catalog (the metadata generator scans its `src/`).
 
 ```bash
-# Backend
+# Terminal 1 — backend
 cd backend
-python -m venv venv && source venv/bin/activate  # Windows: venv\Scripts\activate
+python -m venv venv
+source venv/bin/activate          # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8001
+```
 
-# Frontend (new terminal)
+```bash
+# Terminal 2 — frontend
 cd frontend
 npm install
 npm run dev
@@ -354,11 +368,16 @@ arduino-cli config add board_manager.additional_urls \
   https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
 arduino-cli core install rp2040:rp2040
 
-# For ESP32 / ESP32-S3 / ESP32-C3:
+# For ATtiny85:
 arduino-cli config add board_manager.additional_urls \
-  https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-arduino-cli core install esp32:esp32@2.0.17
+  http://drazzy.com/package_drazzy.com_index.json
+arduino-cli core install ATTinyCore:avr
 ```
+
+> ESP32 (Xtensa) compilation in manual install requires the ESP-IDF 4.4.7
+> toolchain installed locally. The Docker image bundles this — for manual
+> installs see [docs/ESP32_EMULATION.md](docs/ESP32_EMULATION.md). If you
+> only need AVR / RP2040 / RISC-V boards you can skip ESP-IDF entirely.
 
 ---
 
@@ -380,16 +399,17 @@ velxio/
 │       ├── models/              # User, Project (SQLAlchemy)
 │       ├── services/            # arduino_cli, esp32_worker, qemu_manager, gpio_shim
 │       └── core/                # config, security, dependencies
-├── third-party/                  # Local clones of upstream repos
-│   ├── wokwi-elements/          # Web Components for electronic parts
-│   ├── avr8js/                  # AVR8 CPU emulator
-│   ├── rp2040js/                # RP2040 emulator
-│   └── qemu-lcgamboa/           # QEMU fork for ESP32 Xtensa emulation
-│   # NB: board SVGs live directly in frontend/public/boards/
-├── img/                         # Raspberry Pi 3 boot images (kernel8.img, dtb, OS image)
-├── deploy/                      # nginx.conf, entrypoint.sh
+├── third-party/                  # Reference-only upstream clones (credits)
+│   │                            # — runtime libs come from npm; the only
+│   │                            # one used by the build is qemu-lcgamboa.
+│   ├── wokwi-elements/          # (npm: @wokwi/elements)
+│   ├── avr8js/                  # (npm: avr8js)
+│   ├── rp2040js/                # (npm: rp2040js)
+│   └── qemu-lcgamboa/           # QEMU fork for ESP32 Xtensa (build from source)
+├── img/                         # Raspberry Pi 3 boot images (kernel8.img, dtb, OS)
+├── docker/                      # In-container nginx.conf + entrypoint.sh
 ├── docs/                        # Technical documentation
-├── Dockerfile.standalone        # Single-container production image
+├── Dockerfile.standalone        # Single-container image used for self-hosting
 └── docker-compose.yml           # Self-hosting compose
                                  # (production deployment lives in
                                  # https://github.com/velxio/velxio-prod)
