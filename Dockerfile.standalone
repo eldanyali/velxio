@@ -76,7 +76,14 @@ WORKDIR /app
 COPY frontend/ frontend/
 COPY scripts/ scripts/
 WORKDIR /app/frontend
-RUN npm install && npm run build:docker
+# Drop any host-generated package-lock.json before installing. A lock
+# generated on Windows/macOS pins platform-specific Rollup/esbuild binaries
+# (e.g. @rollup/rollup-win32-x64-msvc) and won't install the Linux variants
+# this image needs — manifests as MODULE_NOT_FOUND in rollup/dist/native.js
+# during the build. See npm/cli#4828.
+RUN rm -f package-lock.json \
+ && npm install --include=optional \
+ && npm run build:docker
 
 
 # ---- Stage 2: Final Production Image ----
