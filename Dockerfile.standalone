@@ -76,11 +76,9 @@ WORKDIR /app
 COPY frontend/ frontend/
 COPY scripts/ scripts/
 WORKDIR /app/frontend
-# Drop any host-generated package-lock.json before installing. A lock
-# generated on Windows/macOS pins platform-specific Rollup/esbuild binaries
-# (e.g. @rollup/rollup-win32-x64-msvc) and won't install the Linux variants
-# this image needs — manifests as MODULE_NOT_FOUND in rollup/dist/native.js
-# during the build. See npm/cli#4828.
+# Lock files aren't committed in this repo (they're gitignored) — see the
+# note in .gitignore. The `rm -f` below is defense-in-depth in case
+# someone runs `docker build .` from a tree where a local lock exists.
 RUN rm -f package-lock.json \
  && npm install --include=optional \
  && npm run build:docker

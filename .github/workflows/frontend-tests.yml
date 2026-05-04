@@ -31,10 +31,10 @@ jobs:
           key: frontend-${{ hashFiles('frontend/package-lock.json') }}
 
       - name: Install frontend dependencies
-        run: cd frontend && npm ci
+        run: cd frontend && npm install
 
       - name: Install root dev dependencies
-        run: npm ci
+        run: npm install
 
       # Regenerate metadata and fail if committed JSON is stale. Catches PRs
       # that modify component-overrides.json without running generate:metadata.

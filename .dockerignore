@@ -2,6 +2,12 @@
 node_modules/
 **/node_modules/
 
+# npm lock files — never include them in the build context. A host-generated
+# lock pins platform-specific Rollup/esbuild binaries and breaks the Linux
+# build inside the image.
+package-lock.json
+**/package-lock.json
+
 # Python
 __pycache__/
 *.py[cod]
