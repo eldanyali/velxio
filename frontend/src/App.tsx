@@ -28,6 +28,7 @@ import { RaspberryPiSimulatorPage } from './pages/RaspberryPiSimulatorPage';
 import { Velxio2Page } from './pages/Velxio2Page';
 import { Velxio25Page } from './pages/Velxio25Page';
 import { AboutPage } from './pages/AboutPage';
+import { PricingPlaceholder } from './pages/PricingPlaceholder';
 import { useAuthStore } from './store/useAuthStore';
 import './App.css';
 
@@ -68,6 +69,8 @@ function App() {
         <Route path="/v2" element={<Velxio2Page />} />
         <Route path="/v2-5" element={<Velxio25Page />} />
         <Route path="/about" element={<AboutPage />} />
+        {/* Pricing — placeholder by default; private overlays portal-inject the real page */}
+        <Route path="/pricing" element={<PricingPlaceholder />} />
         {/* Canonical project URL by ID */}
         <Route path="/project/:id" element={<ProjectByIdPage />} />
         {/* Legacy slug route — redirects to /project/:id */}

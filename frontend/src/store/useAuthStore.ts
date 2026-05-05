@@ -9,6 +9,12 @@ export interface UserResponse {
   avatar_url: string | null;
   is_admin: boolean;
   created_at: string;
+  // Subscription state — populated by deployments that wire an external
+  // billing system (e.g. velxio.dev). Self-hosted OSS images leave these
+  // at the safe defaults (no paid features unlock).
+  is_paid_subscriber?: boolean;
+  subscription_status?: string | null;
+  subscription_period_end?: string | null;
 }
 
 interface AuthState {
