@@ -443,15 +443,27 @@ export const Velxio2Page: React.FC = () => {
             </div>
             <div className="v2-boards-row">
               <div className="v2-board-card">
-                <img src="/boards/arduino-uno.svg" alt="Arduino Uno" />
+                <picture>
+                  <source type="image/webp" srcSet="/boards/arduino-uno.webp 1x, /boards/arduino-uno@2x.webp 2x" />
+                  <source type="image/png" srcSet="/boards/arduino-uno.png 1x, /boards/arduino-uno@2x.png 2x" />
+                  <img src="/boards/arduino-uno.svg" alt="Arduino Uno" loading="lazy" />
+                </picture>
                 <span>Arduino Uno</span>
               </div>
               <div className="v2-board-card">
-                <img src="/boards/arduino-nano.svg" alt="Arduino Nano" />
+                <picture>
+                  <source type="image/webp" srcSet="/boards/arduino-nano.webp 1x, /boards/arduino-nano@2x.webp 2x" />
+                  <source type="image/png" srcSet="/boards/arduino-nano.png 1x, /boards/arduino-nano@2x.png 2x" />
+                  <img src="/boards/arduino-nano.svg" alt="Arduino Nano" loading="lazy" />
+                </picture>
                 <span>Arduino Nano</span>
               </div>
               <div className="v2-board-card">
-                <img src="/boards/arduino-mega.svg" alt="Arduino Mega 2560" />
+                <picture>
+                  <source type="image/webp" srcSet="/boards/arduino-mega.webp 1x, /boards/arduino-mega@2x.webp 2x" />
+                  <source type="image/png" srcSet="/boards/arduino-mega.png 1x, /boards/arduino-mega@2x.png 2x" />
+                  <img src="/boards/arduino-mega.svg" alt="Arduino Mega 2560" loading="lazy" />
+                </picture>
                 <span>Mega 2560</span>
               </div>
             </div>
@@ -465,11 +477,19 @@ export const Velxio2Page: React.FC = () => {
             </div>
             <div className="v2-boards-row">
               <div className="v2-board-card">
-                <img src="/boards/pi-pico.svg" alt="Raspberry Pi Pico" />
+                <picture>
+                  <source type="image/webp" srcSet="/boards/pi-pico.webp 1x, /boards/pi-pico@2x.webp 2x" />
+                  <source type="image/png" srcSet="/boards/pi-pico.png 1x, /boards/pi-pico@2x.png 2x" />
+                  <img src="/boards/pi-pico.svg" alt="Raspberry Pi Pico" loading="lazy" />
+                </picture>
                 <span>Pi Pico</span>
               </div>
               <div className="v2-board-card">
-                <img src="/boards/pi-pico-w.svg" alt="Raspberry Pi Pico W" />
+                <picture>
+                  <source type="image/webp" srcSet="/boards/pi-pico-w.webp 1x, /boards/pi-pico-w@2x.webp 2x" />
+                  <source type="image/png" srcSet="/boards/pi-pico-w.png 1x, /boards/pi-pico-w@2x.png 2x" />
+                  <img src="/boards/pi-pico-w.svg" alt="Raspberry Pi Pico W" loading="lazy" />
+                </picture>
                 <span>Pi Pico W</span>
               </div>
             </div>
@@ -483,7 +503,11 @@ export const Velxio2Page: React.FC = () => {
             </div>
             <div className="v2-boards-row">
               <div className="v2-board-card">
-                <img src="/boards/esp32-c3.svg" alt="ESP32-C3" />
+                <picture>
+                  <source type="image/webp" srcSet="/boards/esp32-c3.webp 1x, /boards/esp32-c3@2x.webp 2x" />
+                  <source type="image/png" srcSet="/boards/esp32-c3.png 1x, /boards/esp32-c3@2x.png 2x" />
+                  <img src="/boards/esp32-c3.svg" alt="ESP32-C3" loading="lazy" />
+                </picture>
                 <span>ESP32-C3</span>
               </div>
               <div className="v2-board-card">
@@ -517,7 +541,11 @@ export const Velxio2Page: React.FC = () => {
                 <span>ESP32-CAM</span>
               </div>
               <div className="v2-board-card">
-                <img src="/boards/xiao-esp32-s3.svg" alt="XIAO ESP32-S3" />
+                <picture>
+                  <source type="image/webp" srcSet="/boards/xiao-esp32-s3.webp 1x, /boards/xiao-esp32-s3@2x.webp 2x" />
+                  <source type="image/png" srcSet="/boards/xiao-esp32-s3.png 1x, /boards/xiao-esp32-s3@2x.png 2x" />
+                  <img src="/boards/xiao-esp32-s3.svg" alt="XIAO ESP32-S3" loading="lazy" />
+                </picture>
                 <span>XIAO S3</span>
               </div>
               <div className="v2-board-card">
