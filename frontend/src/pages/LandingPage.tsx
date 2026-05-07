@@ -583,7 +583,7 @@ const features = [
   {
     icon: <IcoCpu />,
     title: '5 Emulation Engines',
-    desc: 'AVR8 (ATmega328P, ATmega2560, ATtiny85), RP2040 (ARM Cortex-M0+), RV32IMC (ESP32-C3 in-browser), Xtensa LX6/LX7 (ESP32 via QEMU), and ARM Cortex-A53 (Raspberry Pi 3 Linux).',
+    desc: 'AVR8 (ATmega328P, ATmega2560, ATtiny85), RP2040 (ARM Cortex-M0+), RV32IMC (ESP32-C3, CH32V003 via QEMU), Xtensa LX6/LX7 (ESP32 via QEMU), and ARM Cortex-A53 (Raspberry Pi 3 Linux).',
   },
   {
     icon: <IcoChip />,
@@ -779,7 +779,7 @@ export const LandingPage: React.FC = () => {
           name: 'Does Velxio work offline?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'The SPICE solver and the AVR / RP2040 / RISC-V CPU emulators all run in your browser. Compilation of Arduino sketches requires the arduino-cli backend. Self-hosted Docker deployments work fully offline once running.',
+            text: 'The SPICE solver and the AVR / RP2040 CPU emulators run in your browser. Xtensa and RISC-V boards (ESP32, ESP32-S3, ESP32-C3, CH32V003) and Raspberry Pi 3 Linux run through QEMU lcgamboa, bundled in the Docker image. Compilation of Arduino sketches requires the arduino-cli backend. Self-hosted Docker deployments work fully offline once running.',
           },
         },
         {
@@ -1016,14 +1016,14 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ── RISC-V · RV32IMC · Browser ───────────────────────────── */}
+        {/* ── RISC-V · RV32IMC · QEMU lcgamboa ───────────────────────────── */}
         <div className="board-group">
           <div
             className="board-group-header"
             style={{ '--grp-color': '#4a9e6b' } as React.CSSProperties}
           >
-            <span className="board-group-engine">RV32IMC · Browser</span>
-            <span className="board-group-label">RISC-V · 160 MHz · no backend needed</span>
+            <span className="board-group-engine">QEMU lcgamboa</span>
+            <span className="board-group-label">RISC-V · RV32IMC · 160 MHz · libqemu-riscv32</span>
           </div>
           <div className="boards-row">
             <div className="board-card-sm">

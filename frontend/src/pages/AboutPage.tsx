@@ -155,10 +155,10 @@ export const AboutPage: React.FC = () => {
                   <polyline points="8 6 2 12 8 18" />
                 </svg>
               </div>
-              <h3>RISC-V In-Browser</h3>
+              <h3>RISC-V via QEMU</h3>
               <p>
-                ESP32-C3 and CH32V003 run on a custom RV32IMC core written in TypeScript — entirely
-                client-side, no QEMU.
+                ESP32-C3 (DevKit, XIAO, SuperMini) and CH32V003 are emulated through the QEMU
+                lcgamboa fork with libqemu-riscv32, the same backend pattern as Xtensa ESP32.
               </p>
             </div>
             <div className="about-arch-card">

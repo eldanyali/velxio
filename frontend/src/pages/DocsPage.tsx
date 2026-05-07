@@ -1812,9 +1812,11 @@ const RiscVEmulationSection: React.FC = () => (
     <span className="docs-label">// risc-v</span>
     <h1>RISC-V Emulation (ESP32-C3)</h1>
     <p>
-      ESP32-C3, XIAO ESP32-C3, and C3 SuperMini boards use a <strong>RISC-V RV32IMC</strong> core
-      running at 160 MHz. Velxio emulates them entirely in the browser, no backend, no QEMU, no
-      WebAssembly pipeline. The emulator is written in pure TypeScript and runs at real-time speeds.
+      ESP32-C3, XIAO ESP32-C3, and C3 SuperMini boards run on the <strong>RISC-V RV32IMC</strong>
+      architecture at 160 MHz. Velxio emulates them through the same QEMU-based backend as the
+      Xtensa ESP32 family, using <code>libqemu-riscv32</code> with the <code>esp32c3-picsimlab</code>
+      machine target. A separate TypeScript ISA implementation lives in the repo for unit-testing
+      RV32IMC instruction decoding, but it is not the production emulation path.
     </p>
 
     <h2>Supported Boards</h2>
@@ -2088,10 +2090,10 @@ const Esp32EmulationSection: React.FC = () => (
     </p>
 
     <div className="docs-callout">
-      <strong>Note:</strong> This section applies only to <strong>ESP32</strong> and{' '}
-      <strong>ESP32-S3</strong> (Xtensa). For ESP32-C3, XIAO ESP32-C3, and C3 SuperMini (RISC-V),
-      see <strong>RISC-V Emulation (ESP32-C3)</strong> in the sidebar, those boards run entirely in
-      the browser.
+      <strong>Note:</strong> This section applies to <strong>ESP32</strong>,{' '}
+      <strong>ESP32-S3</strong> (Xtensa) and <strong>ESP32-C3</strong> (RISC-V) — they all share
+      the same QEMU lcgamboa pipeline, just with different libqemu binaries and machine targets.
+      See <strong>RISC-V Emulation (ESP32-C3)</strong> for the C3-specific differences.
     </div>
 
     <h2>How It Works</h2>

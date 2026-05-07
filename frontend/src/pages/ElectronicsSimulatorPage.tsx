@@ -25,7 +25,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'Do I need to install anything?',
-    a: 'No. Open velxio.dev in any modern browser and start. Compilation of Arduino sketches uses the cloud arduino-cli backend, but the SPICE solver and AVR / RP2040 / RISC-V emulators all run locally in your browser.',
+    a: 'No. Open velxio.dev in any modern browser and start. The SPICE solver and the AVR / RP2040 emulators run locally in your browser; Xtensa and RISC-V boards (ESP32, ESP32-C3, CH32V003) plus Raspberry Pi 3 Linux run through QEMU lcgamboa, bundled in the Docker image. Compilation of Arduino sketches uses the cloud arduino-cli backend.',
   },
   {
     q: 'Is it good for teaching electronics?',

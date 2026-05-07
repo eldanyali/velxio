@@ -262,7 +262,7 @@ const CHANGE_SECTIONS = [
     items: [
       'Raspberry Pi 3B — full Linux (ARM Cortex-A53 via QEMU raspi3b)',
       'ESP32 / ESP32-S3 / ESP32-CAM — Xtensa LX6/LX7 via QEMU',
-      'ESP32-C3 / CH32V003 — RISC-V RV32IMC, browser-native',
+      'ESP32-C3 / CH32V003 — RISC-V RV32IMC via QEMU (libqemu-riscv32)',
       'RP2040 — Raspberry Pi Pico / Pico W (ARM Cortex-M0+)',
       'ATtiny85, ATmega2560, Leonardo, Pro Mini — AVR8 via avr8js',
       'Multi-board canvas — mix architectures on the same simulation',
@@ -498,7 +498,7 @@ export const Velxio2Page: React.FC = () => {
           {/* RISC-V */}
           <div className="v2-arch-group">
             <div className="v2-arch-label" style={{ borderColor: '#4a9e6b' }}>
-              <span className="v2-arch-engine">Browser-native</span>
+              <span className="v2-arch-engine">QEMU lcgamboa</span>
               RISC-V -- RV32IMC -- 160 MHz
             </div>
             <div className="v2-boards-row">
@@ -725,8 +725,8 @@ export const Velxio2Page: React.FC = () => {
             <div className="seo-card">
               <h3>More realistic emulation</h3>
               <p>
-                QEMU-based Xtensa and ARM emulation. Browser-native RISC-V. Cycle-accurate AVR8 via
-                avr8js. Real firmware execution, not approximations.
+                QEMU-based Xtensa, RISC-V and ARM emulation. Cycle-accurate AVR8 via avr8js. Real
+                firmware execution, not approximations.
               </p>
             </div>
             <div className="seo-card">
