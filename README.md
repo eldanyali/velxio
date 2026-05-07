@@ -114,10 +114,10 @@ ESP32 simulation with an HC-SR04 ultrasonic distance sensor — real Xtensa emul
 | **ESP32-CAM** | Xtensa LX6 @ 240 MHz | QEMU lcgamboa (backend) | C++ (Arduino) |
 | **Seeed XIAO ESP32-S3** | Xtensa LX7 @ 240 MHz | QEMU lcgamboa (backend) | C++ (Arduino) |
 | **Arduino Nano ESP32** | Xtensa LX6 @ 240 MHz | QEMU lcgamboa (backend) | C++ (Arduino) |
-| **ESP32-C3 DevKit** | RISC-V RV32IMC @ 160 MHz | RiscVCore.ts (browser) | C++ (Arduino) |
-| **Seeed XIAO ESP32-C3** | RISC-V RV32IMC @ 160 MHz | RiscVCore.ts (browser) | C++ (Arduino) |
-| **ESP32-C3 SuperMini** | RISC-V RV32IMC @ 160 MHz | RiscVCore.ts (browser) | C++ (Arduino) |
-| **CH32V003** | RISC-V RV32EC @ 48 MHz | RiscVCore.ts (browser) | C++ (Arduino) |
+| **ESP32-C3 DevKit** | RISC-V RV32IMC @ 160 MHz | QEMU lcgamboa (backend) | C++ (Arduino) |
+| **Seeed XIAO ESP32-C3** | RISC-V RV32IMC @ 160 MHz | QEMU lcgamboa (backend) | C++ (Arduino) |
+| **ESP32-C3 SuperMini** | RISC-V RV32IMC @ 160 MHz | QEMU lcgamboa (backend) | C++ (Arduino) |
+| **CH32V003** | RISC-V RV32EC @ 48 MHz | QEMU lcgamboa (backend) | C++ (Arduino) |
 | **Raspberry Pi 3B** | ARM Cortex-A53 @ 1.2 GHz | QEMU raspi3b (backend) | Python |
 
 ---
@@ -176,14 +176,13 @@ See [docs/RP2040_EMULATION.md](docs/RP2040_EMULATION.md) for full technical deta
 
 See [docs/ESP32_EMULATION.md](docs/ESP32_EMULATION.md) for setup and full technical details.
 
-#### ESP32-C3 / XIAO-C3 / SuperMini / CH32V003 (RISC-V, in-browser)
+#### ESP32-C3 / XIAO-C3 / SuperMini / CH32V003 (RISC-V via QEMU)
 
-- **RV32IMC emulation** in TypeScript — no backend, no QEMU, no WebSocket
+- **RV32IMC emulation** through QEMU lcgamboa with `libqemu-riscv32` and the `esp32c3-picsimlab` machine — same backend pattern as Xtensa ESP32, different libqemu binary
 - **GPIO 0–21** via W1TS/W1TC MMIO registers (ESP32-C3); PB0–PB5 (CH32V003)
 - **UART0** serial output in Serial Monitor
 - **CH32V003** — RV32EC core at 48 MHz, 16 KB flash, DIP-8 / SOP package — ultra-compact
-- **Instant startup** — zero latency, works offline
-- **CI-testable** — same TypeScript runs in Vitest
+- **TypeScript ISA layer** (`RiscVCore.ts`, `Esp32C3Simulator.ts`) is kept as Vitest-only unit-test infrastructure — it cannot handle the 150+ ROM functions ESP-IDF needs and is not the production emulation path
 
 See [docs/RISCV_EMULATION.md](docs/RISCV_EMULATION.md) for full technical details.
 

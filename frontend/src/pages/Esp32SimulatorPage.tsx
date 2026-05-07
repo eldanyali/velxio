@@ -152,7 +152,8 @@ export const Esp32SimulatorPage: React.FC = () => {
             <div className="seo-card">
               <h3>ESP32-C3 (RISC-V)</h3>
               <p>
-                Single-core RISC-V RV32IMC at 160 MHz. Browser-native emulation — no QEMU needed.{' '}
+                Single-core RISC-V RV32IMC at 160 MHz, emulated via the same QEMU backend as Xtensa
+                ESP32 (libqemu-riscv32, esp32c3-picsimlab machine).{' '}
                 <Link to="/esp32-c3-simulator">Learn more →</Link>
               </p>
             </div>

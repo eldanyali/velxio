@@ -45,7 +45,7 @@ const JSON_LD: object[] = [
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'Any (browser-based)',
     description:
-      'Free online ESP32-C3 RISC-V simulator. Browser-native RV32IMC emulation at 160 MHz — no backend, no install. Simulate ESP32-C3 DevKit, XIAO ESP32-C3, SuperMini, and CH32V003.',
+      'Free online ESP32-C3 RISC-V simulator. RV32IMC emulation at 160 MHz via the QEMU lcgamboa backend (libqemu-riscv32). Simulate ESP32-C3 DevKit, XIAO ESP32-C3, SuperMini, and CH32V003.',
     url: 'https://velxio.dev/esp32-c3-simulator',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     author: { '@type': 'Person', name: 'David Montero Crespo' },
@@ -90,11 +90,12 @@ export const Esp32C3SimulatorPage: React.FC = () => {
           <h1>
             Free ESP32-C3 Simulator
             <br />
-            <span className="accent">RISC-V Emulation — Runs in Your Browser</span>
+            <span className="accent">RISC-V Emulation via QEMU</span>
           </h1>
           <p className="subtitle">
-            Simulate ESP32-C3 and CH32V003 RISC-V code directly in your browser — no QEMU backend,
-            no install. RV32IMC at 160 MHz with 48+ interactive components.
+            Simulate ESP32-C3 and CH32V003 RISC-V code via the QEMU lcgamboa backend
+            (libqemu-riscv32, esp32c3-picsimlab machine). RV32IMC at 160 MHz with 48+ interactive
+            components.
           </p>
           <div className="seo-cta-group">
             <Link
@@ -109,15 +110,16 @@ export const Esp32C3SimulatorPage: React.FC = () => {
             </Link>
           </div>
           <p className="seo-trust">
-            Free &amp; open-source · 100% browser-native · No backend required
+            Free &amp; open-source · QEMU lcgamboa backend · libqemu-riscv32
           </p>
         </section>
 
         <section className="seo-section">
           <h2>Supported RISC-V boards</h2>
           <p className="lead">
-            Velxio emulates RISC-V microcontrollers natively in the browser using WebAssembly — the
-            fastest simulation path available, no server round-trip.
+            Velxio emulates RISC-V microcontrollers through the QEMU lcgamboa fork — the same
+            backend pattern used for Xtensa ESP32 / ESP32-S3, with libqemu-riscv32 instead of
+            libqemu-xtensa.
           </p>
           <div className="seo-grid">
             <div className="seo-card">

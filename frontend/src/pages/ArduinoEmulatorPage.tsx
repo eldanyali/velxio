@@ -157,8 +157,8 @@ export const ArduinoEmulatorPage: React.FC = () => {
             <div className="seo-card">
               <h3>RISC-V (ESP32-C3)</h3>
               <p>
-                Browser-native RV32IMC emulation for ESP32-C3 — no backend server required, compiled
-                to WebAssembly, runs at 160 MHz.
+                RV32IMC emulation for ESP32-C3 at 160 MHz via the QEMU lcgamboa fork
+                (libqemu-riscv32, esp32c3-picsimlab machine).
               </p>
             </div>
           </div>
@@ -184,9 +184,10 @@ export const ArduinoEmulatorPage: React.FC = () => {
               <p>Raspberry Pi Pico, Raspberry Pi Pico W — dual ARM Cortex-M0+ at 133 MHz.</p>
             </div>
             <div className="seo-card">
-              <h3>RISC-V — Browser</h3>
+              <h3>RISC-V — QEMU</h3>
               <p>
-                ESP32-C3 DevKit, XIAO ESP32-C3, ESP32-C3 SuperMini, CH32V003 — RV32IMC at 160 MHz.
+                ESP32-C3 DevKit, XIAO ESP32-C3, ESP32-C3 SuperMini, CH32V003 — RV32IMC at 160 MHz
+                via libqemu-riscv32.
               </p>
             </div>
             <div className="seo-card">

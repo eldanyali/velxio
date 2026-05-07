@@ -3626,18 +3626,18 @@ void loop() {
     ],
   },
 
-  // ─── ESP32-C3 (RISC-V browser emulator) Examples ──────────────────────────
+  // ─── ESP32-C3 (RISC-V via QEMU lcgamboa) Examples ─────────────────────────
   {
     id: 'c3-blink',
     title: 'ESP32-C3: Blink LED',
     description:
-      'Blink an LED on GPIO 8 of the ESP32-C3. Runs entirely in the browser via the RISC-V emulator — no backend needed.',
+      'Blink an LED on GPIO 8 of the ESP32-C3. Runs through the QEMU lcgamboa backend (libqemu-riscv32) at 160 MHz.',
     category: 'basics',
     difficulty: 'beginner',
     boardType: 'esp32-c3',
     boardFilter: 'esp32-c3',
     code: `// ESP32-C3 — Blink LED on GPIO 8
-// Runs in-browser via RV32IMC emulator (Esp32C3Simulator)
+// Runs via QEMU libqemu-riscv32 (esp32c3-picsimlab machine)
 
 #define LED_PIN 8
 
@@ -3696,7 +3696,7 @@ void setup() {
   Serial.begin(115200);
   delay(200);
   Serial.println("=== ESP32-C3 Serial Demo ===");
-  Serial.println("RV32IMC @ 160 MHz — browser emulator");
+  Serial.println("RV32IMC @ 160 MHz — QEMU libqemu-riscv32");
   Serial.println();
 }
 
