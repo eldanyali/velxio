@@ -1,5 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {
+  Cpu as IcoChip,
+  CircuitBoard as IcoCpu,
+  Code2 as IcoCode,
+  Zap as IcoZap,
+  Layers as IcoLayers,
+  Monitor as IcoMonitor,
+} from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { trackVisitGitHub, trackClickCTA } from '../utils/analytics';
 import { AppHeader } from '../components/layout/AppHeader';
@@ -12,94 +20,7 @@ const GITHUB_URL = 'https://github.com/davidmonterocrespo24/velxio';
 const PAYPAL_URL = 'https://paypal.me/odoonext';
 const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/davidmonterocrespo24';
 
-/* ── Icons ───────────────────────────────────────────── */
-const IcoChip = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="5" y="5" width="14" height="14" rx="2" />
-    <rect x="9" y="9" width="6" height="6" />
-    <path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4" />
-  </svg>
-);
-
-const IcoCpu = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="4" y="4" width="16" height="16" rx="2" />
-    <rect x="8" y="8" width="8" height="8" />
-    <path d="M10 2v2M14 2v2M10 20v2M14 20v2M2 10h2M2 14h2M20 10h2M20 14h2" />
-  </svg>
-);
-
-const IcoCode = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="16 18 22 12 16 6" />
-    <polyline points="8 6 2 12 8 18" />
-  </svg>
-);
-
-const IcoZap = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-  </svg>
-);
-
-const IcoLayers = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polygon points="12 2 2 7 12 12 22 7 12 2" />
-    <polyline points="2 17 12 22 22 17" />
-    <polyline points="2 12 12 17 22 12" />
-  </svg>
-);
-
-const IcoMonitor = () => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="2" y="3" width="20" height="14" rx="2" />
-    <line x1="8" y1="21" x2="16" y2="21" />
-    <line x1="12" y1="17" x2="12" y2="21" />
-  </svg>
-);
-
+/* GitHub keeps a custom (filled) glyph — Lucide's outline doesn't match the brand. */
 const IcoGitHub = () => (
   <svg viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.385-1.335-1.755-1.335-1.755-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z" />
@@ -962,25 +883,66 @@ export const LandingPage: React.FC = () => {
           <div className="boards-row">
             <div className="board-card-sm">
               <div className="board-img-box">
-                <img src="/boards/arduino-uno.svg" alt="Arduino Uno" className="board-img-sm" />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/boards/arduino-uno.webp 1x, /boards/arduino-uno@2x.webp 2x"
+                  />
+                  <source
+                    type="image/png"
+                    srcSet="/boards/arduino-uno.png 1x, /boards/arduino-uno@2x.png 2x"
+                  />
+                  <img
+                    src="/boards/arduino-uno.svg"
+                    alt="Arduino Uno"
+                    className="board-img-sm"
+                    loading="lazy"
+                  />
+                </picture>
               </div>
               <span className="board-name-sm">Arduino Uno</span>
               <span className="board-chip-sm">ATmega328p · 32 KB</span>
             </div>
             <div className="board-card-sm">
               <div className="board-img-box">
-                <img src="/boards/arduino-nano.svg" alt="Arduino Nano" className="board-img-sm" />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/boards/arduino-nano.webp 1x, /boards/arduino-nano@2x.webp 2x"
+                  />
+                  <source
+                    type="image/png"
+                    srcSet="/boards/arduino-nano.png 1x, /boards/arduino-nano@2x.png 2x"
+                  />
+                  <img
+                    src="/boards/arduino-nano.svg"
+                    alt="Arduino Nano"
+                    className="board-img-sm"
+                    loading="lazy"
+                  />
+                </picture>
               </div>
               <span className="board-name-sm">Arduino Nano</span>
               <span className="board-chip-sm">ATmega328p · 32 KB</span>
             </div>
             <div className="board-card-sm">
               <div className="board-img-box">
-                <img
-                  src="/boards/arduino-mega.svg"
-                  alt="Arduino Mega 2560"
-                  className="board-img-sm"
-                />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/boards/arduino-mega.webp 1x, /boards/arduino-mega@2x.webp 2x"
+                  />
+                  <source
+                    type="image/png"
+                    srcSet="/boards/arduino-mega.png 1x, /boards/arduino-mega@2x.png 2x"
+                  />
+                  <img
+                    src="/boards/arduino-mega.svg"
+                    alt="Arduino Mega 2560"
+                    className="board-img-sm"
+                    loading="lazy"
+                  />
+                </picture>
               </div>
               <span className="board-name-sm">Arduino Mega 2560</span>
               <span className="board-chip-sm">ATmega2560 · 256 KB</span>
@@ -1007,18 +969,44 @@ export const LandingPage: React.FC = () => {
           <div className="boards-row">
             <div className="board-card-sm">
               <div className="board-img-box">
-                <img src="/boards/pi-pico.svg" alt="Raspberry Pi Pico" className="board-img-sm" />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/boards/pi-pico.webp 1x, /boards/pi-pico@2x.webp 2x"
+                  />
+                  <source
+                    type="image/png"
+                    srcSet="/boards/pi-pico.png 1x, /boards/pi-pico@2x.png 2x"
+                  />
+                  <img
+                    src="/boards/pi-pico.svg"
+                    alt="Raspberry Pi Pico"
+                    className="board-img-sm"
+                    loading="lazy"
+                  />
+                </picture>
               </div>
               <span className="board-name-sm">Raspberry Pi Pico</span>
               <span className="board-chip-sm">RP2040 · 264 KB RAM</span>
             </div>
             <div className="board-card-sm">
               <div className="board-img-box">
-                <img
-                  src="/boards/pi-pico-w.svg"
-                  alt="Raspberry Pi Pico W"
-                  className="board-img-sm"
-                />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/boards/pi-pico-w.webp 1x, /boards/pi-pico-w@2x.webp 2x"
+                  />
+                  <source
+                    type="image/png"
+                    srcSet="/boards/pi-pico-w.png 1x, /boards/pi-pico-w@2x.png 2x"
+                  />
+                  <img
+                    src="/boards/pi-pico-w.svg"
+                    alt="Raspberry Pi Pico W"
+                    className="board-img-sm"
+                    loading="lazy"
+                  />
+                </picture>
               </div>
               <span className="board-name-sm">Raspberry Pi Pico W</span>
               <span className="board-chip-sm">RP2040 + WiFi</span>
@@ -1038,7 +1026,22 @@ export const LandingPage: React.FC = () => {
           <div className="boards-row">
             <div className="board-card-sm">
               <div className="board-img-box">
-                <img src="/boards/esp32-c3.svg" alt="ESP32-C3" className="board-img-sm" />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/boards/esp32-c3.webp 1x, /boards/esp32-c3@2x.webp 2x"
+                  />
+                  <source
+                    type="image/png"
+                    srcSet="/boards/esp32-c3.png 1x, /boards/esp32-c3@2x.png 2x"
+                  />
+                  <img
+                    src="/boards/esp32-c3.svg"
+                    alt="ESP32-C3"
+                    className="board-img-sm"
+                    loading="lazy"
+                  />
+                </picture>
               </div>
               <span className="board-name-sm">ESP32-C3 DevKit</span>
               <span className="board-chip-sm">RV32IMC · 4 MB flash</span>
@@ -1083,11 +1086,22 @@ export const LandingPage: React.FC = () => {
           <div className="boards-row">
             <div className="board-card-sm">
               <div className="board-img-box">
-                <img
-                  src="/boards/esp32-devkit-c-v4.svg"
-                  alt="ESP32 DevKit V1"
-                  className="board-img-sm"
-                />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/boards/esp32-devkit-v1.webp 1x, /boards/esp32-devkit-v1@2x.webp 2x"
+                  />
+                  <source
+                    type="image/png"
+                    srcSet="/boards/esp32-devkit-v1.png 1x, /boards/esp32-devkit-v1@2x.png 2x"
+                  />
+                  <img
+                    src="/boards/esp32-devkit-v1.svg"
+                    alt="ESP32 DevKit V1"
+                    className="board-img-sm"
+                    loading="lazy"
+                  />
+                </picture>
               </div>
               <span className="board-name-sm">ESP32 DevKit V1</span>
               <span className="board-chip-sm">LX6 · 4 MB flash</span>
@@ -1119,7 +1133,22 @@ export const LandingPage: React.FC = () => {
             </div>
             <div className="board-card-sm">
               <div className="board-img-box">
-                <img src="/boards/xiao-esp32-s3.svg" alt="XIAO ESP32-S3" className="board-img-sm" />
+                <picture>
+                  <source
+                    type="image/webp"
+                    srcSet="/boards/xiao-esp32-s3.webp 1x, /boards/xiao-esp32-s3@2x.webp 2x"
+                  />
+                  <source
+                    type="image/png"
+                    srcSet="/boards/xiao-esp32-s3.png 1x, /boards/xiao-esp32-s3@2x.png 2x"
+                  />
+                  <img
+                    src="/boards/xiao-esp32-s3.svg"
+                    alt="XIAO ESP32-S3"
+                    className="board-img-sm"
+                    loading="lazy"
+                  />
+                </picture>
               </div>
               <span className="board-name-sm">XIAO ESP32-S3</span>
               <span className="board-chip-sm">LX7 · compact</span>
