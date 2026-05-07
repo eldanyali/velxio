@@ -6,7 +6,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { exampleProjects, type ExampleProject } from '../../data/examples';
-import { CircuitPreview } from './CircuitPreview';
+import { ExampleThumbnail } from './ExampleThumbnail';
 import './ExamplesGallery.css';
 
 interface ExamplesGalleryProps {
@@ -316,21 +316,13 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
           return (
             <div key={example.id} className="example-card" onClick={() => onLoadExample(example)}>
               <div className="example-thumbnail">
-                {example.thumbnail ? (
-                  <img
-                    src={example.thumbnail}
-                    alt={example.title}
-                    className="example-preview-image"
-                  />
-                ) : (
-                  <CircuitPreview
-                    example={example}
-                    width={300}
-                    height={180}
-                    background="#0a0a0c"
-                    style={{ width: '100%', height: '100%' }}
-                  />
-                )}
+                <ExampleThumbnail
+                  example={example}
+                  width={300}
+                  height={180}
+                  background="#0a0a0c"
+                  style={{ width: '100%', height: '100%' }}
+                />
               </div>
               <div className="example-info">
                 <h3 className="example-title">{example.title}</h3>

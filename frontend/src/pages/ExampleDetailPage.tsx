@@ -14,7 +14,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { exampleProjects } from '../data/examples';
 import { loadExample, type LibraryInstallProgress } from '../utils/loadExample';
 import { AppHeader } from '../components/layout/AppHeader';
-import { CircuitPreview } from '../components/examples/CircuitPreview';
+import { ExampleThumbnail } from '../components/examples/ExampleThumbnail';
 import { useSEO } from '../utils/useSEO';
 
 const DOMAIN = 'https://velxio.dev';
@@ -176,7 +176,7 @@ export const ExampleDetailPage: React.FC = () => {
               border: '1px solid #333',
             }}
           >
-            <CircuitPreview
+            <ExampleThumbnail
               example={example}
               width={760}
               height={240}
