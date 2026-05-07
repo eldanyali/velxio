@@ -845,12 +845,14 @@ export const LandingPage: React.FC = () => {
         </div>
         <div className="hero-right">
           <picture>
-            <source srcSet="/image.webp" type="image/webp" />
+            <source srcSet="/marketing/hero-editor.webp" type="image/webp" />
+            <source srcSet="/marketing/hero-editor.png" type="image/png" />
             <img
-              src="/image.png"
-              alt="Velxio simulator preview"
+              src="/marketing/hero-editor.png"
+              alt="Velxio editor with Arduino Uno traffic-light circuit"
               className="hero-preview-img"
-              loading="lazy"
+              loading="eager"
+              fetchPriority="high"
             />
           </picture>
         </div>
