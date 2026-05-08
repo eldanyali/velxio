@@ -102,13 +102,15 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
     pinManager,
     initSimulator,
     updateComponentState,
-    addComponent,
-    removeComponent,
     removeBoard,
     updateComponent,
     serialMonitorOpen,
     toggleSerialMonitor,
   } = useSimulatorStore();
+  // `addComponent` / `removeComponent` / `removeWire` are no longer used here —
+  // every user-initiated mutation routes through the record* actions below
+  // so it can be undone. Raw mutators are still available for transient
+  // operations (e.g. drag preview frames) but those don't live in this file.
 
   // Active board (for WiFi/BLE status display)
   const activeBoard = boards.find((b) => b.id === activeBoardId) ?? null;
@@ -128,9 +130,19 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
   const recalculateAllWirePositions = useSimulatorStore((s) => s.recalculateAllWirePositions);
   const selectedWireId = useSimulatorStore((s) => s.selectedWireId);
   const setSelectedWire = useSimulatorStore((s) => s.setSelectedWire);
-  const removeWire = useSimulatorStore((s) => s.removeWire);
   const updateWire = useSimulatorStore((s) => s.updateWire);
   const wires = useSimulatorStore((s) => s.wires);
+
+  // Recorded canvas actions — these wrap the raw mutators above with an
+  // undoable CanvasCommand. Use these at the *commit* point of a user
+  // interaction (drag-end, click finish, picker confirm); use the raw
+  // mutators for transient state during the interaction (drag preview).
+  const recordAddComponent = useSimulatorStore((s) => s.recordAddComponent);
+  const recordRemoveComponent = useSimulatorStore((s) => s.recordRemoveComponent);
+  const recordMove = useSimulatorStore((s) => s.recordMove);
+  const recordRotate = useSimulatorStore((s) => s.recordRotate);
+  const recordSetProperty = useSimulatorStore((s) => s.recordSetProperty);
+  const recordRemoveWire = useSimulatorStore((s) => s.recordRemoveWire);
 
   // Oscilloscope
   const oscilloscopeOpen = useOscilloscopeStore((s) => s.open);
@@ -199,6 +211,10 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
 
   // Component dragging state
   const [draggedComponentId, setDraggedComponentId] = useState<string | null>(null);
+  // Captures (x, y) of the dragged component at mousedown so a drag-end
+  // can record the diff as a single undoable Move. Boards are intentionally
+  // skipped — board moves don't go through component history.
+  const dragStartPosRef = useRef<{ x: number; y: number } | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   // Canvas ref for coordinate calculations
@@ -1067,7 +1083,8 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
       }
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedComponentId) {
-          removeComponent(selectedComponentId);
+          // Recorded so the user can Ctrl+Z this back. Cascades wire removal too.
+          recordRemoveComponent(selectedComponentId);
           setSelectedComponentId(null);
         } else if (activeBoardId) {
           setBoardToRemove(activeBoardId);
@@ -1077,7 +1094,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedComponentId, removeComponent, activeBoardId]);
+  }, [selectedComponentId, recordRemoveComponent, activeBoardId]);
 
   // Handle component selection from modal
   const handleSelectComponent = (metadata: ComponentMetadata) => {
@@ -1101,7 +1118,8 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
 
     const component = createComponentFromMetadata(metadata, x, y);
     trackAddComponent(metadata.id);
-    addComponent(component as any);
+    // Recorded — user can Ctrl+Z to remove the just-added component.
+    recordAddComponent(component as Parameters<typeof recordAddComponent>[0]);
     setShowComponentPicker(false);
 
     // Custom Chips need a compile step before they can do anything — open the
@@ -1111,18 +1129,21 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
     }
   };
 
-  // Component rotation
+  // Component rotation — applies the new angle and records it as a single
+  // undoable command (round-trip flips the rotation property both ways).
   const handleRotateComponent = (componentId: string) => {
     const component = components.find((c) => c.id === componentId);
     if (!component) return;
 
     const currentRotation = (component.properties.rotation as number) || 0;
+    const nextRotation = (currentRotation + 90) % 360;
     updateComponent(componentId, {
       properties: {
         ...component.properties,
-        rotation: (currentRotation + 90) % 360,
+        rotation: nextRotation,
       },
     } as any);
+    recordRotate(componentId, currentRotation, nextRotation);
   };
 
   // Component dragging handlers
@@ -1142,6 +1163,9 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
       x: world.x - component.x,
       y: world.y - component.y,
     });
+    // Snapshot the starting position. mouseup uses this to push a single
+    // Move command if the component actually moved (vs being a click).
+    dragStartPosRef.current = { x: component.x, y: component.y };
     setSelectedComponentId(componentId);
   };
 
@@ -1383,6 +1407,25 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
         }
       }
 
+      // If this was a real drag (not a click), commit one Move command
+      // so undo can roll the position back. Click-without-drag short-
+      // circuits via the (posDiff < 5 && timeDiff < 300) branch above
+      // and just opens the property dialog — no history entry needed.
+      const start = dragStartPosRef.current;
+      const isClick = posDiff < 5 && timeDiff < 300;
+      if (
+        !isClick &&
+        start &&
+        draggedComponentId &&
+        !draggedComponentId.startsWith('__board__')
+      ) {
+        const moved = components.find((c) => c.id === draggedComponentId);
+        if (moved && (moved.x !== start.x || moved.y !== start.y)) {
+          recordMove(draggedComponentId, start, { x: moved.x, y: moved.y });
+        }
+      }
+      dragStartPosRef.current = null;
+
       recalculateAllWirePositions();
       setDraggedComponentId(null);
     }
@@ -1522,9 +1565,24 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
     }
 
     if (wireInProgress) {
-      // Finish wire: connect to this pin
+      // Finish wire: the store atomically appends the new wire and clears
+      // `wireInProgress`. Once that's done, we look up the wire it just
+      // created and push a CanvasCommand with applyNow:false (state is
+      // already at the post-add state). Undo removes the wire; redo re-adds.
       finishWireCreation({ componentId, pinName, x, y });
       trackCreateWire();
+      const wires = useSimulatorStore.getState().wires;
+      const created = wires[wires.length - 1];
+      if (created) {
+        useSimulatorStore.getState().pushCommand(
+          {
+            description: 'Add wire',
+            execute: () => useSimulatorStore.getState().addWire(created),
+            undo: () => useSimulatorStore.getState().removeWire(created.id),
+          },
+          { applyNow: false },
+        );
+      }
     } else {
       // Start wire: auto-detect color from pin name
       startWireCreation({ componentId, pinName, x, y }, autoWireColor(pinName));
@@ -1539,9 +1597,9 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
         cancelWireCreation();
         return;
       }
-      // Delete / Backspace → remove selected wire
+      // Delete / Backspace → remove selected wire (recorded for undo).
       if ((e.key === 'Delete' || e.key === 'Backspace') && selectedWireId) {
-        removeWire(selectedWireId);
+        recordRemoveWire(selectedWireId);
         return;
       }
       // Color shortcuts (0-9, c, l, m, p, y) — Wokwi style
@@ -1561,7 +1619,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
     wireInProgress,
     cancelWireCreation,
     selectedWireId,
-    removeWire,
+    recordRemoveWire,
     setWireInProgressColor,
     updateWire,
   ]);
@@ -2251,7 +2309,8 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                     kind="wire"
                     label="Wire"
                     onDelete={() => {
-                      removeWire(selectedWireId);
+                      // Recorded so the touch / mobile delete is also undoable.
+                      recordRemoveWire(selectedWireId);
                       setSelectedWire(null);
                     }}
                     onDeselect={() => setSelectedWire(null)}
@@ -2269,7 +2328,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                     canRotate
                     onRotate={() => handleRotateComponent(selectedComponentId)}
                     onDelete={() => {
-                      removeComponent(selectedComponentId);
+                      recordRemoveComponent(selectedComponentId);
                       setSelectedComponentId(null);
                     }}
                     onDeselect={() => setSelectedComponentId(null)}
@@ -2317,7 +2376,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               setBoardToRemove(id);
             } else {
               setPinPicker(null);
-              removeComponent(id);
+              recordRemoveComponent(id);
               setSelectedComponentId(null);
             }
           };
@@ -2390,15 +2449,22 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               onClose={() => setShowPropertyDialog(false)}
               onRotate={handleRotateComponent}
               onDelete={(id) => {
-                removeComponent(id);
+                recordRemoveComponent(id);
                 setShowPropertyDialog(false);
               }}
               onPropertyChange={(id, propName, value) => {
                 const comp = components.find((c) => c.id === id);
                 if (comp) {
+                  const prevValue = comp.properties[propName];
                   updateComponent(id, {
                     properties: { ...comp.properties, [propName]: value },
                   });
+                  // Property panel is the canonical UI for property edits — record
+                  // each change so Ctrl+Z reverts the value (without re-running the
+                  // raw mutation, which already happened).
+                  if (prevValue !== value) {
+                    recordSetProperty(id, propName, prevValue, value);
+                  }
                 }
               }}
               onPinSelect={(id, pinName) => {
