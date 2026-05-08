@@ -163,7 +163,11 @@ class Esp32LibBridge:
 
     def start(self, firmware_b64: str, machine: str = 'esp32-picsimlab') -> None:
         """Decode firmware, init QEMU, start event loop in daemon thread."""
-        fw_bytes = base64.b64decode(firmware_b64)
+        from app.services.esp32_flash_image import pad_to_flash_size
+        # The compiler trims trailing 0xFF padding before serializing (issue
+        # #101 — full 4 MB images blew nginx buffers). Re-pad here so QEMU's
+        # MTD layer sees a valid power-of-2 flash size.
+        fw_bytes = pad_to_flash_size(base64.b64decode(firmware_b64))
         tmp = tempfile.NamedTemporaryFile(suffix='.bin', delete=False)
         tmp.write(fw_bytes)
         tmp.close()

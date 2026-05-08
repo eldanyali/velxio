@@ -314,7 +314,11 @@ def main() -> None:  # noqa: C901  (complexity OK for inline worker)
 
     # ── 3. Write firmware to a temp file ──────────────────────────────────────
     try:
-        fw_bytes = base64.b64decode(firmware_b64)
+        # The compiler trims trailing 0xFF padding before serializing (issue
+        # #101 — full 4 MB images blew nginx buffers). Re-pad here so QEMU's
+        # MTD layer sees a valid power-of-2 flash size.
+        from app.services.esp32_flash_image import pad_to_flash_size
+        fw_bytes = pad_to_flash_size(base64.b64decode(firmware_b64))
         tmp = tempfile.NamedTemporaryFile(suffix='.bin', delete=False)
         tmp.write(fw_bytes)
         tmp.close()

@@ -771,6 +771,7 @@ class ESPIDFCompiler:
             missing = [k for k, v in files_found.items() if not v]
             raise FileNotFoundError(f'Missing binaries for merge: {missing}')
 
+        last_used = 0
         for offset, path in [
             (bootloader_offset, bootloader),
             (0x8000, partitions),
@@ -778,11 +779,24 @@ class ESPIDFCompiler:
         ]:
             data = path.read_bytes()
             flash[offset:offset + len(data)] = data
+            last_used = max(last_used, offset + len(data))
             logger.info(f'[espidf] Placed {path.name} at 0x{offset:04X} ({len(data)} bytes)')
 
+        # Trim the trailing 0xFF padding before serializing.
+        #
+        # Keeping the full 4 MB flash image here gives a ~5.5 MB base64 JSON
+        # response that nginx / Cloudflare can choke on (issue #101 — user
+        # saw "No response from server"). The frontend stores the trimmed
+        # bytes and the backend pads back to the QEMU flash size at the
+        # bridge layer right before mtd attach. Lossless: bytes after
+        # last_used are 0xFF by construction, so re-padding restores the
+        # original image byte-for-byte.
         merged_path = build_dir / 'merged_flash.bin'
-        merged_path.write_bytes(bytes(flash))
-        logger.info(f'[espidf] Merged flash image: {merged_path.stat().st_size} bytes')
+        merged_path.write_bytes(bytes(flash[:last_used]))
+        logger.info(
+            f'[espidf] Merged flash image (trimmed): {merged_path.stat().st_size} bytes '
+            f'(would have been {FLASH_SIZE} bytes unpadded)'
+        )
         return merged_path
 
     async def compile(self, files: list[dict], board_fqbn: str) -> dict:
