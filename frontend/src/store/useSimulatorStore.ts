@@ -335,6 +335,32 @@ interface Component {
   properties: Record<string, unknown>;
 }
 
+// ── Undo/redo history ────────────────────────────────────────────────────
+/**
+ * One entry on the canvas undo/redo stack.
+ *
+ *   description  — human-readable label shown as the undo/redo button
+ *                  tooltip ("Undo: Move LED").
+ *   execute()    — applied on redo. Should be idempotent against the
+ *                  current state at redo time (the user may have undone
+ *                  several steps then started a new branch).
+ *   undo()       — reverts the change. Same idempotency contract.
+ *
+ * Commands that capture the inverse on construction (e.g. `recordMove`
+ * captures fromX/fromY) are pushed with `applyNow:false` because the
+ * mutation already happened — the command only needs to remember how to
+ * undo/redo it later. Commands that ARE the canonical mutation (e.g.
+ * `recordAddComponent`) are pushed with `applyNow:true` so a single call
+ * both performs the action and stores the undo path.
+ */
+export interface CanvasCommand {
+  description: string;
+  execute(): void;
+  undo(): void;
+}
+
+const HISTORY_MAX = 50;
+
 // ── Store interface ───────────────────────────────────────────────────────
 interface SimulatorState {
   // ── Multi-board state ───────────────────────────────────────────────────
@@ -435,6 +461,44 @@ interface SimulatorState {
   cancelWireCreation: () => void;
   updateWirePositions: (componentId: string) => void;
   recalculateAllWirePositions: () => void;
+
+  // ── Undo/redo ────────────────────────────────────────────────────────────
+  /** Bounded ring buffer of canvas mutations (HISTORY_MAX = 50). */
+  history: CanvasCommand[];
+  /** Index of the last APPLIED command. -1 = empty / fully undone. */
+  historyIndex: number;
+  /** Push a command and (by default) execute it. Truncates the redo stack. */
+  pushCommand: (cmd: CanvasCommand, opts?: { applyNow?: boolean }) => void;
+  undo: () => void;
+  redo: () => void;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
+  /** Wipe the stack (called on project load / clear). */
+  clearHistory: () => void;
+  /**
+   * Recorded canvas actions — these are the public API the UI and agent
+   * tools should use to mutate the canvas. Each one wraps a raw mutator
+   * with a CanvasCommand so the change is undoable. Drag-preview frames
+   * still use the raw mutators (addComponent / updateComponent / addWire
+   * / removeWire / updateWire) which DO NOT touch history.
+   */
+  recordAddComponent: (component: Component) => void;
+  recordRemoveComponent: (id: string) => void;
+  recordMove: (
+    id: string,
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+  ) => void;
+  recordRotate: (id: string, prevRotation: number, nextRotation: number) => void;
+  recordSetProperty: (id: string, key: string, prevValue: unknown, nextValue: unknown) => void;
+  recordAddWire: (wire: Wire) => void;
+  recordRemoveWire: (wireId: string) => void;
+  recordUpdateWire: (
+    wireId: string,
+    prev: Partial<Wire>,
+    next: Partial<Wire>,
+    description?: string,
+  ) => void;
 
   // ── Serial monitor ──────────────────────────────────────────────────────
   toggleSerialMonitor: () => void;
@@ -1503,7 +1567,11 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
 
     handleComponentEvent: (_componentId, _eventName, _data) => {},
 
-    setComponents: (components) => set({ components }),
+    setComponents: (components) => {
+      // Bulk replacement (project load / clear) — any pending undo/redo
+      // would point at component IDs that no longer exist after this.
+      set({ components, history: [], historyIndex: -1 });
+    },
 
     addWire: (wire) => set((state) => ({ wires: [...state.wires, wire] })),
 
@@ -1524,6 +1592,9 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       set({
         // Ensure every wire has waypoints (backwards-compatible with saved projects)
         wires: wires.map((w) => ({ waypoints: [], ...w })),
+        // Bulk replacement clears history for the same reason as setComponents.
+        history: [],
+        historyIndex: -1,
       }),
 
     startWireCreation: (endpoint, color) =>
@@ -1643,6 +1714,239 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         return updated;
       });
       set({ wires: updatedWires });
+    },
+
+    // ── Undo/redo ──────────────────────────────────────────────────────────
+    history: [],
+    historyIndex: -1,
+
+    pushCommand: (cmd, opts) => {
+      const applyNow = opts?.applyNow ?? true;
+      if (applyNow) cmd.execute();
+      set((state) => {
+        // Truncate the redo branch — once you push a new command, the
+        // entries you'd previously redone are abandoned.
+        const truncated = state.history.slice(0, state.historyIndex + 1);
+        let next = [...truncated, cmd];
+        let nextIdx = next.length - 1;
+        // Cap at HISTORY_MAX. When over, drop the oldest entry and shift
+        // the index down so it still points at the just-pushed command.
+        if (next.length > HISTORY_MAX) {
+          const overflow = next.length - HISTORY_MAX;
+          next = next.slice(overflow);
+          nextIdx = next.length - 1;
+        }
+        return { history: next, historyIndex: nextIdx };
+      });
+    },
+
+    undo: () => {
+      const state = get();
+      if (state.historyIndex < 0) return;
+      const cmd = state.history[state.historyIndex];
+      try {
+        cmd.undo();
+      } catch (err) {
+        // A failing undo would otherwise leave the index pointing at a
+        // half-applied command. Bail out cleanly.
+        // eslint-disable-next-line no-console
+        console.error('[history] undo failed:', cmd.description, err);
+        return;
+      }
+      set({ historyIndex: state.historyIndex - 1 });
+    },
+
+    redo: () => {
+      const state = get();
+      if (state.historyIndex >= state.history.length - 1) return;
+      const cmd = state.history[state.historyIndex + 1];
+      try {
+        cmd.execute();
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('[history] redo failed:', cmd.description, err);
+        return;
+      }
+      set({ historyIndex: state.historyIndex + 1 });
+    },
+
+    canUndo: () => get().historyIndex >= 0,
+    canRedo: () => {
+      const s = get();
+      return s.historyIndex < s.history.length - 1;
+    },
+
+    clearHistory: () => set({ history: [], historyIndex: -1 }),
+
+    // ── Recorded canvas actions ────────────────────────────────────────────
+    // Each `record*` builds a CanvasCommand that captures both directions
+    // and pushes it. Naming intent: the user has *committed* a change
+    // (drag-end, click finalised, agent tool execute) — distinct from the
+    // raw mutators above which can be called per-frame during a drag.
+
+    recordAddComponent: (component) => {
+      get().pushCommand({
+        description: `Add ${component.metadataId}`,
+        execute: () =>
+          set((s) => ({ components: [...s.components, component] })),
+        undo: () =>
+          set((s) => ({
+            components: s.components.filter((c) => c.id !== component.id),
+            // Mirror the cascade in removeComponent so a redo→undo round
+            // trip of an add-then-wired pair stays consistent.
+            wires: s.wires.filter(
+              (w) =>
+                w.start.componentId !== component.id && w.end.componentId !== component.id,
+            ),
+          })),
+      });
+    },
+
+    recordRemoveComponent: (id) => {
+      const state = get();
+      const removed = state.components.find((c) => c.id === id);
+      if (!removed) return;
+      // Capture wires that will be cascaded too — undo must restore both
+      // the component AND its wires together.
+      const removedWires = state.wires.filter(
+        (w) => w.start.componentId === id || w.end.componentId === id,
+      );
+      get().pushCommand({
+        description: `Remove ${removed.metadataId}`,
+        execute: () =>
+          set((s) => ({
+            components: s.components.filter((c) => c.id !== id),
+            wires: s.wires.filter(
+              (w) => w.start.componentId !== id && w.end.componentId !== id,
+            ),
+          })),
+        undo: () =>
+          set((s) => ({
+            components: [...s.components, removed],
+            wires: [...s.wires, ...removedWires],
+          })),
+      });
+    },
+
+    recordMove: (id, from, to) => {
+      // The state is already at `to` (caller mutated during drag). We push
+      // applyNow:false so we don't redundantly re-apply on first push;
+      // execute()/undo() are only invoked on future redo/undo.
+      get().pushCommand(
+        {
+          description: 'Move component',
+          execute: () => {
+            set((s) => ({
+              components: s.components.map((c) =>
+                c.id === id ? { ...c, x: to.x, y: to.y } : c,
+              ),
+            }));
+            get().updateWirePositions(id);
+          },
+          undo: () => {
+            set((s) => ({
+              components: s.components.map((c) =>
+                c.id === id ? { ...c, x: from.x, y: from.y } : c,
+              ),
+            }));
+            get().updateWirePositions(id);
+          },
+        },
+        { applyNow: false },
+      );
+    },
+
+    recordRotate: (id, prevRotation, nextRotation) => {
+      get().pushCommand(
+        {
+          description: 'Rotate component',
+          execute: () =>
+            set((s) => ({
+              components: s.components.map((c) =>
+                c.id === id
+                  ? { ...c, properties: { ...c.properties, rotation: nextRotation } }
+                  : c,
+              ),
+            })),
+          undo: () =>
+            set((s) => ({
+              components: s.components.map((c) =>
+                c.id === id
+                  ? { ...c, properties: { ...c.properties, rotation: prevRotation } }
+                  : c,
+              ),
+            })),
+        },
+        { applyNow: false },
+      );
+    },
+
+    recordSetProperty: (id, key, prevValue, nextValue) => {
+      get().pushCommand(
+        {
+          description: `Change ${key}`,
+          execute: () =>
+            set((s) => ({
+              components: s.components.map((c) =>
+                c.id === id
+                  ? { ...c, properties: { ...c.properties, [key]: nextValue } }
+                  : c,
+              ),
+            })),
+          undo: () =>
+            set((s) => ({
+              components: s.components.map((c) =>
+                c.id === id
+                  ? { ...c, properties: { ...c.properties, [key]: prevValue } }
+                  : c,
+              ),
+            })),
+        },
+        { applyNow: false },
+      );
+    },
+
+    recordAddWire: (wire) => {
+      get().pushCommand({
+        description: 'Add wire',
+        execute: () => set((s) => ({ wires: [...s.wires, wire] })),
+        undo: () =>
+          set((s) => ({
+            wires: s.wires.filter((w) => w.id !== wire.id),
+            selectedWireId: s.selectedWireId === wire.id ? null : s.selectedWireId,
+          })),
+      });
+    },
+
+    recordRemoveWire: (wireId) => {
+      const removed = get().wires.find((w) => w.id === wireId);
+      if (!removed) return;
+      get().pushCommand({
+        description: 'Remove wire',
+        execute: () =>
+          set((s) => ({
+            wires: s.wires.filter((w) => w.id !== wireId),
+            selectedWireId: s.selectedWireId === wireId ? null : s.selectedWireId,
+          })),
+        undo: () => set((s) => ({ wires: [...s.wires, removed] })),
+      });
+    },
+
+    recordUpdateWire: (wireId, prev, next, description = 'Update wire') => {
+      get().pushCommand(
+        {
+          description,
+          execute: () =>
+            set((s) => ({
+              wires: s.wires.map((w) => (w.id === wireId ? { ...w, ...next } : w)),
+            })),
+          undo: () =>
+            set((s) => ({
+              wires: s.wires.map((w) => (w.id === wireId ? { ...w, ...prev } : w)),
+            })),
+        },
+        { applyNow: false },
+      );
     },
 
     toggleSerialMonitor: () => set((s) => ({ serialMonitorOpen: !s.serialMonitorOpen })),
