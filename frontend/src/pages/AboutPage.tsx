@@ -247,7 +247,15 @@ export const AboutPage: React.FC = () => {
           <h2 className="about-heading">The Creator</h2>
           <div className="about-creator">
             <div className="about-creator-photo">
-              <div className="about-creator-avatar">DMC</div>
+              <img
+                className="about-creator-avatar"
+                src="https://avatars.githubusercontent.com/u/47928504?v=4"
+                alt="David Montero Crespo"
+                width={120}
+                height={120}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <div className="about-creator-info">
               <h3 className="about-creator-name">David Montero Crespo</h3>
@@ -329,6 +337,36 @@ export const AboutPage: React.FC = () => {
                 </a>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Releases */}
+      <section className="about-section">
+        <div className="about-container">
+          <h2 className="about-heading">Recent releases</h2>
+          <div className="about-releases">
+            <Link to="/v2-5" className="about-release-card about-release-card-latest">
+              <span className="about-release-tag">Latest</span>
+              <h3>Velxio 2.5</h3>
+              <p className="about-release-tagline">Arduino meets SPICE in your browser</p>
+              <p className="about-release-blurb">
+                Real-time analog circuit simulation via ngspice-WASM, wired to Arduino, ESP32 and
+                Raspberry Pi Pico. 100+ SPICE-accurate components, live ammeters and voltmeters,
+                40 new analog/hybrid examples — co-simulated with your firmware.
+              </p>
+              <span className="about-release-link">Read the launch notes →</span>
+            </Link>
+            <Link to="/v2" className="about-release-card">
+              <h3>Velxio 2.0</h3>
+              <p className="about-release-tagline">Multi-board canvas, ESP32, Raspberry Pi 3</p>
+              <p className="about-release-blurb">
+                Full QEMU-driven ESP32 emulation with WiFi/BLE, Raspberry Pi 3B Linux, MicroPython
+                support across Pico/ESP32, custom WASM chips, and a redesigned canvas with
+                multi-board co-simulation.
+              </p>
+              <span className="about-release-link">Read the launch notes →</span>
+            </Link>
           </div>
         </div>
       </section>
