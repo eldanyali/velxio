@@ -197,6 +197,34 @@ export const EditorPage: React.FC = () => {
     return () => window.removeEventListener('keydown', handler);
   }, [handleSaveClick]);
 
+  // Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z — canvas undo/redo. Skipped when the
+  // user is typing in any input/textarea/contenteditable so the Monaco
+  // editor's per-file history (and the AI chat composer, etc.) keep
+  // working untouched.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t) {
+        const tag = t.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t.isContentEditable) {
+          return;
+        }
+      }
+      if (!(e.ctrlKey || e.metaKey)) return;
+      const k = e.key.toLowerCase();
+      const sim = useSimulatorStore.getState();
+      if (k === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        sim.undo();
+      } else if (k === 'y' || (k === 'z' && e.shiftKey)) {
+        e.preventDefault();
+        sim.redo();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
   // Prevent body scroll on the editor page
   useEffect(() => {
     const html = document.documentElement;

@@ -143,6 +143,12 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
   const recordRotate = useSimulatorStore((s) => s.recordRotate);
   const recordSetProperty = useSimulatorStore((s) => s.recordSetProperty);
   const recordRemoveWire = useSimulatorStore((s) => s.recordRemoveWire);
+  // Subscribe to history shape so the undo/redo buttons reactively
+  // enable/disable and their tooltips reflect the next command.
+  const history = useSimulatorStore((s) => s.history);
+  const historyIndex = useSimulatorStore((s) => s.historyIndex);
+  const undo = useSimulatorStore((s) => s.undo);
+  const redo = useSimulatorStore((s) => s.redo);
 
   // Oscilloscope
   const oscilloscopeOpen = useOscilloscopeStore((s) => s.open);
@@ -1900,6 +1906,61 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                 No board
               </span>
             )}
+
+            {/* Undo / Redo — canvas-scoped, mirrors the Ctrl+Z / Ctrl+Y
+                handler in EditorPage. Tooltip surfaces the description of
+                the command that would be applied. Disabled when the stack
+                is exhausted in that direction. */}
+            <button
+              onClick={() => undo()}
+              disabled={historyIndex < 0}
+              className="canvas-icon-btn"
+              title={
+                historyIndex >= 0
+                  ? `Undo: ${history[historyIndex].description} (Ctrl+Z)`
+                  : 'Nothing to undo'
+              }
+              aria-label="Undo"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M3 7v6h6" />
+                <path d="M3 13a9 9 0 1 0 3-7.7L3 8" />
+              </svg>
+            </button>
+            <button
+              onClick={() => redo()}
+              disabled={historyIndex >= history.length - 1}
+              className="canvas-icon-btn"
+              title={
+                historyIndex < history.length - 1
+                  ? `Redo: ${history[historyIndex + 1].description} (Ctrl+Y)`
+                  : 'Nothing to redo'
+              }
+              aria-label="Redo"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 7v6h-6" />
+                <path d="M21 13a9 9 0 1 1-3-7.7L21 8" />
+              </svg>
+            </button>
 
             {/* Serial Monitor toggle */}
             <button

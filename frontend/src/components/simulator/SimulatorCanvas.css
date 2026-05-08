@@ -137,6 +137,36 @@
   color: #4fc3f7;
 }
 
+/* ── Canvas icon-only buttons (undo/redo, …) ─────── */
+.canvas-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid #3a4a5a;
+  border-radius: 5px;
+  color: #9d9d9d;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    color 0.15s,
+    opacity 0.15s;
+  flex-shrink: 0;
+}
+
+.canvas-icon-btn:hover:not(:disabled) {
+  border-color: #007acc;
+  color: #ccc;
+}
+
+.canvas-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 /* ── Component count ─────────────────────────────── */
 .component-count {
   display: flex;
