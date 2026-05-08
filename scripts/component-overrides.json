@@ -1951,6 +1951,17 @@
       "defaultValues": { "panelKind": "epaper-5in65-7c", "refreshMs": 150 },
       "pinCount": 8,
       "tags": ["epaper", "e-paper", "e-ink", "display", "uc8159c", "acep", "7-color", "5.65", "gxepd2", "spi"]
+    },
+    {
+      "id": "bmp280",
+      "tagName": "velxio-bmp280",
+      "name": "BMP280 (Pressure + Temp)",
+      "category": "sensor",
+      "thumbnail": "<svg width=\"64\" height=\"64\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"64\" height=\"64\" rx=\"4\" fill=\"#1a2332\"/><rect x=\"10\" y=\"8\" width=\"44\" height=\"48\" rx=\"3\" fill=\"#2d6a2d\" stroke=\"#1a4a1a\"/><rect x=\"22\" y=\"22\" width=\"20\" height=\"16\" rx=\"2\" fill=\"#1a1a1a\" stroke=\"#444\"/><text x=\"32\" y=\"33\" text-anchor=\"middle\" font-size=\"5\" fill=\"#aaa\" font-family=\"monospace\">BMP280</text><rect x=\"6\" y=\"14\" width=\"6\" height=\"4\" rx=\"1\" fill=\"#c8a000\"/><rect x=\"6\" y=\"22\" width=\"6\" height=\"4\" rx=\"1\" fill=\"#c8a000\"/><rect x=\"6\" y=\"30\" width=\"6\" height=\"4\" rx=\"1\" fill=\"#c8a000\"/><rect x=\"6\" y=\"38\" width=\"6\" height=\"4\" rx=\"1\" fill=\"#c8a000\"/><text x=\"40\" y=\"50\" font-size=\"4\" fill=\"#aaffaa\" font-family=\"monospace\">GY-BMP280</text></svg>",
+      "properties": [],
+      "defaultValues": {},
+      "pinCount": 4,
+      "tags": ["sensor", "i2c", "pressure", "temperature", "bmp280", "weather", "barometer"]
     }
   ],
   "led": {
