@@ -55,6 +55,10 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
+  // Two-step delete: first click arms the action (footer flips to a
+  // "Delete X?" confirm prompt), second click commits. Replaces the old
+  // window.confirm() call which was visually jarring on mobile.
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   // Calculate dialog position on mount — clamp within canvas viewport
   useEffect(() => {
@@ -238,26 +242,49 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
 
       </div>{/* /component-property-body */}
 
-      {/* Action Buttons */}
+      {/* Action Buttons — flips into a confirm-delete prompt when armed. */}
       <div className="property-actions">
-        <button
-          className="property-action-button rotate-button"
-          onClick={() => onRotate(componentId)}
-          title="Rotate 90°"
-        >
-          Rotate
-        </button>
-        <button
-          className="property-action-button delete-button"
-          onClick={() => {
-            if (window.confirm(`Delete ${componentMetadata.name}?`)) {
-              onDelete(componentId);
-            }
-          }}
-          title="Delete component"
-        >
-          Delete
-        </button>
+        {confirmingDelete ? (
+          <>
+            <span className="property-confirm-label">
+              Delete {componentMetadata.name}?
+            </span>
+            <button
+              className="property-action-button rotate-button"
+              onClick={() => setConfirmingDelete(false)}
+              title="Cancel"
+            >
+              Cancel
+            </button>
+            <button
+              className="property-action-button delete-button"
+              onClick={() => {
+                setConfirmingDelete(false);
+                onDelete(componentId);
+              }}
+              title="Confirm delete"
+            >
+              Delete
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="property-action-button rotate-button"
+              onClick={() => onRotate(componentId)}
+              title="Rotate 90°"
+            >
+              Rotate
+            </button>
+            <button
+              className="property-action-button delete-button"
+              onClick={() => setConfirmingDelete(true)}
+              title="Delete component"
+            >
+              Delete
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
