@@ -399,7 +399,7 @@ export const AboutPage: React.FC = () => {
           <h2 className="about-heading">Community &amp; Press</h2>
           <div className="about-stats-grid">
             <div className="about-stat">
-              <span className="about-stat-number">600+</span>
+              <span className="about-stat-number">2,000+</span>
               <span className="about-stat-label">GitHub Stars</span>
             </div>
             <div className="about-stat">
@@ -407,11 +407,11 @@ export const AboutPage: React.FC = () => {
               <span className="about-stat-label">Countries</span>
             </div>
             <div className="about-stat">
-              <span className="about-stat-number">19</span>
+              <span className="about-stat-number">17</span>
               <span className="about-stat-label">Supported Boards</span>
             </div>
             <div className="about-stat">
-              <span className="about-stat-number">5</span>
+              <span className="about-stat-number">6</span>
               <span className="about-stat-label">CPU Architectures</span>
             </div>
           </div>
