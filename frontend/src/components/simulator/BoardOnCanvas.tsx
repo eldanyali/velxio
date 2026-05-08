@@ -38,8 +38,13 @@ interface BoardOnCanvasProps {
   running: boolean;
   led13?: boolean;
   isActive?: boolean;
+  /** When false, the pin overlay is hidden — keeps the canvas uncluttered when
+   * the user isn't hovering, isn't selecting, and isn't actively wiring. */
+  showPins?: boolean;
   onMouseDown: (e: React.MouseEvent) => void;
   onContextMenu?: (e: React.MouseEvent) => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   onPinClick: (componentId: string, pinName: string, x: number, y: number) => void;
   zoom?: number;
 }
@@ -49,8 +54,11 @@ export const BoardOnCanvas = ({
   running,
   led13 = false,
   isActive = false,
+  showPins = true,
   onMouseDown,
   onContextMenu,
+  onMouseEnter,
+  onMouseLeave,
   onPinClick,
   zoom = 1,
 }: BoardOnCanvasProps) => {
@@ -148,6 +156,8 @@ export const BoardOnCanvas = ({
             onMouseDown(e);
           }}
           onContextMenu={onContextMenu}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
         />
       )}
 
@@ -157,7 +167,7 @@ export const BoardOnCanvas = ({
         componentX={x}
         componentY={y}
         onPinClick={onPinClick}
-        showPins={true}
+        showPins={showPins}
         wrapperOffsetX={0}
         wrapperOffsetY={0}
         zoom={zoom}

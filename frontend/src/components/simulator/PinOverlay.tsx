@@ -9,16 +9,20 @@
  */
 
 import React, { useEffect, useState } from 'react';
-
-/** Detect touch-capable device once */
-const isTouchDevice =
-  typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+import { useIsCoarsePointer } from '../../utils/useTouchDevice';
 
 /** Minimum visual pin size in *world* pixels at zoom 1 */
 const PIN_VISUAL = 12;
 
 /** Desired minimum screen-space hit-target size for touch (px) */
 const TOUCH_MIN_SCREEN_PX = 44;
+
+/**
+ * Hard ceiling for the world-space pin size, in CSS pixels.
+ * At very low zoom, `TOUCH_MIN_SCREEN_PX / zoom` would otherwise produce
+ * massive overlays that cover the whole board.
+ */
+const PIN_WORLD_MAX = 28;
 
 interface PinInfo {
   name: string;
@@ -51,6 +55,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({
   zoom = 1,
 }) => {
   const [pins, setPins] = useState<PinInfo[]>([]);
+  const isCoarse = useIsCoarsePointer();
 
   useEffect(() => {
     const tryRead = () => {
@@ -72,9 +77,12 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({
     return null;
   }
 
-  // On touch devices, compute world-space size so the pin is at least
-  // TOUCH_MIN_SCREEN_PX on screen.  On desktop, keep the original 12px.
-  const pinSize = isTouchDevice ? Math.max(PIN_VISUAL, TOUCH_MIN_SCREEN_PX / zoom) : PIN_VISUAL;
+  // On touch-primary devices, compute world-space size so the pin is at least
+  // TOUCH_MIN_SCREEN_PX on screen — but clamp to PIN_WORLD_MAX so very low
+  // zoom levels can't produce gigantic overlays. On desktop, keep PIN_VISUAL.
+  const pinSize = isCoarse
+    ? Math.min(PIN_WORLD_MAX, Math.max(PIN_VISUAL, TOUCH_MIN_SCREEN_PX / zoom))
+    : PIN_VISUAL;
   const pinHalf = pinSize / 2;
 
   return (

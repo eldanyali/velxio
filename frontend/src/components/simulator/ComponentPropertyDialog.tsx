@@ -25,6 +25,19 @@ interface ComponentPropertyDialogProps {
   onRotate: (componentId: string) => void;
   onDelete: (componentId: string) => void;
   onPropertyChange?: (componentId: string, propertyName: string, value: unknown) => void;
+  /**
+   * Called when the user taps a pin row in the "Pin Roles" list. Used as a
+   * touch-friendly alternative to picking pins from the canvas overlay (where
+   * a fingertip is bigger than the pin). The dialog closes; the parent starts
+   * or finishes a wire from the chosen pin.
+   */
+  onPinSelect?: (componentId: string, pinName: string) => void;
+  /**
+   * If true, the pin rows render as primary actions (e.g. "Connect to D2")
+   * because a wire is already in progress and tapping a pin will *finish* the
+   * wire here. When false the rows say "Start wire from D2".
+   */
+  wireInProgress?: boolean;
 }
 
 export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = ({
@@ -37,6 +50,8 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
   onRotate,
   onDelete,
   onPropertyChange,
+  onPinSelect,
+  wireInProgress,
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
@@ -120,16 +135,52 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
         </button>
       </div>
 
-      {/* Pin Roles Section */}
+      {/* Scrollable middle: everything between the header and the action
+          footer goes here so the action buttons stay pinned at the bottom on
+          mobile (where the dialog uses a flex column layout). */}
+      <div className="component-property-body">
+
+      {/* Pin Roles Section — when onPinSelect is provided each row becomes a
+          touch-friendly button that starts (or finishes) a wire from that pin.
+          On a phone this is the primary way to wire things up: tapping a pin
+          name in a list is much easier than poking a 12px overlay with a
+          fingertip. */}
       {pinInfo.length > 0 && (
         <div className="pin-roles-section">
-          <div className="pin-roles-label">Pin Roles:</div>
-          {pinInfo.map((pin) => (
-            <div key={pin.name} className="pin-role-item">
-              <span className="pin-name">• {pin.name}</span>
-              {pin.description && <span className="pin-description"> ({pin.description})</span>}
-            </div>
-          ))}
+          <div className="pin-roles-label">
+            {onPinSelect ? (wireInProgress ? 'Tap a pin to connect:' : 'Tap a pin to wire:') : 'Pin Roles:'}
+          </div>
+          {pinInfo.map((pin) => {
+            const isInteractive = Boolean(onPinSelect);
+            const handle = () => onPinSelect?.(componentId, pin.name);
+            return (
+              <div
+                key={pin.name}
+                role={isInteractive ? 'button' : undefined}
+                tabIndex={isInteractive ? 0 : undefined}
+                className={`pin-role-item${isInteractive ? ' pin-role-item--interactive' : ''}`}
+                onClick={isInteractive ? handle : undefined}
+                onKeyDown={
+                  isInteractive
+                    ? (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handle();
+                        }
+                      }
+                    : undefined
+                }
+              >
+                <span className="pin-name">• {pin.name}</span>
+                {pin.description && <span className="pin-description"> ({pin.description})</span>}
+                {isInteractive && (
+                  <span className="pin-role-action" aria-hidden="true">
+                    →
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -184,6 +235,8 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
             })}
         </div>
       )}
+
+      </div>{/* /component-property-body */}
 
       {/* Action Buttons */}
       <div className="property-actions">

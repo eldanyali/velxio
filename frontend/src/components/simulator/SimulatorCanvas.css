@@ -422,3 +422,23 @@
 .canvas-ble-advertising {
   color: #6366f1;
 }
+
+/* ── Selection action bar (floating toolbar for selected wire/component/board) ─── */
+.selection-action-bar button:hover {
+  background: #2a2d2e !important;
+  border-color: #3c3c3c !important;
+}
+.selection-action-bar button:active {
+  transform: scale(0.97);
+}
+.selection-action-bar button:focus-visible {
+  outline: 2px solid #007acc;
+  outline-offset: 1px;
+}
+
+/* Hide button labels on narrow viewports — keep just the icons */
+@media (max-width: 520px) {
+  .selection-action-bar .selection-action-bar__label {
+    display: none;
+  }
+}

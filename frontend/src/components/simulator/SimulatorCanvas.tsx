@@ -35,13 +35,7 @@ import {
   collectAlignmentTargets,
   snapToNearest,
 } from '../../utils/wireHitDetection';
-
-/** World-units of tolerance for alignment snap (scales with zoom). */
-const ALIGN_SNAP_PX = 6;
-
-/** Detect touch-capable device once */
-const isTouchDevice =
-  typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+import { useIsCoarsePointer } from '../../utils/useTouchDevice';
 import type { ComponentMetadata } from '../../types/component-metadata';
 import type { BoardKind } from '../../types/board';
 import { BOARD_KIND_LABELS } from '../../types/board';
@@ -52,7 +46,19 @@ import {
   trackCreateWire,
   trackToggleSerialMonitor,
 } from '../../utils/analytics';
+import { SelectionActionBar } from './SelectionActionBar';
+import { WireModeBanner } from './WireModeBanner';
+import { PinPickerDialog } from './PinPickerDialog';
 import './SimulatorCanvas.css';
+
+/** World-units of tolerance for alignment snap (scales with zoom). */
+const ALIGN_SNAP_PX = 6;
+
+/** Long-press duration for touch context menu (ms). */
+const LONG_PRESS_MS = 500;
+
+/** Max movement during long-press before it cancels (px). */
+const LONG_PRESS_MOVE_TOLERANCE = 8;
 
 /** Check if a board kind is an ESP32-family board. */
 function isEsp32Kind(kind: BoardKind): boolean {
@@ -80,6 +86,12 @@ interface SimulatorCanvasProps {
 }
 
 export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
+  const isTouchDevice = useIsCoarsePointer();
+  // Mirror to a ref so the long-lived touch handler effect (deps deliberately
+  // narrow to avoid rebinding listeners on every render) can read the latest
+  // value without listing it as a dep.
+  const isTouchDeviceRef = useRef(isTouchDevice);
+  isTouchDeviceRef.current = isTouchDevice;
   const {
     boards,
     activeBoardId,
@@ -143,6 +155,20 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
   // Component selection
   const [selectedComponentId, setSelectedComponentId] = useState<string | null>(null);
 
+  // Hover tracking — drives the conditional pin overlay so the canvas isn't
+  // permanently covered in pin chips. Pins show for the hovered/selected
+  // component or board, plus all elements while a wire is in progress.
+  const [hoveredComponentId, setHoveredComponentId] = useState<string | null>(null);
+  const [hoveredBoardId, setHoveredBoardId] = useState<string | null>(null);
+
+  // Touch-friendly pin picker — shown when the user taps a component or board
+  // body (not a tiny pin overlay) and we want to let them pick a pin from a
+  // list. `kind` distinguishes board vs component so we can pull the right
+  // metadata for the dialog title.
+  const [pinPicker, setPinPicker] = useState<
+    { kind: 'component' | 'board'; targetId: string } | null
+  >(null);
+
   // Component property dialog
   const [showPropertyDialog, setShowPropertyDialog] = useState(false);
   const [propertyDialogComponentId, setPropertyDialogComponentId] = useState<string | null>(null);
@@ -195,6 +221,8 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
   componentsRef.current = components;
   const boardPositionRef = useRef(boardPosition);
   boardPositionRef.current = boardPosition;
+  const boardsRef = useRef(boards);
+  boardsRef.current = boards;
 
   // Wire interaction state (canvas-level hit detection — bypasses SVG pointer-events issues)
   const [hoveredWireId, setHoveredWireId] = useState<string | null>(null);
@@ -269,6 +297,17 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
   const touchPassthroughRef = useRef(false);
   const touchOnPinRef = useRef(false);
   const lastTapTimeRef = useRef(0);
+
+  // Long-press (touch-equivalent of right-click) — opens board context menu on
+  // touch devices since right-click isn't available there.
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressFiredRef = useRef(false);
+  const cancelLongPress = useCallback(() => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
 
   // Convert viewport coords to world (canvas) coords
   const toWorld = useCallback((screenX: number, screenY: number) => {
@@ -360,7 +399,8 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
 
       if (e.touches.length === 2) {
         e.preventDefault();
-        // Cancel wire in progress on two-finger gesture
+        // Cancel wire in progress and any pending long-press on two-finger gesture
+        cancelLongPress();
         if (wireInProgressRef.current) {
           useSimulatorStore.getState().cancelWireCreation();
         }
@@ -458,6 +498,22 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
             x: world.x - boardInstance.x,
             y: world.y - boardInstance.y,
           };
+
+          // Schedule long-press to open the board context menu (touch
+          // equivalent of right-click). Cancelled if the user moves enough
+          // to start a drag, ends touch quickly, or starts a pinch.
+          longPressFiredRef.current = false;
+          cancelLongPress();
+          const pressX = touch.clientX;
+          const pressY = touch.clientY;
+          const targetBoardId = boardInstance.id;
+          longPressTimerRef.current = setTimeout(() => {
+            longPressFiredRef.current = true;
+            // Cancel the implicit drag so finger lifting after the menu opens
+            // doesn't also fire the short-tap "set active board" branch.
+            touchDraggedComponentIdRef.current = null;
+            setBoardContextMenu({ boardId: targetBoardId, x: pressX, y: pressY });
+          }, LONG_PRESS_MS);
         } else {
           // Fallback to legacy single board
           const board = boardPositionRef.current;
@@ -487,6 +543,16 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
       if (touchOnPinRef.current) {
         e.preventDefault();
         return;
+      }
+
+      // Cancel pending long-press if the finger drifts beyond tolerance.
+      if (longPressTimerRef.current && e.touches.length === 1) {
+        const t = e.touches[0];
+        const dx = t.clientX - touchClickStartPosRef.current.x;
+        const dy = t.clientY - touchClickStartPosRef.current.y;
+        if (dx * dx + dy * dy > LONG_PRESS_MOVE_TOLERANCE * LONG_PRESS_MOVE_TOLERANCE) {
+          cancelLongPress();
+        }
       }
 
       e.preventDefault();
@@ -585,6 +651,16 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
     };
 
     const onTouchEnd = (e: TouchEvent) => {
+      // Always clear any pending long-press timer on touch release.
+      cancelLongPress();
+      // If the long-press fired and opened a context menu, swallow this
+      // touchend so we don't also fire the short-tap action below.
+      if (longPressFiredRef.current) {
+        longPressFiredRef.current = false;
+        touchDraggedComponentIdRef.current = null;
+        e.preventDefault();
+        return;
+      }
       // Let interactive components handle their own touch
       if (touchPassthroughRef.current) {
         touchPassthroughRef.current = false;
@@ -653,9 +729,17 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
 
         if (isShortTap) {
           if (touchId.startsWith('__board__:')) {
-            // Short tap on board → make it the active board
+            // Short tap on board: first tap → make it active (so pins show);
+            // tap again on the same board → open the touch-friendly pin
+            // picker so the user can start a wire by name without poking at
+            // a tiny pin overlay with a finger.
             const boardId = touchId.slice('__board__:'.length);
-            useSimulatorStore.getState().setActiveBoardId(boardId);
+            const state = useSimulatorStore.getState();
+            if (state.activeBoardId === boardId) {
+              setPinPicker({ kind: 'board', targetId: boardId });
+            } else {
+              state.setActiveBoardId(boardId);
+            }
           } else if (touchId !== '__board__') {
             // Short tap on component → open property dialog or sensor panel.
             // While the simulator is running, components stay interactive —
@@ -684,11 +768,26 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
         return;
       }
 
-      // ── Wire in progress: short tap adds waypoint ──
+      // ── Wire in progress: short tap adds waypoint OR opens pin picker ──
+      // If the user tapped on a component / board body (not a pin overlay),
+      // open the touch-friendly pin picker so they can finish the wire by
+      // tapping a pin name from a list — far more reliable than poking at a
+      // 12px overlay with a fingertip. Empty-canvas taps still drop waypoints.
       if (wireInProgressRef.current) {
         if (isShortTap) {
-          const world = toWorld(changed.clientX, changed.clientY);
-          useSimulatorStore.getState().addWireWaypoint(world.x, world.y);
+          const tapTarget = document.elementFromPoint(changed.clientX, changed.clientY);
+          const componentWrapper = tapTarget?.closest('[data-component-id]');
+          const boardOverlay = tapTarget?.closest('[data-board-overlay]');
+          if (componentWrapper) {
+            const id = componentWrapper.getAttribute('data-component-id');
+            if (id) setPinPicker({ kind: 'component', targetId: id });
+          } else if (boardOverlay) {
+            const id = boardOverlay.getAttribute('data-board-id');
+            if (id) setPinPicker({ kind: 'board', targetId: id });
+          } else {
+            const world = toWorld(changed.clientX, changed.clientY);
+            useSimulatorStore.getState().addWireWaypoint(world.x, world.y);
+          }
         }
         return;
       }
@@ -697,7 +796,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
       if (isShortTap) {
         const now = Date.now();
         const world = toWorld(changed.clientX, changed.clientY);
-        const baseThreshold = isTouchDevice ? 20 : 8;
+        const baseThreshold = isTouchDeviceRef.current ? 20 : 8;
         const threshold = baseThreshold / zoomRef.current;
         const wire = findWireNearPoint(wiresRef.current, world.x, world.y, threshold);
 
@@ -738,8 +837,9 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
       el.removeEventListener('touchstart', onTouchStart);
       el.removeEventListener('touchmove', onTouchMove);
       el.removeEventListener('touchend', onTouchEnd);
+      cancelLongPress();
     };
-  }, [toWorld, setBoardPosition, updateComponent, recalculateAllWirePositions]);
+  }, [toWorld, setBoardPosition, updateComponent, recalculateAllWirePositions, cancelLongPress]);
 
   // Recalculate wire positions after web components initialize their pinInfo
   useEffect(() => {
@@ -1480,16 +1580,21 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
     return () => timers.forEach((t) => clearTimeout(t));
   }, [components, recalculateAllWirePositions]);
 
-  // Auto-pan to keep the board and all components visible after a project import/load.
-  // We track the previous component count and only re-center when the count
-  // jumps (indicating the user loaded a new circuit, not just added one part).
+  // Auto-pan/zoom to keep the board and all components visible after a project
+  // import/load. We track the previous component count and only re-center when
+  // the count jumps (indicating the user loaded a new circuit, not just added
+  // one part).
+  //
+  // On touch-primary devices we also auto-fit the zoom — projects authored on
+  // a desktop with a wide canvas otherwise show up cramped at zoom 1 on a
+  // ~400px-wide phone, with everything piled into the top-left corner.
   const prevComponentCountRef = useRef(-1);
   useEffect(() => {
     const prev = prevComponentCountRef.current;
     const curr = components.length;
     prevComponentCountRef.current = curr;
 
-    // Only re-center when the component list transitions from empty/different
+    // Only re-fit when the component list transitions from empty/different
     // project to a populated one (i.e., a load/import event).
     const isLoad = curr > 0 && (prev <= 0 || Math.abs(curr - prev) > 2);
     if (!isLoad) return;
@@ -1498,26 +1603,70 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
       const canvas = canvasRef.current;
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
-      const currentZoom = zoomRef.current;
 
-      // Compute the centroid of all world-space elements (board + extra components)
-      // so that the auto-pan keeps everything visible, not just the board.
-      const allX = [boardPositionRef.current.x, ...componentsRef.current.map((c) => c.x)];
-      const allY = [boardPositionRef.current.y, ...componentsRef.current.map((c) => c.y)];
-      const minX = Math.min(...allX);
-      const maxX = Math.max(...allX);
-      const minY = Math.min(...allY);
-      const maxY = Math.max(...allY);
+      // Read actual rendered sizes from the DOM so the fit accounts for each
+      // board/component's true footprint, not a guessed bounding box.
+      const z = zoomRef.current;
+      const p = panRef.current;
+      const toWorldRect = (r: DOMRect) => ({
+        x1: (r.left - rect.left - p.x) / z,
+        y1: (r.top - rect.top - p.y) / z,
+        x2: (r.right - rect.left - p.x) / z,
+        y2: (r.bottom - rect.top - p.y) / z,
+      });
+
+      const targets: HTMLElement[] = [];
+      boardsRef.current.forEach((b) => {
+        const el = canvas.querySelector<HTMLElement>(`[data-board-id="${b.id}"]`);
+        if (el) targets.push(el);
+      });
+      componentsRef.current.forEach((c) => {
+        const el = canvas.querySelector<HTMLElement>(`[data-component-id="${c.id}"]`);
+        if (el) targets.push(el);
+      });
+
+      if (targets.length === 0) return;
+
+      let minX = Infinity;
+      let minY = Infinity;
+      let maxX = -Infinity;
+      let maxY = -Infinity;
+      targets.forEach((el) => {
+        const wr = toWorldRect(el.getBoundingClientRect());
+        if (wr.x1 < minX) minX = wr.x1;
+        if (wr.y1 < minY) minY = wr.y1;
+        if (wr.x2 > maxX) maxX = wr.x2;
+        if (wr.y2 > maxY) maxY = wr.y2;
+      });
+      if (!isFinite(minX)) return;
+
       const centerX = (minX + maxX) / 2;
       const centerY = (minY + maxY) / 2;
+      const worldW = Math.max(1, maxX - minX);
+      const worldH = Math.max(1, maxY - minY);
+
+      // On touch-primary viewports, also adjust zoom so everything fits with
+      // padding. On desktop, keep the existing behavior (pan only) so users
+      // who set a custom zoom don't lose it on every load.
+      let nextZoom = z;
+      if (isTouchDeviceRef.current) {
+        const PADDING = 32;
+        const availW = Math.max(50, rect.width - PADDING * 2);
+        const availH = Math.max(50, rect.height - PADDING * 2);
+        // Never zoom *in* past 1× — small projects shouldn't get magnified.
+        const fit = Math.min(availW / worldW, availH / worldH, 1);
+        nextZoom = Math.max(0.2, fit);
+      }
 
       const newPan = {
-        x: rect.width / 2 - centerX * currentZoom,
-        y: rect.height / 2 - centerY * currentZoom,
+        x: rect.width / 2 - centerX * nextZoom,
+        y: rect.height / 2 - centerY * nextZoom,
       };
+      zoomRef.current = nextZoom;
       panRef.current = newPan;
+      setZoom(nextZoom);
       setPan(newPan);
-    }, 150);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, [components.length]);
@@ -1528,6 +1677,17 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
     // directly and let PinOverlay read the pinInfo we attach in the wrapper.
     if (component.metadataId === 'instr-voltmeter' || component.metadataId === 'instr-ammeter') {
       const isSelected = selectedComponentId === component.id;
+      const isHovered = hoveredComponentId === component.id;
+      // Suppress pin overlays whenever a modal-style UI is open over the
+      // canvas — they'd just visually conflict with the dialog's controls.
+      const dialogOpen =
+        showPropertyDialog || customChipComponentId !== null || sensorControlComponentId !== null;
+      // On touch devices the pin picker dialog (PinPickerDialog) is the
+      // primary way to pick pins, so the tiny overlay squares are hidden —
+      // they're hard to hit with a finger anyway. Desktop still uses overlays
+      // (hover/select shows them so the user can click with a mouse).
+      const showPinsForComponent =
+        !dialogOpen && !isTouchDevice && (wireInProgress || isSelected || isHovered);
       return (
         <React.Fragment key={component.id}>
           <InstrumentComponent
@@ -1544,7 +1704,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               componentX={component.x}
               componentY={component.y}
               onPinClick={handlePinClick}
-              showPins={true}
+              showPins={showPinsForComponent}
               zoom={zoom}
               wrapperOffsetX={0}
               wrapperOffsetY={0}
@@ -1561,8 +1721,15 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
     }
 
     const isSelected = selectedComponentId === component.id;
-    // Always show pins for better UX when creating wires
-    const showPinsForComponent = true;
+    const isHovered = hoveredComponentId === component.id;
+    const dialogOpen =
+      showPropertyDialog || customChipComponentId !== null || sensorControlComponentId !== null;
+    // Show pins only when relevant: while a wire is in progress (any pin is a
+    // valid target), when this component is selected, or while hovering it.
+    // Hidden when a dialog is open. Hidden entirely on touch — there the
+    // PinPickerDialog (tap component → list of pins) replaces the overlays.
+    const showPinsForComponent =
+      !dialogOpen && !isTouchDevice && (wireInProgress || isSelected || isHovered);
 
     return (
       <React.Fragment key={component.id}>
@@ -1576,6 +1743,10 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
           onMouseDown={(e) => {
             handleComponentMouseDown(component.id, e);
           }}
+          onMouseEnter={() => setHoveredComponentId(component.id)}
+          onMouseLeave={() =>
+            setHoveredComponentId((curr) => (curr === component.id ? null : curr))
+          }
         />
 
         {/* Pin overlay for wire creation - hide when running */}
@@ -2008,29 +2179,49 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
             />
 
             {/* All boards on canvas */}
-            {boards.map((board) => (
-              <BoardOnCanvas
-                key={board.id}
-                board={board}
-                running={running}
-                isActive={board.id === activeBoardId}
-                led13={Boolean(boardLedStates[board.id])}
-                onMouseDown={(e) => {
-                  setClickStartTime(Date.now());
-                  setClickStartPos({ x: e.clientX, y: e.clientY });
-                  const world = toWorld(e.clientX, e.clientY);
-                  setDraggedComponentId(`__board__:${board.id}`);
-                  setDragOffset({ x: world.x - board.x, y: world.y - board.y });
-                }}
-                onContextMenu={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setBoardContextMenu({ boardId: board.id, x: e.clientX, y: e.clientY });
-                }}
-                onPinClick={handlePinClick}
-                zoom={zoom}
-              />
-            ))}
+            {boards.map((board) => {
+              const isHovered = hoveredBoardId === board.id;
+              const isActive = board.id === activeBoardId;
+              const dialogOpen =
+                showPropertyDialog ||
+                customChipComponentId !== null ||
+                sensorControlComponentId !== null;
+              // Pins show during wiring (every endpoint is a valid target),
+              // when hovering the board, or when it's the active board.
+              // Suppressed while a dialog is open. Hidden entirely on touch
+              // since the PinPickerDialog (tap board to open list) replaces
+              // the overlays — fingers can't reliably hit a 12px pin anyway.
+              const showPins =
+                !dialogOpen && !isTouchDevice && (wireInProgress || isHovered || isActive);
+              return (
+                <BoardOnCanvas
+                  key={board.id}
+                  board={board}
+                  running={running}
+                  isActive={isActive}
+                  showPins={showPins}
+                  led13={Boolean(boardLedStates[board.id])}
+                  onMouseEnter={() => setHoveredBoardId(board.id)}
+                  onMouseLeave={() =>
+                    setHoveredBoardId((curr) => (curr === board.id ? null : curr))
+                  }
+                  onMouseDown={(e) => {
+                    setClickStartTime(Date.now());
+                    setClickStartPos({ x: e.clientX, y: e.clientY });
+                    const world = toWorld(e.clientX, e.clientY);
+                    setDraggedComponentId(`__board__:${board.id}`);
+                    setDragOffset({ x: world.x - board.x, y: world.y - board.y });
+                  }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setBoardContextMenu({ boardId: board.id, x: e.clientX, y: e.clientY });
+                  }}
+                  onPinClick={handlePinClick}
+                  zoom={zoom}
+                />
+              );
+            })}
 
             {/* Components using wokwi-elements */}
             <div className="components-area">
@@ -2043,13 +2234,139 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
 
           {/* Wire creation mode banner — visible on both desktop and mobile */}
           {wireInProgress && (
-            <div className="wire-mode-banner">
-              <span>Tap a pin to connect — tap canvas for waypoints</span>
-              <button onClick={() => cancelWireCreation()}>Cancel</button>
-            </div>
+            <WireModeBanner
+              message="Tap a pin to connect — tap canvas for waypoints"
+              onCancel={() => cancelWireCreation()}
+            />
           )}
+
+          {/* Floating action bar for the current selection — primary delete UI
+              for touch devices (no Delete key, no right-click). Hidden while
+              creating a wire so it doesn't fight the wire-mode banner. */}
+          {!wireInProgress &&
+            (() => {
+              if (selectedWireId) {
+                return (
+                  <SelectionActionBar
+                    kind="wire"
+                    label="Wire"
+                    onDelete={() => {
+                      removeWire(selectedWireId);
+                      setSelectedWire(null);
+                    }}
+                    onDeselect={() => setSelectedWire(null)}
+                  />
+                );
+              }
+              if (selectedComponentId) {
+                const c = components.find((x) => x.id === selectedComponentId);
+                if (!c) return null;
+                const meta = registry.getById(c.metadataId);
+                return (
+                  <SelectionActionBar
+                    kind="component"
+                    label={meta?.name ?? 'Component'}
+                    canRotate
+                    onRotate={() => handleRotateComponent(selectedComponentId)}
+                    onDelete={() => {
+                      removeComponent(selectedComponentId);
+                      setSelectedComponentId(null);
+                    }}
+                    onDeselect={() => setSelectedComponentId(null)}
+                  />
+                );
+              }
+              return null;
+            })()}
         </div>
       </div>
+
+      {/* Touch-friendly pin picker — used to pick a pin from a list when the
+          user taps a component or board body (rather than poking a 12px
+          overlay). Closes on backdrop tap or after a pin is chosen. */}
+      {pinPicker &&
+        (() => {
+          const id = pinPicker.targetId;
+          const el = document.getElementById(id);
+          const pins: Array<{ name: string; x: number; y: number; description?: string }> = el
+            ? ((el as any).pinInfo ?? [])
+            : [];
+          let title = pinPicker.kind === 'board' ? 'Board' : 'Component';
+          if (pinPicker.kind === 'board') {
+            const b = boards.find((x) => x.id === id);
+            if (b) title = BOARD_KIND_LABELS[b.boardKind] ?? b.boardKind;
+          } else {
+            const c = components.find((x) => x.id === id);
+            const meta = c ? registry.getById(c.metadataId) : null;
+            if (meta) title = meta.name;
+          }
+          const subtitle = wireInProgress ? 'Tap a pin to connect' : 'Tap a pin to start a wire';
+          // Rotate is only meaningful for components (boards have no rotation).
+          const handlePickerRotate =
+            pinPicker.kind === 'component'
+              ? () => {
+                  handleRotateComponent(id);
+                }
+              : undefined;
+          // Delete handlers route through the existing flows: components use
+          // removeComponent() directly; boards use the confirmation dialog
+          // that's already wired for the right-click "Remove board" item.
+          const handlePickerDelete = () => {
+            if (pinPicker.kind === 'board') {
+              setPinPicker(null);
+              setBoardToRemove(id);
+            } else {
+              setPinPicker(null);
+              removeComponent(id);
+              setSelectedComponentId(null);
+            }
+          };
+          return (
+            <PinPickerDialog
+              targetId={id}
+              title={title}
+              subtitle={subtitle}
+              pins={pins}
+              onRotate={handlePickerRotate}
+              onDelete={handlePickerDelete}
+              onClose={() => setPinPicker(null)}
+              onPinSelect={(targetId, pinName) => {
+                const pin = pins.find((p) => p.name === pinName);
+                if (!pin) {
+                  setPinPicker(null);
+                  return;
+                }
+                // Resolve world coords from the rendered element rect — this
+                // accounts for wrapper offsets, rotation, and current zoom.
+                const compEl = document.getElementById(targetId);
+                const canvasRect = canvasRef.current?.getBoundingClientRect();
+                const compRect = compEl?.getBoundingClientRect();
+                let worldX: number;
+                let worldY: number;
+                if (canvasRect && compRect) {
+                  const screenX = compRect.left + pin.x * zoomRef.current;
+                  const screenY = compRect.top + pin.y * zoomRef.current;
+                  const w = toWorld(screenX, screenY);
+                  worldX = w.x;
+                  worldY = w.y;
+                } else {
+                  // Fallback: approximate from the stored x/y of the target.
+                  if (pinPicker.kind === 'board') {
+                    const b = boards.find((x) => x.id === targetId);
+                    worldX = (b?.x ?? 0) + pin.x;
+                    worldY = (b?.y ?? 0) + pin.y;
+                  } else {
+                    const c = components.find((x) => x.id === targetId);
+                    worldX = (c?.x ?? 0) + pin.x;
+                    worldY = (c?.y ?? 0) + pin.y;
+                  }
+                }
+                setPinPicker(null);
+                handlePinClick(targetId, pinName, worldX, worldY);
+              }}
+            />
+          );
+        })()}
 
       {/* Component Property Dialog */}
       {showPropertyDialog &&
@@ -2069,6 +2386,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               componentProperties={component.properties}
               position={propertyDialogPosition}
               pinInfo={pinInfo || []}
+              wireInProgress={Boolean(wireInProgress)}
               onClose={() => setShowPropertyDialog(false)}
               onRotate={handleRotateComponent}
               onDelete={(id) => {
@@ -2082,6 +2400,34 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                     properties: { ...comp.properties, [propName]: value },
                   });
                 }
+              }}
+              onPinSelect={(id, pinName) => {
+                // Pick world coords from the live element rect when possible —
+                // it accounts for the wokwi-element wrapper offset and the
+                // current rotation. Falls back to component origin + pin
+                // offset if the rect can't be read.
+                const compEl = document.getElementById(id);
+                const pin = (pinInfo || []).find((p: { name: string }) => p.name === pinName);
+                const c = components.find((x) => x.id === id);
+                if (!c || !pin) return;
+                const canvasRect = canvasRef.current?.getBoundingClientRect();
+                const compRect = compEl?.getBoundingClientRect();
+                let worldX: number;
+                let worldY: number;
+                if (canvasRect && compRect) {
+                  // Convert pin's CSS-pixel offset (relative to component) into
+                  // world coords via the canvas pan/zoom transform.
+                  const screenX = compRect.left + pin.x * zoomRef.current;
+                  const screenY = compRect.top + pin.y * zoomRef.current;
+                  const w = toWorld(screenX, screenY);
+                  worldX = w.x;
+                  worldY = w.y;
+                } else {
+                  worldX = c.x + pin.x;
+                  worldY = c.y + pin.y;
+                }
+                setShowPropertyDialog(false);
+                handlePinClick(id, pinName, worldX, worldY);
               }}
             />
           );
