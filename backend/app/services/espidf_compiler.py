@@ -846,9 +846,21 @@ class ESPIDFCompiler:
             if self.has_arduino:
                 # Arduino-as-component mode: copy sketch as .cpp
                 sketch_cpp = project_dir / 'main' / 'sketch.ino.cpp'
-                # Prepend Arduino.h if not already included
+                # Prepend Arduino.h + velxio_compat.h if not already included.
+                # velxio_compat.h shims arduino-esp32 3.x APIs (ledcAttach, …)
+                # onto the 2.0.17 toolchain we currently pin. See
+                # esp-idf-template/main/velxio_compat.h.
                 if '#include' not in main_content or 'Arduino.h' not in main_content:
-                    main_content = '#include "Arduino.h"\n' + main_content
+                    main_content = (
+                        '#include "Arduino.h"\n'
+                        '#include "velxio_compat.h"\n' + main_content
+                    )
+                else:
+                    main_content = main_content.replace(
+                        '#include "Arduino.h"',
+                        '#include "Arduino.h"\n#include "velxio_compat.h"',
+                        1,
+                    )
                 sketch_cpp.write_text(main_content, encoding='utf-8')
 
                 # Copy additional files (.h, .cpp)
