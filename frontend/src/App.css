@@ -367,6 +367,13 @@ body {
   }
 }
 
+/* ── View-mode toggle: desktop only (mobile uses bottom-nav) ─────── */
+@media (max-width: 768px) {
+  .view-mode-toggle {
+    display: none !important;
+  }
+}
+
 /* ── Header responsive ───────────────────────────── */
 @media (max-width: 768px) {
   .app-header {

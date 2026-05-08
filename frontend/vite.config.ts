@@ -21,6 +21,12 @@ export default defineConfig({
     alias: {
       '@pro': proOverlayPath,
     },
+    // When the pro overlay is wired in via a junction (Windows local-dev
+    // pattern), Vite's default resolution walks symlinks to the real path,
+    // which breaks relative imports from pro into upstream sibling dirs.
+    // Keeping the symlink-as-path lets `../../store/...` from pro resolve
+    // back into the OSS tree's src/.
+    preserveSymlinks: !!process.env.VITE_PRO_BUILD,
   },
   server: {
     proxy: {

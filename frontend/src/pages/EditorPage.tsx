@@ -25,6 +25,7 @@ import { SaveProjectModal } from '../components/layout/SaveProjectModal';
 import { LoginPromptModal } from '../components/layout/LoginPromptModal';
 import { GitHubStarBanner } from '../components/layout/GitHubStarBanner';
 import { useSimulatorStore, DEFAULT_BOARD_POSITION } from '../store/useSimulatorStore';
+import { useEditorStore } from '../store/useEditorStore';
 import { useOscilloscopeStore } from '../store/useOscilloscopeStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProjectStore } from '../store/useProjectStore';
@@ -38,9 +39,9 @@ const BOTTOM_PANEL_MIN = 80;
 const BOTTOM_PANEL_MAX = 600;
 const BOTTOM_PANEL_DEFAULT = 200;
 
-const EXPLORER_MIN = 120;
+const EXPLORER_MIN = 110;
 const EXPLORER_MAX = 500;
-const EXPLORER_DEFAULT = 210;
+const EXPLORER_DEFAULT = 165;
 
 const resizeHandleStyle: React.CSSProperties = {
   height: 5,
@@ -64,6 +65,10 @@ export const EditorPage: React.FC = () => {
   const autoSave = useAutoSaveProject();
 
   const [editorWidthPct, setEditorWidthPct] = useState(45);
+  // Desktop-only 3-way layout switch (code-only / circuit-only / both).
+  // Lets users hide a pane to give the right-docked chat more room.
+  const viewMode = useEditorStore((s) => s.viewMode);
+  const setViewMode = useEditorStore((s) => s.setViewMode);
   const containerRef = useRef<HTMLDivElement>(null);
   const resizingRef = useRef(false);
   const serialMonitorOpen = useSimulatorStore((s) => s.serialMonitorOpen);
@@ -355,6 +360,66 @@ export const EditorPage: React.FC = () => {
               <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
             </svg>
           </button>
+          {/* View-mode toggle: Code / Both / Circuit. Lets users hide a
+              pane to give the right-docked AI chat more breathing room.
+              Hidden on mobile — there's already a code/circuit toggle in
+              the mobile bottom-nav. */}
+          <div
+            role="group"
+            aria-label="View mode"
+            className="view-mode-toggle"
+            style={{
+              display: 'flex',
+              gap: 1,
+              background: '#252526',
+              border: '1px solid #3c3c3c',
+              borderRadius: 4,
+              overflow: 'hidden',
+              alignSelf: 'center',
+              margin: '0 6px',
+            }}
+          >
+            {(
+              [
+                { key: 'code', label: 'Code', path: 'M16 18l6-6-6-6M8 6l-6 6 6 6' },
+                { key: 'both', label: 'Both', path: 'M3 3h7v18H3zM14 3h7v18h-7z' },
+                { key: 'circuit', label: 'Circuit', path: 'M5 12h14M12 5v14' },
+              ] as const
+            ).map((m) => (
+              <button
+                key={m.key}
+                onClick={() => setViewMode(m.key)}
+                aria-pressed={viewMode === m.key}
+                style={{
+                  background: viewMode === m.key ? '#0e639c' : 'transparent',
+                  color: viewMode === m.key ? 'white' : '#aaa',
+                  border: 'none',
+                  height: 28,
+                  padding: '0 10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontFamily: 'inherit',
+                }}
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d={m.path} />
+                </svg>
+                <span>{m.label}</span>
+              </button>
+            ))}
+          </div>
           <div className="unified-toolbar-editor">
             <EditorToolbar
               consoleOpen={consoleOpen}
@@ -373,8 +438,17 @@ export const EditorPage: React.FC = () => {
         <div
           className="editor-panel"
           style={{
-            width: isMobile ? '100%' : `${editorWidthPct}%`,
-            display: isMobile && mobileView !== 'code' ? 'none' : 'flex',
+            width: isMobile
+              ? '100%'
+              : viewMode === 'code'
+              ? '100%'
+              : viewMode === 'circuit'
+              ? '0%'
+              : `${editorWidthPct}%`,
+            display:
+              (isMobile && mobileView !== 'code') || (!isMobile && viewMode === 'circuit')
+                ? 'none'
+                : 'flex',
             flexDirection: 'row',
           }}
         >
@@ -477,8 +551,8 @@ export const EditorPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Resize handle (desktop only) */}
-        {!isMobile && (
+        {/* Resize handle (desktop only, and only when both panes are visible) */}
+        {!isMobile && viewMode === 'both' && (
           <div className="resize-handle" onMouseDown={handleResizeMouseDown}>
             <div className="resize-handle-grip" />
           </div>
@@ -488,8 +562,17 @@ export const EditorPage: React.FC = () => {
         <div
           className="simulator-panel"
           style={{
-            width: isMobile ? '100%' : `${100 - editorWidthPct}%`,
-            display: isMobile && mobileView !== 'circuit' ? 'none' : 'flex',
+            width: isMobile
+              ? '100%'
+              : viewMode === 'circuit'
+              ? '100%'
+              : viewMode === 'code'
+              ? '0%'
+              : `${100 - editorWidthPct}%`,
+            display:
+              (isMobile && mobileView !== 'circuit') || (!isMobile && viewMode === 'code')
+                ? 'none'
+                : 'flex',
             flexDirection: 'column',
           }}
         >
@@ -526,6 +609,9 @@ export const EditorPage: React.FC = () => {
       {saveModalOpen && <SaveProjectModal onClose={() => setSaveModalOpen(false)} />}
       {loginPromptOpen && <LoginPromptModal onClose={() => setLoginPromptOpen(false)} />}
       {showStarBanner && <GitHubStarBanner onClose={handleDismissStarBanner} />}
+      {/* Slot reserved for the private pro overlay (e.g. agent chat panel).
+          Self-hosted builds without an overlay see nothing here. */}
+      <div data-velxio-slot="agent-chat" />
     </div>
   );
 };

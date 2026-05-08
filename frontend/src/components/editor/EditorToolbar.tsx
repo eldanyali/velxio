@@ -113,24 +113,7 @@ export const EditorToolbar = ({
   const importInputRef = useRef<HTMLInputElement>(null);
   const firmwareInputRef = useRef<HTMLInputElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
-  const [overflowOpen, setOverflowOpen] = useState(false);
-  const overflowMenuRef = useRef<HTMLDivElement>(null);
   const [missingLibHint, setMissingLibHint] = useState(false);
-
-  // (ResizeObserver removed — Library Manager is always visible now,
-  // only import/export live in the overflow menu)
-
-  // Close overflow dropdown on outside click
-  useEffect(() => {
-    if (!overflowOpen) return;
-    const handler = (e: MouseEvent) => {
-      if (overflowMenuRef.current && !overflowMenuRef.current.contains(e.target as Node)) {
-        setOverflowOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [overflowOpen]);
 
   // Compile All / Run All — runs sequentially, logs to console (no dialog)
   const [compileAllRunning, setCompileAllRunning] = useState(false);
@@ -635,48 +618,33 @@ export const EditorToolbar = ({
     <>
       <div className="editor-toolbar-wrapper" style={{ position: 'relative' }}>
         <div className="editor-toolbar" ref={toolbarRef}>
-          {/* Active board context pill */}
-          {activeBoard && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-              <div
-                className="tb-board-pill"
-                style={{
-                  borderColor: BOARD_PILL_COLOR[activeBoard.boardKind],
-                  color: BOARD_PILL_COLOR[activeBoard.boardKind],
-                }}
-                title={`Editing: ${BOARD_KIND_LABELS[activeBoard.boardKind]}`}
-              >
-                <span className="tb-board-pill-icon">{BOARD_PILL_ICON[activeBoard.boardKind]}</span>
-                <span className="tb-board-pill-label">
-                  {BOARD_KIND_LABELS[activeBoard.boardKind]}
-                </span>
-                {activeBoard.running && <span className="tb-board-pill-running" title="Running" />}
-              </div>
-              {BOARD_SUPPORTS_MICROPYTHON.has(activeBoard.boardKind) && (
-                <select
-                  className="tb-lang-select"
-                  value={activeBoard.languageMode ?? 'arduino'}
-                  onChange={(e) => {
-                    if (activeBoardId)
-                      setBoardLanguageMode(activeBoardId, e.target.value as LanguageMode);
-                  }}
-                  title="Language mode"
-                  style={{
-                    background: '#2d2d2d',
-                    color: '#ccc',
-                    border: '1px solid #444',
-                    borderRadius: 4,
-                    padding: '2px 4px',
-                    fontSize: 11,
-                    cursor: 'pointer',
-                    outline: 'none',
-                  }}
-                >
-                  <option value="arduino">Arduino C++</option>
-                  <option value="micropython">MicroPython</option>
-                </select>
-              )}
-            </div>
+          {/* MicroPython language selector — only when active board supports it.
+              The board context pill that used to live here was removed: it
+              duplicated the BoardSelector dropdown elsewhere in the toolbar. */}
+          {activeBoard && BOARD_SUPPORTS_MICROPYTHON.has(activeBoard.boardKind) && (
+            <select
+              className="tb-lang-select"
+              value={activeBoard.languageMode ?? 'arduino'}
+              onChange={(e) => {
+                if (activeBoardId)
+                  setBoardLanguageMode(activeBoardId, e.target.value as LanguageMode);
+              }}
+              title="Language mode"
+              style={{
+                background: '#2d2d2d',
+                color: '#ccc',
+                border: '1px solid #444',
+                borderRadius: 4,
+                padding: '2px 4px',
+                fontSize: 11,
+                cursor: 'pointer',
+                outline: 'none',
+                marginRight: 4,
+              }}
+            >
+              <option value="arduino">Arduino C++</option>
+              <option value="micropython">MicroPython</option>
+            </select>
           )}
 
           <div className="toolbar-group">
@@ -868,95 +836,42 @@ export const EditorToolbar = ({
               <span className="tb-libraries-label">Libraries</span>
             </button>
 
-            {/* Import / Export — overflow menu */}
-            <div className="tb-overflow-wrap" ref={overflowMenuRef}>
-              <button
-                onClick={() => setOverflowOpen((v) => !v)}
-                className={`tb-btn tb-btn-overflow${overflowOpen ? ' tb-btn-overflow-active' : ''}`}
-                title="Import / Export"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-                  <circle cx="5" cy="12" r="2" />
-                  <circle cx="12" cy="12" r="2" />
-                  <circle cx="19" cy="12" r="2" />
-                </svg>
-              </button>
-
-              {overflowOpen && (
-                <div className="tb-overflow-menu">
-                  <button
-                    className="tb-overflow-item"
-                    onClick={() => {
-                      importInputRef.current?.click();
-                      setOverflowOpen(false);
-                    }}
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="7 10 12 15 17 10" />
-                      <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
-                    Import zip
-                  </button>
-                  <button
-                    className="tb-overflow-item"
-                    onClick={() => {
-                      handleExport();
-                      setOverflowOpen(false);
-                    }}
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
-                    Export zip
-                  </button>
-                  <div style={{ borderTop: '1px solid #3c3c3c', margin: '4px 0' }} />
-                  <button
-                    className="tb-overflow-item"
-                    onClick={() => {
-                      firmwareInputRef.current?.click();
-                      setOverflowOpen(false);
-                    }}
-                  >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
-                      <line x1="12" y1="15" x2="12" y2="22" />
-                      <polyline points="8 18 12 22 16 18" />
-                    </svg>
-                    Upload firmware (.hex, .bin, .elf)
-                  </button>
-                </div>
-              )}
-            </div>
+            {/* Import zip — was previously hidden in a 3-dot overflow menu;
+                inlined since there's space and the discoverability cost
+                outweighed the toolbar savings. */}
+            <button
+              onClick={() => importInputRef.current?.click()}
+              className="tb-btn"
+              title="Import a project from a .zip file"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            </button>
+            <button
+              onClick={() => handleExport()}
+              className="tb-btn"
+              title="Export the current project as a .zip file"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+            </button>
+            <button
+              onClick={() => firmwareInputRef.current?.click()}
+              className="tb-btn"
+              title="Upload firmware (.hex, .bin, .elf, .ihex) to bypass compilation"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                <line x1="12" y1="15" x2="12" y2="22" />
+                <polyline points="8 18 12 22 16 18" />
+              </svg>
+            </button>
 
             <div className="tb-divider" />
 

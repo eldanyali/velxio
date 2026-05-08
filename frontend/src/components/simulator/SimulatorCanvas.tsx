@@ -955,6 +955,16 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
   // Handle keyboard delete for components and boards
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Skip when the user is typing in an input/textarea/contenteditable —
+      // otherwise Backspace inside the AI chat (or any future text field)
+      // also asks to delete the active board.
+      const t = e.target as HTMLElement | null;
+      if (t) {
+        const tag = t.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t.isContentEditable) {
+          return;
+        }
+      }
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedComponentId) {
           removeComponent(selectedComponentId);
