@@ -247,7 +247,12 @@ export const SerialMonitor: React.FC = () => {
       <pre ref={outputRef} style={styles.output}>
         {activeBoard?.serialOutput
           ? (() => {
-              const text = activeBoard.serialOutput;
+              // ESP-IDF and many other firmwares emit ANSI SGR escapes
+              // (`\x1b[0;32m...`). The <pre> renders them literally, so
+              // users saw raw `[0;32m` mixed into their Serial.print output.
+              // Strip them before any further processing — color isn't
+              // worth a full parser here.
+              const text = activeBoard.serialOutput.replace(/\x1b\[[0-9;]*m/g, '');
               const ipRegex = /http:\/\/192\.168\.4\.(\d+)(\/[^\s]*)?/g;
               const matches = [...text.matchAll(ipRegex)];
 
