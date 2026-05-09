@@ -1,0 +1,28 @@
+{
+  "header": {
+    "skipToContent": "跳到内容",
+    "openMenu": "打开菜单",
+    "closeMenu": "关闭菜单",
+    "nav": {
+      "home": "首页",
+      "documentation": "文档",
+      "examples": "示例",
+      "editor": "编辑器",
+      "about": "关于",
+      "blog": "博客",
+      "github": "GitHub",
+      "discord": "Discord"
+    },
+    "auth": {
+      "signIn": "登录",
+      "signUp": "注册",
+      "myProjects": "我的项目",
+      "signOut": "退出登录"
+    },
+    "language": "语言",
+    "search": "搜索"
+  },
+  "footer": {
+    "about": "Velxio 是一款免费的开源电路和微控制器模拟器，完全在您的浏览器中运行。支持 Arduino、ESP32、RP2040 和 ATtiny85，配备 SPICE 精度的模拟协同仿真。专为通过实践学习的创客、学生和嵌入式工程师打造。AGPLv3。"
+  }
+}

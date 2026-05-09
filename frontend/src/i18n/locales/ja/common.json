@@ -1,0 +1,28 @@
+{
+  "header": {
+    "skipToContent": "コンテンツへスキップ",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる",
+    "nav": {
+      "home": "ホーム",
+      "documentation": "ドキュメント",
+      "examples": "サンプル",
+      "editor": "エディタ",
+      "about": "概要",
+      "blog": "ブログ",
+      "github": "GitHub",
+      "discord": "Discord"
+    },
+    "auth": {
+      "signIn": "サインイン",
+      "signUp": "サインアップ",
+      "myProjects": "マイプロジェクト",
+      "signOut": "サインアウト"
+    },
+    "language": "言語",
+    "search": "検索"
+  },
+  "footer": {
+    "about": "Velxio は、ブラウザ上で完全に動作する無料のオープンソース回路・マイクロコントローラシミュレータです。Arduino、ESP32、RP2040、ATtiny85 に対応し、SPICE 精度のアナログ協調シミュレーションを備えています。実践を通じて学ぶメイカー、学生、組み込みエンジニアのために作られました。AGPLv3。"
+  }
+}

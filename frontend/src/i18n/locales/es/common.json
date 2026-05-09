@@ -1,0 +1,28 @@
+{
+  "header": {
+    "skipToContent": "Saltar al contenido",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "nav": {
+      "home": "Inicio",
+      "documentation": "Documentación",
+      "examples": "Ejemplos",
+      "editor": "Editor",
+      "about": "Acerca de",
+      "blog": "Blog",
+      "github": "GitHub",
+      "discord": "Discord"
+    },
+    "auth": {
+      "signIn": "Iniciar sesión",
+      "signUp": "Crear cuenta",
+      "myProjects": "Mis proyectos",
+      "signOut": "Cerrar sesión"
+    },
+    "language": "Idioma",
+    "search": "Buscar"
+  },
+  "footer": {
+    "about": "Velxio es un simulador de circuitos y microcontroladores gratuito y de código abierto que se ejecuta enteramente en tu navegador. Arduino, ESP32, RP2040 y ATtiny85, con co-simulación analógica precisa SPICE. Construido para makers, estudiantes e ingenieros embebidos que aprenden haciendo. AGPLv3."
+  }
+}

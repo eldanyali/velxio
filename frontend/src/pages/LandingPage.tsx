@@ -8,6 +8,7 @@ import {
   Layers as IcoLayers,
   Monitor as IcoMonitor,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/useAuthStore';
 import { trackVisitGitHub, trackClickCTA } from '../utils/analytics';
 import { AppHeader } from '../components/layout/AppHeader';
@@ -744,6 +745,7 @@ const UserMenu: React.FC = () => {
 
 /* ── Component ────────────────────────────────────────── */
 export const LandingPage: React.FC = () => {
+  const { t } = useTranslation();
   useSEO({
     ...getSeoMeta('/')!,
     jsonLd: {
@@ -1261,12 +1263,7 @@ export const LandingPage: React.FC = () => {
           <Link to="/editor">Editor</Link>
           <Link to="/about">About</Link>
         </div>
-        <p className="footer-copy">
-          Velxio is a free, open-source circuit and microcontroller simulator
-          that runs entirely in your browser. Arduino, ESP32, RP2040 and
-          ATtiny85, with SPICE-accurate analog co-simulation. Built for
-          makers, students and embedded engineers learning by doing. AGPLv3.
-        </p>
+        <p className="footer-copy">{t('footer.about')}</p>
       </footer>
     </div>
   );

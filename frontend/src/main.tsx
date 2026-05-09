@@ -1,5 +1,9 @@
 import { createRoot } from 'react-dom/client';
 import './index.css';
+// Side-effect import: initialises i18next BEFORE any component renders so
+// useTranslation() always resolves against a live instance. Must come
+// before App.
+import './i18n';
 import './components/velxio-components/IC74HC595';
 import './components/velxio-components/LogicGateElements';
 import './components/velxio-components/TransistorElements';
