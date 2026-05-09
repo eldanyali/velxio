@@ -6,6 +6,7 @@
  */
 
 import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ComponentMetadata } from '../../types/component-metadata';
 import './ComponentPropertyDialog.css';
 
@@ -53,6 +54,7 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
   onPinSelect,
   wireInProgress,
 }) => {
+  const { t } = useTranslation();
   const dialogRef = useRef<HTMLDivElement>(null);
   const [dialogPosition, setDialogPosition] = useState({ x: 0, y: 0 });
   // Two-step delete: first click arms the action (footer flips to a
@@ -134,7 +136,7 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
       {/* Header */}
       <div className="component-property-header">
         <span className="component-property-title">{componentMetadata.name}</span>
-        <button className="property-close-button" onClick={onClose} title="Close">
+        <button className="property-close-button" onClick={onClose} title={t('editor.componentProps.close')}>
           ×
         </button>
       </div>
@@ -152,7 +154,11 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
       {pinInfo.length > 0 && (
         <div className="pin-roles-section">
           <div className="pin-roles-label">
-            {onPinSelect ? (wireInProgress ? 'Tap a pin to connect:' : 'Tap a pin to wire:') : 'Pin Roles:'}
+            {onPinSelect
+              ? wireInProgress
+                ? t('editor.componentProps.tapToConnect')
+                : t('editor.componentProps.tapToWire')
+              : t('editor.componentProps.pinRoles')}
           </div>
           {pinInfo.map((pin) => {
             const isInteractive = Boolean(onPinSelect);
@@ -191,7 +197,7 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
       {/* Current Arduino Pin Assignment */}
       {componentProperties.pin !== undefined && (
         <div className="pin-assignment-section">
-          <div className="pin-assignment-label">Arduino Pin:</div>
+          <div className="pin-assignment-label">{t('editor.componentProps.arduinoPin')}</div>
           <div className="pin-assignment-value">
             {componentProperties.pin >= 14
               ? `A${componentProperties.pin - 14}`
@@ -247,14 +253,14 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
         {confirmingDelete ? (
           <>
             <span className="property-confirm-label">
-              Delete {componentMetadata.name}?
+              {t('editor.componentProps.confirmDelete', { name: componentMetadata.name })}
             </span>
             <button
               className="property-action-button rotate-button"
               onClick={() => setConfirmingDelete(false)}
-              title="Cancel"
+              title={t('editor.componentProps.cancel')}
             >
-              Cancel
+              {t('editor.componentProps.cancel')}
             </button>
             <button
               className="property-action-button delete-button"
@@ -262,9 +268,9 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
                 setConfirmingDelete(false);
                 onDelete(componentId);
               }}
-              title="Confirm delete"
+              title={t('editor.componentProps.confirmDeleteTitle')}
             >
-              Delete
+              {t('editor.componentProps.delete')}
             </button>
           </>
         ) : (
@@ -272,16 +278,16 @@ export const ComponentPropertyDialog: React.FC<ComponentPropertyDialogProps> = (
             <button
               className="property-action-button rotate-button"
               onClick={() => onRotate(componentId)}
-              title="Rotate 90°"
+              title={t('editor.componentProps.rotate90')}
             >
-              Rotate
+              {t('editor.componentProps.rotate')}
             </button>
             <button
               className="property-action-button delete-button"
               onClick={() => setConfirmingDelete(true)}
-              title="Delete component"
+              title={t('editor.componentProps.deleteTitle')}
             >
-              Delete
+              {t('editor.componentProps.delete')}
             </button>
           </>
         )}

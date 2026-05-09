@@ -350,6 +350,80 @@
       "installAll": "Install All ({{count}})",
       "installingShort": "Installing…"
     },
+    "oscilloscope": {
+      "title": "Oscilloscope",
+      "addChannelTitle": "Add a pin channel",
+      "addChannel": "Add Channel",
+      "timeDiv": "Time/div:",
+      "pauseTitle": "Pause capture",
+      "resumeTitle": "Resume capture",
+      "pause": "Pause",
+      "run": "Run",
+      "clearTitle": "Clear all captured samples",
+      "clear": "Clear",
+      "noChannels": "No channels added.",
+      "noChannelsHint": "Click \"+ Add Channel\" to monitor a pin.",
+      "removeChannel": "Remove {{label}}"
+    },
+    "componentProps": {
+      "close": "Close",
+      "tapToConnect": "Tap a pin to connect:",
+      "tapToWire": "Tap a pin to wire:",
+      "pinRoles": "Pin Roles:",
+      "arduinoPin": "Arduino Pin:",
+      "confirmDelete": "Delete {{name}}?",
+      "confirmDeleteTitle": "Confirm delete",
+      "deleteTitle": "Delete component",
+      "rotate90": "Rotate 90°",
+      "rotate": "Rotate",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    },
+    "selectionBar": {
+      "label": "Selection actions",
+      "rotate90": "Rotate 90°",
+      "rotate": "Rotate",
+      "delete": "Delete",
+      "deselect": "Deselect",
+      "deleteKind": {
+        "wire": "Delete wire",
+        "component": "Delete component",
+        "board": "Delete board"
+      }
+    },
+    "console": {
+      "title": "Output",
+      "errorCount_one": "{{count}} error",
+      "errorCount_other": "{{count}} errors",
+      "warningCount_one": "{{count}} warning",
+      "warningCount_other": "{{count}} warnings",
+      "filterAll": "All",
+      "filterErrors": "Errors",
+      "filterWarnings": "Warnings",
+      "auto": "Auto",
+      "clear": "Clear output",
+      "close": "Close",
+      "empty": "No compilation output yet. Click Compile to start."
+    },
+    "boardPicker": {
+      "title": "Add Board"
+    },
+    "sensorPanel": {
+      "close": "Close"
+    },
+    "customChip": {
+      "title": "Custom Chip — {{chipName}}",
+      "tabExamples": "Examples",
+      "tabEditor": "Editor",
+      "attributes": "Attributes",
+      "compiling": "Compiling…",
+      "compile": "Compile",
+      "compiledOk": "✓ Compiled — {{kb}} KB",
+      "compileFailed": "Compile failed",
+      "cancel": "Cancel",
+      "savePlace": "Save & Place",
+      "compileFirst": "Compile first"
+    },
     "serial": {
       "title": "Serial Monitor",
       "addBoard": "Add a board to start the serial monitor.",

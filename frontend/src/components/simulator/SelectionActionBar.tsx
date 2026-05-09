@@ -17,6 +17,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type SelectionKind = 'wire' | 'component' | 'board';
 
@@ -126,6 +127,7 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
   onRotate,
   onDeselect,
 }) => {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const deleteRef = useRef<HTMLButtonElement | null>(null);
   const rotateRef = useRef<HTMLButtonElement | null>(null);
@@ -159,7 +161,7 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
     <div
       ref={containerRef}
       role="toolbar"
-      aria-label="Selection actions"
+      aria-label={t('editor.selectionBar.label')}
       className="selection-action-bar"
       style={{
         position: 'absolute',
@@ -200,12 +202,12 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
           ref={rotateRef}
           onClick={onRotate}
           style={buttonStyle}
-          title="Rotate 90°"
-          aria-label="Rotate"
+          title={t('editor.selectionBar.rotate90')}
+          aria-label={t('editor.selectionBar.rotate')}
         >
           <RotateIcon />
           <span className="selection-action-bar__label" style={buttonLabelStyle}>
-            Rotate
+            {t('editor.selectionBar.rotate')}
           </span>
         </button>
       )}
@@ -215,12 +217,12 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
         ref={deleteRef}
         onClick={onDelete}
         style={{ ...buttonStyle, color: '#e06c75' }}
-        title={`Delete ${kind}`}
-        aria-label={`Delete ${kind}`}
+        title={t(`editor.selectionBar.deleteKind.${kind}`)}
+        aria-label={t(`editor.selectionBar.deleteKind.${kind}`)}
       >
         <TrashIcon />
         <span className="selection-action-bar__label" style={buttonLabelStyle}>
-          Delete
+          {t('editor.selectionBar.delete')}
         </span>
       </button>
 
@@ -229,8 +231,8 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
         ref={deselectRef}
         onClick={onDeselect}
         style={{ ...buttonStyle, padding: '6px 8px' }}
-        title="Deselect"
-        aria-label="Deselect"
+        title={t('editor.selectionBar.deselect')}
+        aria-label={t('editor.selectionBar.deselect')}
       >
         <CloseIcon />
       </button>

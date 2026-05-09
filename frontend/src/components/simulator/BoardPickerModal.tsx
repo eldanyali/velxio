@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { BoardKind } from '../../types/board';
 import { BOARD_KIND_LABELS } from '../../types/board';
 
@@ -42,6 +43,7 @@ const BOARDS: BoardKind[] = [
 ];
 
 export const BoardPickerModal = ({ isOpen, onClose, onSelectBoard }: BoardPickerModalProps) => {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   return (
@@ -68,7 +70,7 @@ export const BoardPickerModal = ({ isOpen, onClose, onSelectBoard }: BoardPicker
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 style={{ color: '#ccc', margin: '0 0 16px 0', fontSize: 16 }}>Add Board</h3>
+        <h3 style={{ color: '#ccc', margin: '0 0 16px 0', fontSize: 16 }}>{t('editor.boardPicker.title')}</h3>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {BOARDS.map((kind) => (

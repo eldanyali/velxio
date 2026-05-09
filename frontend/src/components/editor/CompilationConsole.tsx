@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CompilationLog } from '../../utils/compilationLogger';
 
 interface CompilationConsoleProps {
@@ -19,6 +20,7 @@ export const CompilationConsole: React.FC<CompilationConsoleProps> = ({
   logs,
   onClear,
 }) => {
+  const { t } = useTranslation();
   const outputRef = useRef<HTMLDivElement>(null);
   const [autoscroll, setAutoscroll] = useState(true);
   const [filter, setFilter] = useState<'all' | 'errors' | 'warnings'>('all');
@@ -55,15 +57,21 @@ export const CompilationConsole: React.FC<CompilationConsoleProps> = ({
       {/* Header */}
       <div style={styles.header}>
         <div style={styles.headerLeft}>
-          <span style={styles.title}>Output</span>
+          <span style={styles.title}>{t('editor.console.title')}</span>
           <div style={styles.badges}>
             {errorCount > 0 && (
-              <span style={styles.errorBadge} title={`${errorCount} error(s)`}>
+              <span
+                style={styles.errorBadge}
+                title={t('editor.console.errorCount', { count: errorCount })}
+              >
                 ✕ {errorCount}
               </span>
             )}
             {warningCount > 0 && (
-              <span style={styles.warningBadge} title={`${warningCount} warning(s)`}>
+              <span
+                style={styles.warningBadge}
+                title={t('editor.console.warningCount', { count: warningCount })}
+              >
                 ⚠ {warningCount}
               </span>
             )}
@@ -76,9 +84,9 @@ export const CompilationConsole: React.FC<CompilationConsoleProps> = ({
             onChange={(e) => setFilter(e.target.value as typeof filter)}
             style={styles.filterSelect}
           >
-            <option value="all">All</option>
-            <option value="errors">Errors</option>
-            <option value="warnings">Warnings</option>
+            <option value="all">{t('editor.console.filterAll')}</option>
+            <option value="errors">{t('editor.console.filterErrors')}</option>
+            <option value="warnings">{t('editor.console.filterWarnings')}</option>
           </select>
 
           {/* Autoscroll */}
@@ -89,11 +97,11 @@ export const CompilationConsole: React.FC<CompilationConsoleProps> = ({
               onChange={(e) => setAutoscroll(e.target.checked)}
               style={styles.checkbox}
             />
-            Auto
+            {t('editor.console.auto')}
           </label>
 
           {/* Clear */}
-          <button onClick={onClear} style={styles.iconBtn} title="Clear output">
+          <button onClick={onClear} style={styles.iconBtn} title={t('editor.console.clear')}>
             <svg
               width="14"
               height="14"
@@ -109,7 +117,7 @@ export const CompilationConsole: React.FC<CompilationConsoleProps> = ({
           </button>
 
           {/* Close */}
-          <button onClick={onClose} style={styles.iconBtn} title="Close">
+          <button onClick={onClose} style={styles.iconBtn} title={t('editor.console.close')}>
             <svg
               width="14"
               height="14"
@@ -130,7 +138,7 @@ export const CompilationConsole: React.FC<CompilationConsoleProps> = ({
       {/* Output content */}
       <div ref={outputRef} style={styles.output}>
         {filteredLogs.length === 0 ? (
-          <div style={styles.emptyState}>No compilation output yet. Click Compile to start.</div>
+          <div style={styles.emptyState}>{t('editor.console.empty')}</div>
         ) : (
           filteredLogs.map((log, i) => (
             <div key={i} style={styles.logLine}>

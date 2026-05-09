@@ -13,6 +13,7 @@
 
 import React, { useRef, useEffect, useState, useCallback, useLayoutEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import {
   useOscilloscopeStore,
   type OscChannel,
@@ -352,6 +353,7 @@ const ChannelPicker: React.FC<ChannelPickerProps> = ({
 // ── Main component ─────────────────────────────────────────────────────────
 
 export const Oscilloscope: React.FC = () => {
+  const { t } = useTranslation();
   const {
     running: capturing,
     timeDivMs,
@@ -450,16 +452,16 @@ export const Oscilloscope: React.FC = () => {
     <div className="osc-container">
       {/* ── Header ── */}
       <div className="osc-header">
-        <span className="osc-title">Oscilloscope</span>
+        <span className="osc-title">{t('editor.oscilloscope.title')}</span>
 
         {/* Add Channel button + portal picker */}
         <button
           ref={addBtnRef}
           className="osc-btn"
           onClick={handleTogglePicker}
-          title="Add a pin channel"
+          title={t('editor.oscilloscope.addChannelTitle')}
         >
-          + Add Channel
+          + {t('editor.oscilloscope.addChannel')}
         </button>
 
         {showPicker && pickerAnchor && (
@@ -476,7 +478,7 @@ export const Oscilloscope: React.FC = () => {
         )}
 
         {/* Time / div */}
-        <span className="osc-label">Time/div:</span>
+        <span className="osc-label">{t('editor.oscilloscope.timeDiv')}</span>
         <select
           className="osc-select"
           value={timeDivMs}
@@ -493,26 +495,26 @@ export const Oscilloscope: React.FC = () => {
         <button
           className={`osc-btn${capturing ? '' : ' osc-btn-active'}`}
           onClick={() => setCapturing(!capturing)}
-          title={capturing ? 'Pause capture' : 'Resume capture'}
+          title={capturing ? t('editor.oscilloscope.pauseTitle') : t('editor.oscilloscope.resumeTitle')}
         >
-          {capturing ? '⏸ Pause' : '▶ Run'}
+          {capturing ? `⏸ ${t('editor.oscilloscope.pause')}` : `▶ ${t('editor.oscilloscope.run')}`}
         </button>
 
         {/* Clear */}
         <button
           className="osc-btn osc-btn-danger"
           onClick={clearSamples}
-          title="Clear all captured samples"
+          title={t('editor.oscilloscope.clearTitle')}
         >
-          Clear
+          {t('editor.oscilloscope.clear')}
         </button>
       </div>
 
       {/* ── Waveforms ── */}
       {channels.length === 0 ? (
         <div className="osc-empty">
-          <span>No channels added.</span>
-          <span style={{ color: '#777' }}>Click &quot;+ Add Channel&quot; to monitor a pin.</span>
+          <span>{t('editor.oscilloscope.noChannels')}</span>
+          <span style={{ color: '#777' }}>{t('editor.oscilloscope.noChannelsHint')}</span>
         </div>
       ) : (
         <>
@@ -529,7 +531,7 @@ export const Oscilloscope: React.FC = () => {
                   <button
                     className="osc-channel-remove"
                     onClick={() => removeChannel(ch.id)}
-                    title={`Remove ${ch.label}`}
+                    title={t('editor.oscilloscope.removeChannel', { label: ch.label })}
                   >
                     ×
                   </button>

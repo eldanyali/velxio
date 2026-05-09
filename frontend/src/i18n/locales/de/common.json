@@ -4,11 +4,11 @@
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
     "nav": {
-      "home": "Start",
+      "home": "Startseite",
       "documentation": "Dokumentation",
       "examples": "Beispiele",
       "editor": "Editor",
-      "about": "Über",
+      "about": "Über uns",
       "blog": "Blog",
       "github": "GitHub",
       "discord": "Discord"
@@ -20,69 +20,69 @@
       "signOut": "Abmelden"
     },
     "language": "Sprache",
-    "search": "Suchen"
+    "search": "Suche"
   },
   "footer": {
-    "about": "Velxio ist ein kostenloser, quelloffener Schaltungs- und Mikrocontroller-Simulator, der vollständig im Browser läuft. Arduino, ESP32, RP2040 und ATtiny85 mit SPICE-genauer analoger Co-Simulation. Entwickelt für Maker, Studierende und Embedded-Engineers, die durch praktisches Tun lernen. AGPLv3."
+    "about": "Velxio ist ein kostenloser, quelloffener Schaltkreis- und Mikrocontroller-Simulator, der vollständig in Ihrem Browser läuft. Arduino, ESP32, RP2040 und ATtiny85, mit SPICE-genauer analoger Co-Simulation. Entwickelt für Maker, Studierende und Embedded-Ingenieure, die durch praktisches Lernen lernen. AGPLv3."
   },
   "landing": {
     "hero": {
-      "titleLine1": "Arduino, ESP32 und Raspberry Pi.",
-      "titleAccent": "Direkt in deinem Browser.",
-      "subtitle": "Code schreiben, Komponenten verkabeln, Run drücken. 19 Boards, 48+ Bauteile, echte CPU-Emulation — ohne Hardware, ohne Installation, ohne Cloud.",
+      "titleLine1": "Arduino, ESP32 & Raspberry Pi.",
+      "titleAccent": "Direkt in Ihrem Browser.",
+      "subtitle": "Code schreiben, Komponenten verdrahten, auf Start drücken. 19 Boards, 48+ Teile, echte CPU-Emulation – keine Hardware, keine Installation, keine Cloud.",
       "ctaPrimary": "Simulator kostenlos testen →",
       "ctaGithub": "Auf GitHub ansehen",
-      "trustLine": "Keine Anmeldung · Läuft zu 100% im Browser · Kostenlos und Open Source",
-      "imageAlt": "Velxio-Editor mit einer Ampelschaltung auf Arduino Uno"
+      "trustLine": "Keine Anmeldung erforderlich · Läuft zu 100 % in Ihrem Browser · Kostenlos & quelloffen",
+      "imageAlt": "Velxio-Editor mit Arduino Uno-Ampelschaltung"
     },
     "boards": {
       "label": "Unterstützte Hardware",
       "titleLine1": "Jede Architektur.",
-      "titleLine2": "Ein Tool.",
-      "subtitle": "19 Boards über 5 CPU-Architekturen — AVR8, ARM Cortex-M0+, RISC-V, Xtensa und Linux. Alles lokal, ohne Cloud."
+      "titleLine2": "Ein Werkzeug.",
+      "subtitle": "19 Boards über 5 CPU-Architekturen – AVR8, ARM Cortex-M0+, RISC-V, Xtensa und Linux. Alle laufen lokal, keine Cloud erforderlich."
     },
     "features": {
       "label": "Funktionen",
-      "title": "Alles, was du brauchst.",
-      "subtitle": "Eine vollständige IDE, ein Compiler und ein Multi-Architektur-Simulator — alles lokal, ganz ohne externe Dienste.",
+      "title": "Alles, was Sie brauchen.",
+      "subtitle": "Eine vollständige IDE, Compiler und Multi-Architektur-Simulator – läuft lokal ohne externe Dienste.",
       "spice": {
         "title": "Echtzeit-SPICE-Analog",
-        "desc": "ngspice-WASM-Engine — vollständige modifizierte Knotenpunktanalyse mit ~60 Hz. Widerstände, Kondensatoren, OPVs, BJTs, MOSFETs und Regler verhalten sich wie echtes Silizium, nicht wie idealisierte Modelle."
+        "desc": "ngspice-WASM-Engine – vollständige modifizierte Knotenanalyse bei ~60 Hz. Widerstände, Kondensatoren, Operationsverstärker, BJTs, MOSFETs, Regler verhalten sich wie echtes Silizium, nicht wie idealisierte Modelle."
       },
       "engines": {
         "title": "5 Emulations-Engines",
-        "desc": "AVR8 (ATmega328P, ATmega2560, ATtiny85), RP2040 (ARM Cortex-M0+), RV32IMC (ESP32-C3, CH32V003 über QEMU), Xtensa LX6/LX7 (ESP32 über QEMU) und ARM Cortex-A53 (Raspberry Pi 3 Linux)."
+        "desc": "AVR8 (ATmega328P, ATmega2560, ATtiny85), RP2040 (ARM Cortex-M0+), RV32IMC (ESP32-C3, CH32V003 via QEMU), Xtensa LX6/LX7 (ESP32 via QEMU) und ARM Cortex-A53 (Raspberry Pi 3 Linux)."
       },
       "customChips": {
-        "title": "Eigene Chips",
-        "desc": "Schreibe eigene integrierte Schaltungen in C, Rust oder AssemblyScript mit der Wokwi Custom Chips API. Kompiliere zu WebAssembly und nutze sie in beliebigen Projekten."
+        "title": "Benutzerdefinierte Chips",
+        "desc": "Erstellen Sie eigene integrierte Schaltungen in C, Rust oder AssemblyScript mit der Wokwi Custom Chips API. Kompilieren Sie zu WebAssembly und verwenden Sie sie projektübergreifend wieder."
       },
       "components": {
-        "title": "Über 100 Bauteile",
-        "desc": "SPICE-genaue analoge Bauteile plus über 48 visuelle wokwi-Bauteile — LEDs, LCDs, ILI9341 TFT, Servos, Summer, Ultraschallsensoren, Tastenfelder, NeoPixel-Streifen."
+        "title": "100+ Komponenten",
+        "desc": "SPICE-genaue analoge Teile plus 48+ wokwi visuelle Komponenten – LEDs, LCDs, ILI9341 TFT, Servos, Summer, Ultraschallsensoren, Tastenfelder, NeoPixel-Streifen."
       },
       "instruments": {
         "title": "Live-Instrumente",
-        "desc": "Mehrkanal-Oszilloskop, Voltmeter, Amperemeter, Signalgenerator. Setze sie an einen beliebigen Knoten und beobachte die Signalverläufe in Echtzeit, während die Simulation läuft."
+        "desc": "Mehrkanal-Oszilloskop, Voltmeter, Amperemeter, Signalgenerator. Platzieren Sie sie an einem beliebigen Knoten und beobachten Sie Wellenformen in Echtzeit, während die Simulation läuft."
       },
       "monaco": {
         "title": "Monaco Editor + arduino-cli",
-        "desc": "C++-Editor auf VS-Code-Niveau mit Multi-File-Workspace. Lokales arduino-cli kompiliert zu echten .hex- / .uf2- / .bin-Dateien — ohne Cloud-Roundtrip."
+        "desc": "VS Code-gerechter C++-Editor mit Multi-File-Workspace. Lokales arduino-cli kompiliert zu echten .hex / .uf2 / .bin-Dateien – kein Cloud-Roundtrip."
       }
     },
     "support": {
-      "title": "Unterstütze das Projekt",
-      "subtitle": "Velxio ist kostenlos und Open Source. Wenn es dir Zeit spart, erwäge bitte die Entwicklung zu unterstützen.",
+      "title": "Unterstützen Sie das Projekt",
+      "subtitle": "Velxio ist kostenlos und quelloffen. Wenn es Ihnen Zeit spart, erwägen Sie, seine Entwicklung zu unterstützen.",
       "ctaSponsors": "GitHub Sponsors",
-      "ctaPaypal": "Über PayPal spenden"
+      "ctaPaypal": "Spenden via PayPal"
     }
   },
   "examples": {
-    "heading": "Empfohlene Projekte",
-    "subtitle": "Beispielprojekte erkunden und ausführen — nach Board sortiert",
-    "searchPlaceholder": "Beispiele suchen — z. B. 'esp32 oled', 'blink', 'dht'…",
-    "searchLabel": "Beispiele suchen",
-    "clearSearch": "Suche zurücksetzen",
+    "heading": "Vorgestellte Projekte",
+    "subtitle": "Beispielprojekte erkunden und ausführen – nach Board organisiert",
+    "searchPlaceholder": "Beispiele durchsuchen – versuchen Sie 'esp32 oled', 'blink', 'dht'…",
+    "searchLabel": "Beispiele durchsuchen",
+    "clearSearch": "Suche löschen",
     "clear": "Löschen",
     "matchCount_one": "{{count}} Treffer",
     "matchCount_other": "{{count}} Treffer",
@@ -103,58 +103,70 @@
         "all": "Alle",
         "beginner": "Anfänger",
         "intermediate": "Fortgeschritten",
-        "advanced": "Profi"
+        "advanced": "Experte"
       }
     },
     "copyLink": "Teilbaren Link kopieren",
-    "empty": "Keine Beispiele mit den gewählten Filtern gefunden",
-    "emptyForQuery": "Keine Beispiele für „{{query}}\" mit den gewählten Filtern gefunden",
+    "empty": "Keine Beispiele mit den ausgewählten Filtern gefunden",
+    "emptyForQuery": "Keine Beispiele für \"{{query}}\" mit den ausgewählten Filtern gefunden",
     "resetFilters": "Filter zurücksetzen",
     "installing": "Bibliotheken werden installiert ({{done}}/{{total}})"
   },
   "about": {
     "hero": {
       "title": "Über Velxio",
-      "subtitle": "Ein kostenloser, quelloffener Emulator für eingebettete Systeme — entwickelt von einem einzelnen Entwickler mit Leidenschaft für Hardware und Open Source."
+      "subtitle": "Ein kostenloser, quelloffener Embedded-Systeme-Emulator – entwickelt von einem einzelnen Entwickler mit Leidenschaft für Hardware und Open Source."
     },
-    "story": { "heading": "Die Geschichte" },
-    "howItWorks": { "heading": "So funktioniert es" },
-    "openSource": { "heading": "Open-Source-Philosophie" },
-    "creator": { "heading": "Der Entwickler" },
-    "releases": { "heading": "Aktuelle Releases" },
-    "community": { "heading": "Community & Presse" },
+    "story": {
+      "heading": "Die Geschichte"
+    },
+    "howItWorks": {
+      "heading": "So funktioniert es"
+    },
+    "openSource": {
+      "heading": "Open-Source-Philosophie"
+    },
+    "creator": {
+      "heading": "Der Entwickler"
+    },
+    "releases": {
+      "heading": "Aktuelle Versionen"
+    },
+    "community": {
+      "heading": "Community & Presse"
+    },
     "cta": {
       "title": "Bereit, Velxio auszuprobieren?",
-      "subtitle": "Keine Anmeldung. Läuft zu 100% im Browser. Kostenlos und Open Source.",
+      "subtitle": "Keine Anmeldung erforderlich. Läuft zu 100 % in Ihrem Browser. Kostenlos und quelloffen.",
       "openEditor": "Editor öffnen"
     }
   },
   "auth": {
     "login": {
       "title": "Anmelden",
-      "subtitle": "um zu Velxio fortzufahren",
+      "subtitle": "um mit Velxio fortzufahren",
       "email": "E-Mail",
       "password": "Passwort",
       "signIn": "Anmelden",
-      "signingIn": "Anmelden…",
+      "signingIn": "Anmeldung läuft…",
       "or": "oder",
       "continueGoogle": "Mit Google fortfahren",
-      "noAccount": "Noch keinen Account?",
+      "noAccount": "Noch kein Konto?",
       "failed": "Anmeldung fehlgeschlagen."
     },
     "register": {
       "title": "Konto erstellen",
-      "subtitle": "Kostenlos loslegen",
+      "subtitle": "Kostenlos mit dem Bauen beginnen",
       "username": "Benutzername",
-      "usernamePlaceholder": "z. B. alice",
+      "usernamePlaceholder": "z.B. alice",
       "passwordPlaceholder": "Mindestens 8 Zeichen",
       "create": "Konto erstellen",
       "creating": "Konto wird erstellt…",
-      "haveAccount": "Schon einen Account?",
+      "haveAccount": "Bereits ein Konto?",
       "errors": {
         "reserved": "Dieser Benutzername ist reserviert.",
         "usernameRules": "Benutzername muss 3-30 Zeichen lang sein (a-z, 0-9, _, -)",
-        "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen haben.",
+        "passwordTooShort": "Passwort muss mindestens 8 Zeichen lang sein.",
         "failed": "Registrierung fehlgeschlagen."
       }
     }
@@ -163,17 +175,17 @@
     "toolbar": {
       "languageMode": "Sprachmodus",
       "compile": {
-        "addBoard": "Board hinzufügen, um zu kompilieren",
-        "loading": "Wird geladen…",
+        "addBoard": "Fügen Sie ein Board zum Kompilieren hinzu",
+        "loading": "Laden…",
         "loadMicropython": "MicroPython laden",
         "compile": "Kompilieren (Strg+B)"
       },
       "run": {
-        "addBoard": "Board hinzufügen, um auszuführen",
+        "addBoard": "Fügen Sie ein Board zum Ausführen hinzu",
         "runMicropython": "MicroPython ausführen",
         "run": "Ausführen (kompiliert bei Bedarf automatisch)"
       },
-      "stop": "Stoppen",
+      "stop": "Stopp",
       "reset": "Zurücksetzen",
       "compileAll": "Alle Boards kompilieren",
       "runAll": "Alle Boards ausführen",
@@ -181,32 +193,32 @@
         "title": "Arduino-Bibliotheken suchen und installieren",
         "label": "Bibliotheken"
       },
-      "import": "Projekt aus einer .zip-Datei importieren",
-      "export": "Aktuelles Projekt als .zip exportieren",
-      "uploadFirmware": "Firmware (.hex, .bin, .elf, .ihex) hochladen und Kompilierung überspringen",
+      "import": "Ein Projekt aus einer .zip-Datei importieren",
+      "export": "Das aktuelle Projekt als .zip-Datei exportieren",
+      "uploadFirmware": "Firmware hochladen (.hex, .bin, .elf, .ihex) um Kompilierung zu überspringen",
       "toggleConsole": "Ausgabekonsole umschalten",
       "libHint": {
-        "message": "Bibliothek fehlt? Installiere sie über den",
-        "cta": "Bibliotheksmanager",
+        "message": "Bibliothek fehlt? Installieren Sie sie aus dem",
+        "cta": "Bibliotheksverwaltung",
         "dismiss": "Schließen"
       }
     },
     "fileExplorer": {
       "workspace": "ARBEITSBEREICH",
-      "newWorkspace": "Neuer Arbeitsbereich (entfernt Boards, Bauteile, Drähte und Dateien)",
+      "newWorkspace": "Neuer Arbeitsbereich (löscht Boards, Komponenten, Leitungen und Dateien)",
       "saveProject": "Projekt speichern (Strg+S)",
       "clickToEdit": "zum Bearbeiten klicken",
       "collapse": "Einklappen",
-      "expand": "Aufklappen",
-      "newFileInBoard": "Neue Datei auf diesem Board",
-      "unsavedChanges": "Nicht gespeicherte Änderungen",
-      "unsavedSuffix": "nicht gespeichert",
-      "emptyState": "Füge ein Board zur Leinwand hinzu, um Code zu schreiben.",
+      "expand": "Ausklappen",
+      "newFileInBoard": "Neue Datei in diesem Board",
+      "unsavedChanges": "Ungespeicherte Änderungen",
+      "unsavedSuffix": "ungespeichert",
+      "emptyState": "Fügen Sie ein Board zur Leinwand hinzu, um mit der Codebearbeitung zu beginnen.",
       "confirmDelete": "Diese Datei löschen?",
       "status": {
         "running": "Läuft",
         "compiled": "Kompiliert",
-        "idle": "Inaktiv"
+        "idle": "Bereit"
       },
       "contextMenu": {
         "rename": "Umbenennen",
@@ -214,15 +226,15 @@
       }
     },
     "fileTabs": {
-      "unsavedChanges": "Nicht gespeicherte Änderungen",
+      "unsavedChanges": "Ungespeicherte Änderungen",
       "close": "Schließen",
-      "confirmClose": "Datei mit nicht gespeicherten Änderungen schließen?",
+      "confirmClose": "Datei mit ungespeicherten Änderungen schließen?",
       "closeAnyway": "Trotzdem schließen",
       "cancel": "Abbrechen"
     },
     "loginPrompt": {
-      "title": "Anmelden, um dein Projekt zu speichern",
-      "body": "Erstelle ein kostenloses Konto, um deine Projekte zu speichern und zu teilen.",
+      "title": "Melden Sie sich an, um Ihr Projekt zu speichern",
+      "body": "Erstellen Sie ein kostenloses Konto, um Ihre Projekte zu speichern und zu teilen.",
       "createAccount": "Konto erstellen",
       "cancel": "Abbrechen"
     },
@@ -235,18 +247,18 @@
       "descriptionPlaceholder": "Optional",
       "save": "Speichern",
       "update": "Aktualisieren",
-      "saving": "Wird gespeichert…",
+      "saving": "Speichern…",
       "cancel": "Abbrechen",
       "visibility": {
         "public": "Öffentlich",
-        "publicHint": "Jeder mit dem Link kann es sehen",
+        "publicHint": "Jeder mit dem Link kann es ansehen",
         "private": "Privat",
-        "privateHint": "Nur du kannst es sehen"
+        "privateHint": "Nur Sie können dies sehen"
       },
       "errors": {
         "nameRequired": "Projektname ist erforderlich.",
-        "unreachable": "Server nicht erreichbar. Verbindung prüfen und erneut versuchen.",
-        "notAuth": "Nicht angemeldet. Bitte anmelden und erneut versuchen.",
+        "unreachable": "Server nicht erreichbar. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+        "notAuth": "Nicht authentifiziert. Bitte melden Sie sich an und versuchen Sie es erneut.",
         "failedStatus": "Speichern fehlgeschlagen ({{status}})."
       }
     },
@@ -254,12 +266,12 @@
       "title": "Projekt teilen",
       "public": "Öffentlich",
       "private": "Privat",
-      "publicHint": "Jeder mit dem Link kann dieses Projekt sehen",
-      "privateHint": "Nur du kannst dieses Projekt sehen",
-      "makePrivate": "Auf privat setzen",
-      "makePublic": "Auf öffentlich setzen",
+      "publicHint": "Jeder mit dem Link kann dieses Projekt ansehen",
+      "privateHint": "Nur Sie können dieses Projekt sehen",
+      "makePrivate": "Privat machen",
+      "makePublic": "Öffentlich machen",
       "copy": "Kopieren",
-      "privateWarning": "Dieses Projekt ist privat. Andere sehen beim Öffnen des Links einen 403-Fehler.",
+      "privateWarning": "Dieses Projekt ist privat. Andere sehen einen 403-Fehler, wenn sie diesen Link öffnen.",
       "close": "Schließen"
     },
     "canvas": {
@@ -269,78 +281,78 @@
       },
       "activeBoard": "Aktives Board",
       "noBoard": "Kein Board",
-      "noBoardHint": "Kein Board auf der Leinwand — füge eines über den Hinzufügen-Button hinzu, um Code zu kompilieren und auszuführen",
+      "noBoardHint": "Kein Board auf der Leinwand – fügen Sie eines mit der Schaltfläche 'Hinzufügen' hinzu, um Code zu kompilieren und auszuführen",
       "undo": {
         "label": "Rückgängig",
         "title": "Rückgängig: {{description}} (Strg+Z)",
         "empty": "Nichts rückgängig zu machen"
       },
       "redo": {
-        "label": "Wiederherstellen",
-        "title": "Wiederherstellen: {{description}} (Strg+Y)",
-        "empty": "Nichts wiederherzustellen"
+        "label": "Wiederholen",
+        "title": "Wiederholen: {{description}} (Strg+Y)",
+        "empty": "Nichts zu wiederholen"
       },
-      "toggleSerialMonitor": "Serial Monitor umschalten",
-      "serial": "Serial",
+      "toggleSerialMonitor": "Seriellen Monitor umschalten",
+      "serial": "Seriell",
       "toggleScope": "Oszilloskop / Logikanalysator umschalten",
-      "scope": "Scope",
+      "scope": "Oszilloskop",
       "zoomIn": "Vergrößern",
       "zoomOut": "Verkleinern",
-      "resetView": "Ansicht zurücksetzen (klicken zum Zurücksetzen)",
-      "componentCount_one": "{{count}} Bauteil",
-      "componentCount_other": "{{count}} Bauteile",
-      "addComponentTitle": "Bauteil hinzufügen",
+      "resetView": "Ansicht zurücksetzen (zum Zurücksetzen klicken)",
+      "componentCount_one": "{{count}} Komponente",
+      "componentCount_other": "{{count}} Komponenten",
+      "addComponentTitle": "Komponente hinzufügen",
       "add": "Hinzufügen",
       "dismiss": "Schließen",
       "removeBoard": "Board entfernen",
-      "wireCount_one": "{{count}} Draht",
-      "wireCount_other": "{{count}} Drähte",
+      "wireCount_one": "{{count}} Leitung",
+      "wireCount_other": "{{count}} Leitungen",
       "removeConfirm": {
         "boardFallback": "Board",
         "title": "{{label}} entfernen?",
-        "body": "Das Board wird aus dem Arbeitsbereich entfernt. Dieser Vorgang kann nicht rückgängig gemacht werden.",
-        "bodyWithWires_one": "Das Board wird aus dem Arbeitsbereich entfernt zusammen mit {{count}} verbundenen Draht. Dieser Vorgang kann nicht rückgängig gemacht werden.",
-        "bodyWithWires_other": "Das Board wird aus dem Arbeitsbereich entfernt zusammen mit {{count}} verbundenen Drähten. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+        "body": "Dadurch wird das Board aus dem Arbeitsbereich entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "bodyWithWires_one": "Dadurch wird das Board aus dem Arbeitsbereich und {{count}} verbundene Leitung entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "bodyWithWires_other": "Dadurch wird das Board aus dem Arbeitsbereich und {{count}} verbundene Leitungen entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
         "cancel": "Abbrechen",
         "remove": "Entfernen"
       }
     },
     "componentPicker": {
-      "title": "Bauteil hinzufügen",
+      "title": "Komponente hinzufügen",
       "close": "Schließen",
-      "searchPlaceholder": "Bauteile suchen...",
-      "clearSearch": "Suche zurücksetzen",
-      "allComponents": "Alle Bauteile",
+      "searchPlaceholder": "Komponenten durchsuchen...",
+      "clearSearch": "Suche löschen",
+      "allComponents": "Alle Komponenten",
       "boards": "Boards",
-      "loading": "Bauteile werden geladen...",
-      "noResults": "Keine Bauteile gefunden",
-      "clearFilters": "Filter zurücksetzen"
+      "loading": "Komponenten werden geladen...",
+      "noResults": "Keine Komponenten gefunden",
+      "clearFilters": "Filter löschen"
     },
     "libraryManager": {
-      "title": "BIBLIOTHEKSMANAGER",
+      "title": "BIBLIOTHEKSVERWALTUNG",
       "searchTab": "Suchen",
       "installedTab": "Installiert",
       "filterPlaceholder": "Suche filtern...",
-      "searchingFor": "Suche nach „{{query}}\"…",
+      "searchingFor": "Suche nach \"{{query}}\"…",
       "loadingLibraries": "Bibliotheken werden geladen…",
       "noResults": "Keine Bibliotheken verfügbar",
-      "noResultsFor": "Keine Bibliotheken für „{{query}}\" gefunden",
+      "noResultsFor": "Keine Bibliotheken für \"{{query}}\" gefunden",
       "byAuthor": "von {{author}}",
       "install": "INSTALLIEREN",
-      "installing": "Wird installiert...",
+      "installing": "Installiere...",
       "uninstall": "DEINSTALLIEREN",
-      "uninstalling": "Wird deinstalliert...",
+      "uninstalling": "Deinstalliere...",
       "loadingInstalled": "Installierte Bibliotheken werden geladen...",
       "noneInstalled": "Noch keine Bibliotheken installiert.",
-      "useSearchTab": "Nutze den Tab Suchen, um Bibliotheken zu installieren."
+      "useSearchTab": "Verwenden Sie die Registerkarte 'Suchen', um Bibliotheken zu installieren."
     },
     "installLibs": {
       "title": "ERFORDERLICHE BIBLIOTHEKEN",
       "installingProgress": "Installiere {{done}} von {{total}}…",
       "allDone": "Alle Bibliotheken erfolgreich installiert",
-      "required_one": "Dieses Projekt benötigt {{count}} Bibliothek. Installiere sie, um korrekt zu kompilieren.",
-      "required_other": "Dieses Projekt benötigt {{count}} Bibliotheken. Installiere sie, um korrekt zu kompilieren.",
-      "wokwiHosted": "Von Wokwi gehostete Bibliothek",
+      "required_one": "Dieses Projekt benötigt {{count}} Bibliothek. Installieren Sie sie, um korrekt zu kompilieren.",
+      "required_other": "Dieses Projekt benötigt {{count}} Bibliotheken. Installieren Sie sie, um korrekt zu kompilieren.",
+      "wokwiHosted": "Wokwi-gehostete Bibliothek",
       "pending": "ausstehend",
       "installing": "installiere…",
       "installed": "installiert",
@@ -350,24 +362,98 @@
       "installAll": "Alle installieren ({{count}})",
       "installingShort": "Installiere…"
     },
+    "oscilloscope": {
+      "title": "Oszilloskop",
+      "addChannelTitle": "Einen Pin-Kanal hinzufügen",
+      "addChannel": "Kanal hinzufügen",
+      "timeDiv": "Zeit/Teil:",
+      "pauseTitle": "Aufnahme pausieren",
+      "resumeTitle": "Aufnahme fortsetzen",
+      "pause": "Pause",
+      "run": "Starten",
+      "clearTitle": "Alle aufgezeichneten Samples löschen",
+      "clear": "Löschen",
+      "noChannels": "Keine Kanäle hinzugefügt.",
+      "noChannelsHint": "Klicken Sie auf \"+ Kanal hinzufügen\", um einen Pin zu überwachen.",
+      "removeChannel": "{{label}} entfernen"
+    },
+    "componentProps": {
+      "close": "Schließen",
+      "tapToConnect": "Tippen Sie auf einen Pin, um zu verbinden:",
+      "tapToWire": "Tippen Sie auf einen Pin, um zu verdrahten:",
+      "pinRoles": "Pin-Rollen:",
+      "arduinoPin": "Arduino-Pin:",
+      "confirmDelete": "{{name}} löschen?",
+      "confirmDeleteTitle": "Löschen bestätigen",
+      "deleteTitle": "Komponente löschen",
+      "rotate90": "90° drehen",
+      "rotate": "Drehen",
+      "delete": "Löschen",
+      "cancel": "Abbrechen"
+    },
+    "selectionBar": {
+      "label": "Auswahlaktionen",
+      "rotate90": "90° drehen",
+      "rotate": "Drehen",
+      "delete": "Löschen",
+      "deselect": "Auswahl aufheben",
+      "deleteKind": {
+        "wire": "Leitung löschen",
+        "component": "Komponente löschen",
+        "board": "Board löschen"
+      }
+    },
+    "console": {
+      "title": "Ausgabe",
+      "errorCount_one": "{{count}} Fehler",
+      "errorCount_other": "{{count}} Fehler",
+      "warningCount_one": "{{count}} Warnung",
+      "warningCount_other": "{{count}} Warnungen",
+      "filterAll": "Alle",
+      "filterErrors": "Fehler",
+      "filterWarnings": "Warnungen",
+      "auto": "Auto",
+      "clear": "Ausgabe löschen",
+      "close": "Schließen",
+      "empty": "Noch keine Kompilierungsausgabe. Klicken Sie auf 'Kompilieren', um zu beginnen."
+    },
+    "boardPicker": {
+      "title": "Board hinzufügen"
+    },
+    "sensorPanel": {
+      "close": "Schließen"
+    },
+    "customChip": {
+      "title": "Benutzerdefinierter Chip — {{chipName}}",
+      "tabExamples": "Beispiele",
+      "tabEditor": "Editor",
+      "attributes": "Attribute",
+      "compiling": "Kompiliere…",
+      "compile": "Kompilieren",
+      "compiledOk": "✓ Kompiliert — {{kb}} KB",
+      "compileFailed": "Kompilierung fehlgeschlagen",
+      "cancel": "Abbrechen",
+      "savePlace": "Speichern & Platzieren",
+      "compileFirst": "Zuerst kompilieren"
+    },
     "serial": {
-      "title": "Serial Monitor",
-      "addBoard": "Füge ein Board hinzu, um den Serial Monitor zu starten.",
-      "autoscroll": "Auto-Scroll",
-      "clearTitle": "Ausgabe dieses Boards löschen",
+      "title": "Serieller Monitor",
+      "addBoard": "Fügen Sie ein Board hinzu, um den seriellen Monitor zu starten.",
+      "autoscroll": "Autoscroll",
+      "clearTitle": "Ausgabe für dieses Board löschen",
       "clear": "Löschen",
       "send": "Senden",
-      "iotGatewayTitle": "Klicken, um über IoT Gateway zu öffnen",
-      "openIotGateway": "IoT Gateway öffnen",
+      "iotGatewayTitle": "Klicken, um über IoT-Gateway zu öffnen",
+      "openIotGateway": "IoT-Gateway öffnen",
       "waitingData": "Warte auf serielle Daten...",
-      "startSim": "Starte die Simulation, um serielle Ausgabe zu sehen.",
+      "startSim": "Starten Sie die Simulation, um die serielle Ausgabe zu sehen.",
       "placeholderText": "Nachricht zum Senden eingeben...",
-      "placeholderPython": "Python-Ausdruck eingeben... (Strg+C zum Abbrechen)",
+      "placeholderPython": "Python-Ausdruck eingeben... (Strg+C zum Unterbrechen)",
       "lineEnd": {
         "none": "Kein Zeilenende",
-        "nl": "Zeilenumbruch",
+        "nl": "Neue Zeile",
         "cr": "Wagenrücklauf",
-        "both": "NL und CR"
+        "both": "Beide NL & CR"
       }
     }
   }

@@ -47,6 +47,7 @@ export const SensorControlPanel: React.FC<SensorControlPanelProps> = ({
   sensorName,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const def = SENSOR_CONTROLS[metadataId];
 
   // Local slider/button state — initialised from config defaults
@@ -151,7 +152,7 @@ export const SensorControlPanel: React.FC<SensorControlPanelProps> = ({
     <div className="sensor-control-panel" onClick={(e) => e.stopPropagation()}>
       <div className="sensor-panel-header">
         <span className="sensor-panel-title">{sensorName || def.title}</span>
-        <button className="sensor-panel-close" onClick={onClose} title="Close">
+        <button className="sensor-panel-close" onClick={onClose} title={t('editor.sensorPanel.close')}>
           ×
         </button>
       </div>

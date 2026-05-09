@@ -1,13 +1,13 @@
 {
   "header": {
-    "skipToContent": "コンテンツへスキップ",
+    "skipToContent": "コンテンツにスキップ",
     "openMenu": "メニューを開く",
     "closeMenu": "メニューを閉じる",
     "nav": {
       "home": "ホーム",
       "documentation": "ドキュメント",
-      "examples": "サンプル",
-      "editor": "エディタ",
+      "examples": "作例",
+      "editor": "エディター",
       "about": "概要",
       "blog": "ブログ",
       "github": "GitHub",
@@ -23,79 +23,80 @@
     "search": "検索"
   },
   "footer": {
-    "about": "Velxio は、ブラウザ上で完全に動作する無料のオープンソース回路・マイクロコントローラシミュレータです。Arduino、ESP32、RP2040、ATtiny85 に対応し、SPICE 精度のアナログ協調シミュレーションを備えています。実践を通じて学ぶメイカー、学生、組み込みエンジニアのために作られました。AGPLv3。"
+    "about": "Velxio は、ブラウザ上で完全に動作する無料のオープンソース回路・マイコンシミュレーターです。Arduino、ESP32、RP2040、ATtiny85 に対応し、SPICE 精度のアナログ同時シミュレーションを提供します。メーカー、学生、組み込みエンジニアが学びながら実践できるように作られています。AGPLv3。"
   },
   "landing": {
     "hero": {
-      "titleLine1": "Arduino、ESP32、Raspberry Pi。",
-      "titleAccent": "ブラウザでそのまま。",
-      "subtitle": "コードを書いて、部品を配線し、実行ボタンを押すだけ。19 種のボード、48 以上のパーツ、本格的な CPU エミュレーション — ハードウェア不要、インストール不要、クラウド不要。",
-      "ctaPrimary": "無料でシミュレータを試す →",
+      "titleLine1": "Arduino、ESP32 & Raspberry Pi。",
+      "titleAccent": "ブラウザ上でそのまま。",
+      "subtitle": "コードを書き、部品を配線し、実行を押すだけ。19 種類のボード、48 以上の部品、リアルな CPU エミュレーション — ハードウェアもインストールもクラウドも不要。",
+      "ctaPrimary": "シミュレーターを無料で試す →",
       "ctaGithub": "GitHub で見る",
-      "trustLine": "登録不要 · ブラウザ内で 100% 動作 · 無料・オープンソース",
-      "imageAlt": "Arduino Uno の信号機回路を表示している Velxio エディタ"
+      "trustLine": "サインアップ不要 · 100% ブラウザで動作 · 無料 & オープンソース",
+      "imageAlt": "Arduino Uno 信号機回路を表示した Velxio エディター"
     },
     "boards": {
       "label": "対応ハードウェア",
       "titleLine1": "あらゆるアーキテクチャ。",
       "titleLine2": "ひとつのツール。",
-      "subtitle": "5 つの CPU アーキテクチャに対応した 19 種のボード — AVR8、ARM Cortex-M0+、RISC-V、Xtensa、Linux。すべてローカルで動作し、クラウドは不要です。"
+      "subtitle": "AVR8、ARM Cortex-M0+、RISC-V、Xtensa、Linux の 5 つの CPU アーキテクチャに対応した 19 種類のボード。すべてローカルで動作し、クラウドは不要。"
     },
     "features": {
       "label": "機能",
-      "title": "必要なものすべてを。",
-      "subtitle": "IDE、コンパイラ、マルチアーキテクチャ・シミュレータが一体に — すべてローカルで動作し、外部サービスは一切不要です。",
+      "title": "必要なものはすべて。",
+      "subtitle": "完全な IDE、コンパイラ、マルチアーキテクチャシミュレーター — 外部サービス不要でローカル動作。",
       "spice": {
         "title": "リアルタイム SPICE アナログ",
-        "desc": "ngspice-WASM エンジン — 完全な修正ノード解析を約 60 Hz で実行。抵抗、コンデンサ、オペアンプ、BJT、MOSFET、レギュレータは理想化されたモデルではなく、実シリコンのように振る舞います。"
+        "desc": "ngspice-WASM エンジン — 完全な修正節点解析を約 60 Hz で実行。抵抗、コンデンサ、オペアンプ、BJT、MOSFET、レギュレーターが理想モデルではなく実際のシリコンのように動作。"
       },
       "engines": {
         "title": "5 つのエミュレーションエンジン",
-        "desc": "AVR8（ATmega328P、ATmega2560、ATtiny85）、RP2040（ARM Cortex-M0+）、RV32IMC（QEMU 経由の ESP32-C3、CH32V003）、Xtensa LX6/LX7（QEMU 経由の ESP32）、そして ARM Cortex-A53（Raspberry Pi 3 Linux）。"
+        "desc": "AVR8 (ATmega328P、ATmega2560、ATtiny85)、RP2040 (ARM Cortex-M0+)、RV32IMC (ESP32-C3、CH32V003 via QEMU)、Xtensa LX6/LX7 (ESP32 via QEMU)、ARM Cortex-A53 (Raspberry Pi 3 Linux)。"
       },
       "customChips": {
         "title": "カスタムチップ",
-        "desc": "Wokwi Custom Chips API を使って、C、Rust、または AssemblyScript で独自の集積回路を作成できます。WebAssembly にコンパイルすればプロジェクト間で再利用できます。"
+        "desc": "Wokwi Custom Chips API を使用して、C、Rust、または AssemblyScript で独自の集積回路を作成。WebAssembly にコンパイルしてプロジェクト間で再利用可能。"
       },
       "components": {
         "title": "100 以上のコンポーネント",
         "desc": "SPICE 精度のアナログ部品に加え、48 以上の wokwi ビジュアルコンポーネント — LED、LCD、ILI9341 TFT、サーボ、ブザー、超音波センサー、キーパッド、NeoPixel ストリップ。"
       },
       "instruments": {
-        "title": "ライブ計測機器",
-        "desc": "マルチチャンネル・オシロスコープ、電圧計、電流計、信号発生器。任意のノードに配置すれば、シミュレーション実行中に波形がリアルタイムで更新されます。"
+        "title": "ライブ計測器",
+        "desc": "マルチチャンネルオシロスコープ、電圧計、電流計、信号発生器。任意のノードに配置し、シミュレーション実行中に波形がリアルタイムで更新されるのを確認。"
       },
       "monaco": {
         "title": "Monaco Editor + arduino-cli",
-        "desc": "VS Code 相当の C++ エディタとマルチファイルワークスペース。ローカルの arduino-cli が実際の .hex / .uf2 / .bin ファイルにコンパイルします — クラウドへの往復は不要です。"
+        "desc": "VS Code グレードの C++ エディター、マルチファイルワークスペース対応。ローカルの arduino-cli が実際の .hex / .uf2 / .bin ファイルにコンパイル — クラウド往復不要。"
       }
     },
     "support": {
       "title": "プロジェクトを支援する",
-      "subtitle": "Velxio は無料・オープンソースです。あなたの時間を節約できたなら、ぜひ開発の支援をご検討ください。",
+      "subtitle": "Velxio は無料でオープンソースです。時間の節約になったなら、開発支援をご検討ください。",
       "ctaSponsors": "GitHub Sponsors",
-      "ctaPaypal": "PayPal で寄付する"
+      "ctaPaypal": "PayPal で寄付"
     }
   },
   "examples": {
-    "heading": "おすすめプロジェクト",
-    "subtitle": "サンプルプロジェクトを探して実行 — ボード別に整理",
-    "searchPlaceholder": "サンプルを検索 — 例：「esp32 oled」「blink」「dht」…",
-    "searchLabel": "サンプルを検索",
+    "heading": "注目のプロジェクト",
+    "subtitle": "作例プロジェクトを探索して実行 — ボード別に整理",
+    "searchPlaceholder": "作例を検索 — 「esp32 oled」「blink」「dht」など",
+    "searchLabel": "作例を検索",
     "clearSearch": "検索をクリア",
     "clear": "クリア",
-    "matchCount_other": "{{count}} 件",
+    "matchCount_one": "{{count}} 件の一致",
+    "matchCount_other": "{{count}} 件の一致",
     "filters": {
-      "categoryLabel": "カテゴリ：",
-      "difficultyLabel": "難易度：",
+      "categoryLabel": "カテゴリ:",
+      "difficultyLabel": "難易度:",
       "category": {
         "all": "すべて",
-        "basics": "基礎",
+        "basics": "基本",
         "sensors": "センサー",
         "displays": "ディスプレイ",
         "communication": "通信",
         "games": "ゲーム",
-        "robotics": "ロボティクス",
+        "robotics": "ロボット",
         "circuits": "回路"
       },
       "difficulty": {
@@ -106,32 +107,44 @@
       }
     },
     "copyLink": "共有リンクをコピー",
-    "empty": "選択したフィルタに一致するサンプルが見つかりません",
-    "emptyForQuery": "「{{query}}」に一致するサンプルが見つかりません（選択したフィルタ条件で）",
-    "resetFilters": "フィルタをリセット",
-    "installing": "ライブラリをインストール中（{{done}}/{{total}}）"
+    "empty": "選択したフィルターに一致する作例はありません",
+    "emptyForQuery": "「{{query}}」に一致する作例は、選択したフィルターでは見つかりませんでした",
+    "resetFilters": "フィルターをリセット",
+    "installing": "ライブラリをインストール中 ({{done}}/{{total}})"
   },
   "about": {
     "hero": {
       "title": "Velxio について",
-      "subtitle": "ハードウェアとオープンソースに情熱を注ぐ一人の開発者が作り上げた、無料・オープンソースの組み込みシステムエミュレータです。"
+      "subtitle": "無料のオープンソース組み込みシステムエミュレーター — ハードウェアとオープンソースに情熱を持つ一人の開発者によって作られました。"
     },
-    "story": { "heading": "ストーリー" },
-    "howItWorks": { "heading": "仕組み" },
-    "openSource": { "heading": "オープンソースの理念" },
-    "creator": { "heading": "作者" },
-    "releases": { "heading": "最新リリース" },
-    "community": { "heading": "コミュニティとメディア" },
+    "story": {
+      "heading": "ストーリー"
+    },
+    "howItWorks": {
+      "heading": "仕組み"
+    },
+    "openSource": {
+      "heading": "オープンソースの理念"
+    },
+    "creator": {
+      "heading": "開発者"
+    },
+    "releases": {
+      "heading": "最近のリリース"
+    },
+    "community": {
+      "heading": "コミュニティ & プレス"
+    },
     "cta": {
       "title": "Velxio を試してみませんか？",
-      "subtitle": "登録不要。ブラウザだけで 100% 動作。無料・オープンソース。",
-      "openEditor": "エディタを開く"
+      "subtitle": "サインアップ不要。100% ブラウザで動作。無料でオープンソース。",
+      "openEditor": "エディターを開く"
     }
   },
   "auth": {
     "login": {
       "title": "サインイン",
-      "subtitle": "Velxio を続けるには",
+      "subtitle": "Velxio に続ける",
       "email": "メールアドレス",
       "password": "パスワード",
       "signIn": "サインイン",
@@ -139,21 +152,21 @@
       "or": "または",
       "continueGoogle": "Google で続ける",
       "noAccount": "アカウントをお持ちでないですか？",
-      "failed": "サインインに失敗しました。"
+      "failed": "ログインに失敗しました。"
     },
     "register": {
       "title": "アカウント作成",
-      "subtitle": "無料で始めましょう",
+      "subtitle": "無料で作り始める",
       "username": "ユーザー名",
-      "usernamePlaceholder": "例：alice",
+      "usernamePlaceholder": "例: alice",
       "passwordPlaceholder": "8 文字以上",
       "create": "アカウント作成",
-      "creating": "アカウントを作成中…",
+      "creating": "アカウント作成中…",
       "haveAccount": "すでにアカウントをお持ちですか？",
       "errors": {
-        "reserved": "このユーザー名は予約されています。",
-        "usernameRules": "ユーザー名は 3〜30 文字（a-z、0-9、_、-）で指定してください",
-        "passwordTooShort": "パスワードは 8 文字以上にしてください。",
+        "reserved": "そのユーザー名は予約されています。",
+        "usernameRules": "ユーザー名は 3～30 文字 (a-z、0-9、_、-) である必要があります",
+        "passwordTooShort": "パスワードは 8 文字以上である必要があります。",
         "failed": "登録に失敗しました。"
       }
     }
@@ -162,37 +175,37 @@
     "toolbar": {
       "languageMode": "言語モード",
       "compile": {
-        "addBoard": "コンパイルするにはボードを追加してください",
+        "addBoard": "コンパイルするボードを追加",
         "loading": "読み込み中…",
         "loadMicropython": "MicroPython を読み込む",
         "compile": "コンパイル (Ctrl+B)"
       },
       "run": {
-        "addBoard": "実行するにはボードを追加してください",
+        "addBoard": "実行するボードを追加",
         "runMicropython": "MicroPython を実行",
-        "run": "実行（必要に応じて自動コンパイル）"
+        "run": "実行 (必要に応じて自動コンパイル)"
       },
       "stop": "停止",
       "reset": "リセット",
       "compileAll": "すべてのボードをコンパイル",
       "runAll": "すべてのボードを実行",
       "libraries": {
-        "title": "Arduino ライブラリを検索・インストール",
+        "title": "Arduino ライブラリを検索してインストール",
         "label": "ライブラリ"
       },
       "import": ".zip ファイルからプロジェクトをインポート",
-      "export": "現在のプロジェクトを .zip としてエクスポート",
-      "uploadFirmware": "ファームウェア (.hex, .bin, .elf, .ihex) をアップロードしてコンパイルをスキップ",
-      "toggleConsole": "出力コンソールの表示切り替え",
+      "export": "現在のプロジェクトを .zip ファイルとしてエクスポート",
+      "uploadFirmware": "ファームウェア (.hex、.bin、.elf、.ihex) をアップロードしてコンパイルをスキップ",
+      "toggleConsole": "出力コンソールの表示切替",
       "libHint": {
-        "message": "ライブラリが足りませんか？こちらからインストール：",
+        "message": "ライブラリが足りませんか？",
         "cta": "ライブラリマネージャー",
         "dismiss": "閉じる"
       }
     },
     "fileExplorer": {
       "workspace": "ワークスペース",
-      "newWorkspace": "新しいワークスペース（ボード、コンポーネント、配線、ファイルをすべて削除）",
+      "newWorkspace": "新規ワークスペース (ボード、コンポーネント、配線、ファイルをクリア)",
       "saveProject": "プロジェクトを保存 (Ctrl+S)",
       "clickToEdit": "クリックして編集",
       "collapse": "折りたたむ",
@@ -200,15 +213,15 @@
       "newFileInBoard": "このボードに新規ファイル",
       "unsavedChanges": "未保存の変更",
       "unsavedSuffix": "未保存",
-      "emptyState": "キャンバスにボードを追加してコードの編集を開始しましょう。",
+      "emptyState": "キャンバスにボードを追加してコードの編集を開始してください。",
       "confirmDelete": "このファイルを削除しますか？",
       "status": {
         "running": "実行中",
         "compiled": "コンパイル済み",
-        "idle": "アイドル"
+        "idle": "待機中"
       },
       "contextMenu": {
-        "rename": "名前を変更",
+        "rename": "名前変更",
         "delete": "削除"
       }
     },
@@ -216,20 +229,20 @@
       "unsavedChanges": "未保存の変更",
       "close": "閉じる",
       "confirmClose": "未保存の変更があるファイルを閉じますか？",
-      "closeAnyway": "それでも閉じる",
+      "closeAnyway": "閉じる",
       "cancel": "キャンセル"
     },
     "loginPrompt": {
-      "title": "プロジェクトを保存するにはサインインしてください",
-      "body": "無料アカウントを作成して、プロジェクトを保存・共有しましょう。",
-      "createAccount": "アカウントを作成",
+      "title": "プロジェクトを保存するにはサインイン",
+      "body": "無料アカウントを作成してプロジェクトを保存・共有しましょう。",
+      "createAccount": "アカウント作成",
       "cancel": "キャンセル"
     },
     "saveProject": {
       "titleSave": "プロジェクトを保存",
       "titleUpdate": "プロジェクトを更新",
       "nameLabel": "プロジェクト名 *",
-      "namePlaceholder": "私の素敵なプロジェクト",
+      "namePlaceholder": "私の素晴らしいプロジェクト",
       "descriptionLabel": "説明",
       "descriptionPlaceholder": "任意",
       "save": "保存",
@@ -238,27 +251,27 @@
       "cancel": "キャンセル",
       "visibility": {
         "public": "公開",
-        "publicHint": "リンクを持つ人なら誰でも閲覧できます",
+        "publicHint": "リンクを知っている全員が閲覧可能",
         "private": "非公開",
-        "privateHint": "あなただけが閲覧できます"
+        "privateHint": "自分だけが閲覧可能"
       },
       "errors": {
         "nameRequired": "プロジェクト名は必須です。",
-        "unreachable": "サーバーに接続できません。接続を確認してもう一度お試しください。",
-        "notAuth": "認証されていません。ログインしてもう一度お試しください。",
-        "failedStatus": "保存に失敗しました（{{status}}）。"
+        "unreachable": "サーバーに接続できません。接続を確認して再試行してください。",
+        "notAuth": "認証されていません。ログインして再試行してください。",
+        "failedStatus": "保存に失敗しました ({{status}})。"
       }
     },
     "share": {
       "title": "プロジェクトを共有",
       "public": "公開",
       "private": "非公開",
-      "publicHint": "リンクを持つ人なら誰でもこのプロジェクトを閲覧できます",
-      "privateHint": "このプロジェクトはあなただけが閲覧できます",
+      "publicHint": "リンクを知っている全員がこのプロジェクトを閲覧可能",
+      "privateHint": "自分だけがこのプロジェクトを閲覧可能",
       "makePrivate": "非公開にする",
       "makePublic": "公開にする",
       "copy": "コピー",
-      "privateWarning": "このプロジェクトは非公開です。他の人がこのリンクを開くと 403 エラーが表示されます。",
+      "privateWarning": "このプロジェクトは非公開です。他のユーザーがこのリンクを開くと 403 エラーが表示されます。",
       "close": "閉じる"
     },
     "canvas": {
@@ -268,35 +281,38 @@
       },
       "activeBoard": "アクティブなボード",
       "noBoard": "ボードなし",
-      "noBoardHint": "キャンバスにボードがありません — 「追加」ボタンでボードを追加するとコードのコンパイルと実行ができます",
+      "noBoardHint": "キャンバスにボードがありません — 「追加」ボタンでボードを追加してコードをコンパイル・実行",
       "undo": {
         "label": "元に戻す",
-        "title": "元に戻す：{{description}} (Ctrl+Z)",
+        "title": "元に戻す: {{description}} (Ctrl+Z)",
         "empty": "元に戻す操作はありません"
       },
       "redo": {
         "label": "やり直し",
-        "title": "やり直し：{{description}} (Ctrl+Y)",
+        "title": "やり直し: {{description}} (Ctrl+Y)",
         "empty": "やり直す操作はありません"
       },
-      "toggleSerialMonitor": "シリアルモニタの切り替え",
+      "toggleSerialMonitor": "シリアルモニターの表示切替",
       "serial": "シリアル",
-      "toggleScope": "オシロスコープ / ロジックアナライザの切り替え",
+      "toggleScope": "オシロスコープ / ロジックアナライザーの表示切替",
       "scope": "スコープ",
-      "zoomIn": "ズームイン",
-      "zoomOut": "ズームアウト",
-      "resetView": "ビューをリセット（クリックでリセット）",
+      "zoomIn": "拡大",
+      "zoomOut": "縮小",
+      "resetView": "表示をリセット (クリックでリセット)",
+      "componentCount_one": "{{count}} 個のコンポーネント",
       "componentCount_other": "{{count}} 個のコンポーネント",
       "addComponentTitle": "コンポーネントを追加",
       "add": "追加",
       "dismiss": "閉じる",
       "removeBoard": "ボードを削除",
+      "wireCount_one": "{{count}} 本の配線",
       "wireCount_other": "{{count}} 本の配線",
       "removeConfirm": {
         "boardFallback": "ボード",
         "title": "{{label}} を削除しますか？",
-        "body": "このボードをワークスペースから削除します。この操作は取り消せません。",
-        "bodyWithWires_other": "このボードと接続された {{count}} 本の配線をワークスペースから削除します。この操作は取り消せません。",
+        "body": "ワークスペースからボードが削除されます。この操作は元に戻せません。",
+        "bodyWithWires_one": "ワークスペースからボードと {{count}} 本の接続配線が削除されます。この操作は元に戻せません。",
+        "bodyWithWires_other": "ワークスペースからボードと {{count}} 本の接続配線が削除されます。この操作は元に戻せません。",
         "cancel": "キャンセル",
         "remove": "削除"
       }
@@ -310,7 +326,7 @@
       "boards": "ボード",
       "loading": "コンポーネントを読み込み中...",
       "noResults": "コンポーネントが見つかりません",
-      "clearFilters": "フィルタをクリア"
+      "clearFilters": "フィルターをクリア"
     },
     "libraryManager": {
       "title": "ライブラリマネージャー",
@@ -320,49 +336,124 @@
       "searchingFor": "「{{query}}」を検索中…",
       "loadingLibraries": "ライブラリを読み込み中…",
       "noResults": "利用可能なライブラリがありません",
-      "noResultsFor": "「{{query}}」に該当するライブラリは見つかりません",
-      "byAuthor": "作成者：{{author}}",
+      "noResultsFor": "「{{query}}」に一致するライブラリが見つかりません",
+      "byAuthor": "作者: {{author}}",
       "install": "インストール",
       "installing": "インストール中...",
       "uninstall": "アンインストール",
       "uninstalling": "アンインストール中...",
       "loadingInstalled": "インストール済みライブラリを読み込み中...",
-      "noneInstalled": "まだライブラリはインストールされていません。",
-      "useSearchTab": "ライブラリをインストールするには「検索」タブを使用してください。"
+      "noneInstalled": "まだライブラリがインストールされていません。",
+      "useSearchTab": "「検索」タブを使用してライブラリをインストールしてください。"
     },
     "installLibs": {
       "title": "必要なライブラリ",
-      "installingProgress": "インストール中 {{done}}/{{total}}…",
+      "installingProgress": "{{total}} 中 {{done}} をインストール中…",
       "allDone": "すべてのライブラリが正常にインストールされました",
-      "required_other": "このプロジェクトには {{count}} 個のライブラリが必要です。正しくコンパイルするためにインストールしてください。",
-      "wokwiHosted": "Wokwi 提供ライブラリ",
-      "pending": "待機中",
+      "required_one": "このプロジェクトには {{count}} 個のライブラリが必要です。インストールして正しくコンパイルしてください。",
+      "required_other": "このプロジェクトには {{count}} 個のライブラリが必要です。インストールして正しくコンパイルしてください。",
+      "wokwiHosted": "Wokwi ホスト型ライブラリ",
+      "pending": "保留中",
       "installing": "インストール中…",
       "installed": "インストール済み",
       "errorStatus": "エラー",
       "close": "閉じる",
       "skip": "スキップ",
-      "installAll": "すべてインストール（{{count}}）",
+      "installAll": "すべてインストール ({{count}})",
       "installingShort": "インストール中…"
     },
+    "oscilloscope": {
+      "title": "オシロスコープ",
+      "addChannelTitle": "ピンチャンネルを追加",
+      "addChannel": "チャンネル追加",
+      "timeDiv": "時間/div:",
+      "pauseTitle": "キャプチャを一時停止",
+      "resumeTitle": "キャプチャを再開",
+      "pause": "一時停止",
+      "run": "実行",
+      "clearTitle": "キャプチャしたサンプルをすべてクリア",
+      "clear": "クリア",
+      "noChannels": "チャンネルが追加されていません。",
+      "noChannelsHint": "「+ チャンネル追加」をクリックしてピンを監視します。",
+      "removeChannel": "{{label}} を削除"
+    },
+    "componentProps": {
+      "close": "閉じる",
+      "tapToConnect": "接続するピンをタップ:",
+      "tapToWire": "配線するピンをタップ:",
+      "pinRoles": "ピンの役割:",
+      "arduinoPin": "Arduino ピン:",
+      "confirmDelete": "{{name}} を削除しますか？",
+      "confirmDeleteTitle": "削除の確認",
+      "deleteTitle": "コンポーネントを削除",
+      "rotate90": "90° 回転",
+      "rotate": "回転",
+      "delete": "削除",
+      "cancel": "キャンセル"
+    },
+    "selectionBar": {
+      "label": "選択アクション",
+      "rotate90": "90° 回転",
+      "rotate": "回転",
+      "delete": "削除",
+      "deselect": "選択解除",
+      "deleteKind": {
+        "wire": "配線を削除",
+        "component": "コンポーネントを削除",
+        "board": "ボードを削除"
+      }
+    },
+    "console": {
+      "title": "出力",
+      "errorCount_one": "{{count}} 個のエラー",
+      "errorCount_other": "{{count}} 個のエラー",
+      "warningCount_one": "{{count}} 個の警告",
+      "warningCount_other": "{{count}} 個の警告",
+      "filterAll": "すべて",
+      "filterErrors": "エラー",
+      "filterWarnings": "警告",
+      "auto": "自動",
+      "clear": "出力をクリア",
+      "close": "閉じる",
+      "empty": "まだコンパイル出力がありません。「コンパイル」をクリックして開始してください。"
+    },
+    "boardPicker": {
+      "title": "ボードを追加"
+    },
+    "sensorPanel": {
+      "close": "閉じる"
+    },
+    "customChip": {
+      "title": "カスタムチップ — {{chipName}}",
+      "tabExamples": "作例",
+      "tabEditor": "エディター",
+      "attributes": "属性",
+      "compiling": "コンパイル中…",
+      "compile": "コンパイル",
+      "compiledOk": "✓ コンパイル完了 — {{kb}} KB",
+      "compileFailed": "コンパイル失敗",
+      "cancel": "キャンセル",
+      "savePlace": "保存して配置",
+      "compileFirst": "先にコンパイルしてください"
+    },
     "serial": {
-      "title": "シリアルモニタ",
-      "addBoard": "シリアルモニタを開始するにはボードを追加してください。",
+      "title": "シリアルモニター",
+      "addBoard": "シリアルモニターを開始するにはボードを追加してください。",
       "autoscroll": "自動スクロール",
       "clearTitle": "このボードの出力をクリア",
       "clear": "クリア",
       "send": "送信",
-      "iotGatewayTitle": "クリックで IoT Gateway 経由で開く",
-      "openIotGateway": "IoT Gateway を開く",
+      "iotGatewayTitle": "クリックして IoT ゲートウェイ経由で開く",
+      "openIotGateway": "IoT ゲートウェイを開く",
       "waitingData": "シリアルデータを待機中...",
-      "startSim": "シミュレーションを開始するとシリアル出力が表示されます。",
+      "startSim": "シミュレーションを開始してシリアル出力を確認してください。",
       "placeholderText": "送信するメッセージを入力...",
-      "placeholderPython": "Python 式を入力...（Ctrl+C で中断）",
+      "placeholderPython": "Python 式を入力... (Ctrl+C で中断)",
       "lineEnd": {
-        "none": "改行なし",
-        "nl": "LF（改行）",
-        "cr": "CR（復帰）",
-        "both": "NL と CR"
+        "none": "行末なし",
+        "nl": "改行",
+        "cr": "キャリッジリターン",
+        "both": "NL & CR 両方"
       }
     }
   }
