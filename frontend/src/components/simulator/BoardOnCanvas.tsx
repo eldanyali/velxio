@@ -30,7 +30,7 @@ const BOARD_SIZE: Record<string, { w: number; h: number }> = {
   'arduino-nano-esp32': { w: 217, h: 90 },
   'xiao-esp32-c3': { w: 91, h: 117 },
   'aitewinrobot-esp32c3-supermini': { w: 90, h: 123 },
-  attiny85: { w: 160, h: 100 },
+  attiny85: { w: 160, h: 132 },
 };
 
 interface BoardOnCanvasProps {
