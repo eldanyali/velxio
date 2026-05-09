@@ -40,10 +40,21 @@ Your support helps cover server costs, library maintenance, and frees up time to
 To self-host with Docker (single command):
 
 ```bash
-docker run -d -p 3080:80 ghcr.io/davidmonterocrespo24/velxio:master
+docker run -d -p 3080:80 \
+  -v velxio-data:/app/data \
+  -v velxio-arduino-libs:/root/.arduino15 \
+  -v velxio-arduino-user-libs:/root/Arduino \
+  -v velxio-ccache:/var/cache/ccache \
+  -v velxio-build:/var/lib/velxio-build \
+  ghcr.io/davidmonterocrespo24/velxio:master
 ```
 
 Then open <http://localhost:3080>.
+
+The named volumes are what make compile times reasonable on subsequent
+runs — without them, every container restart wipes the ESP-IDF build
+cache and the first compile after each restart takes 5-7 minutes
+instead of 5-30 seconds.
 
 ---
 
@@ -269,16 +280,35 @@ docker run -d \
   -p 3080:80 \
   -v velxio-data:/app/data \
   -v velxio-arduino-libs:/root/.arduino15 \
+  -v velxio-arduino-user-libs:/root/Arduino \
+  -v velxio-ccache:/var/cache/ccache \
+  -v velxio-build:/var/lib/velxio-build \
   ghcr.io/davidmonterocrespo24/velxio:master
 ```
 
 Open <http://localhost:3080>.
 
-The two named volumes persist:
+The five named volumes persist:
 
 - `velxio-data` → `/app/data`: SQLite DB, project sketch files, auto-generated `SECRET_KEY`
 - `velxio-arduino-libs` → `/root/.arduino15`: arduino-cli config + installed
   cores (saves a 5–10 min reinstall on every container restart)
+- `velxio-arduino-user-libs` → `/root/Arduino`: Library Manager-installed
+  Arduino libraries (e.g. Adafruit_BMP280, DHT, GFX). Without this,
+  every container restart re-downloads them on next compile.
+- `velxio-ccache` → `/var/cache/ccache`: ccache C/C++ object cache for
+  ESP-IDF compiles. Empty on first compile, populated as you go;
+  subsequent compiles hit the cache and finish in seconds instead of
+  minutes.
+- `velxio-build` → `/var/lib/velxio-build`: persistent ESP-IDF build dir
+  (one subdir per target — esp32, esp32c3, esp32s3). Lets ninja's
+  incremental build skip everything that hasn't changed; a re-compile
+  of an unchanged sketch finishes in 2-5 seconds.
+
+If you skip the volume flags, the Dockerfile declares all five paths as
+`VOLUME`, so docker creates anonymous volumes and the caches still
+survive container restarts (just harder to inspect/back up than named
+ones). Only `docker rm -v` or `docker volume prune` would wipe them.
 
 ---
 
