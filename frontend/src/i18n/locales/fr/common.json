@@ -29,10 +29,10 @@
     "hero": {
       "titleLine1": "Arduino, ESP32 & Raspberry Pi.",
       "titleAccent": "Directement dans votre navigateur.",
-      "subtitle": "Écrivez du code, connectez des composants, lancez l'exécution. 19 cartes, 48+ composants, émulation CPU réelle — sans matériel, sans installation, sans cloud.",
+      "subtitle": "Écrivez du code, câblez des composants, lancez l'exécution. 19 cartes, 48+ pièces, émulation CPU réelle — sans matériel, sans installation, sans cloud.",
       "ctaPrimary": "Essayer le simulateur gratuitement →",
       "ctaGithub": "Voir sur GitHub",
-      "trustLine": "Aucune inscription requise · Fonctionne à 100% dans votre navigateur · Gratuit et open-source",
+      "trustLine": "Aucune inscription requise · Fonctionne à 100 % dans votre navigateur · Gratuit et open-source",
       "imageAlt": "Éditeur Velxio avec circuit de feux de circulation Arduino Uno"
     },
     "boards": {
@@ -44,7 +44,7 @@
     "features": {
       "label": "Fonctionnalités",
       "title": "Tout ce dont vous avez besoin.",
-      "subtitle": "Un IDE complet, compilateur et simulateur multi-architecture — fonctionnant localement sans services externes.",
+      "subtitle": "Un IDE complet, compilateur et simulateur multi-architecture — fonctionnant localement sans services externes requis.",
       "spice": {
         "title": "Analogique SPICE en temps réel",
         "desc": "Moteur ngspice-WASM — analyse nodale modifiée complète à ~60 Hz. Résistances, condensateurs, amplificateurs opérationnels, BJT, MOSFET, régulateurs se comportent comme du silicium réel, pas des modèles idéalisés."
@@ -59,7 +59,7 @@
       },
       "components": {
         "title": "100+ composants",
-        "desc": "Pièces analogiques précises SPICE plus 48+ composants visuels wokwi — LED, LCD, écran TFT ILI9341, servos, buzzers, capteurs ultrasoniques, claviers, bandeaux NeoPixel."
+        "desc": "Pièces analogiques précises SPICE plus 48+ composants visuels wokwi — LED, écrans LCD, TFT ILI9341, servos, buzzers, capteurs ultrasoniques, claviers, bandes NeoPixel."
       },
       "instruments": {
         "title": "Instruments en direct",
@@ -77,9 +77,115 @@
       "ctaPaypal": "Faire un don via PayPal"
     }
   },
+  "profile": {
+    "newProject": "Nouveau projet",
+    "loading": "Chargement…",
+    "empty": "Aucun projet public pour le moment.",
+    "private": "Privé",
+    "copyLink": "Copier le lien de partage",
+    "notFound": "Utilisateur introuvable."
+  },
+  "pricing": {
+    "title": "Tarifs",
+    "selfHosted": "Cette instance Velxio est auto-hébergée à partir de l'image open-source — toutes les fonctionnalités sont gratuites pour tous ceux qui l'utilisent.",
+    "hostedVersion": "La version hébergée sur <link>velxio.dev</link> propose un niveau Pro optionnel qui aide à financer le développement.",
+    "sourceCode": "Le code source est <link>sous licence MIT sur GitHub</link>."
+  },
+  "admin": {
+    "loading": "Chargement…",
+    "panel": "Panneau d'administration",
+    "logout": "Déconnexion",
+    "tabs": {
+      "dashboard": "Tableau de bord",
+      "users": "Utilisateurs",
+      "projects": "Projets",
+      "boards": "Cartes"
+    },
+    "errors": {
+      "save": "Échec de l'enregistrement."
+    },
+    "editUser": {
+      "title": "Modifier l'utilisateur",
+      "username": "Nom d'utilisateur",
+      "email": "Email",
+      "newPassword": "Nouveau mot de passe (laisser vide pour conserver)",
+      "passwordPlaceholder": "Min. 8 caractères",
+      "admin": "Admin",
+      "active": "Actif",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…"
+    },
+    "setup": {
+      "title": "Configuration administrateur",
+      "body": "Aucun compte administrateur n'existe encore. Créez le premier utilisateur administrateur pour continuer.",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "passwordMismatch": "Les mots de passe ne correspondent pas.",
+      "creating": "Création…",
+      "createAdmin": "Créer l'administrateur",
+      "failed": "Échec de la création de l'administrateur."
+    },
+    "notAdmin": {
+      "title": "Accès administrateur requis",
+      "body": "Vous devez être connecté en tant qu'administrateur pour accéder à ce panneau.",
+      "goLogin": "Aller à la connexion"
+    },
+    "users": {
+      "loadFailed": "Échec du chargement des utilisateurs.",
+      "deleteFailed": "Échec de la suppression de l'utilisateur.",
+      "confirmDelete": "Supprimer l'utilisateur \"{{username}}\" et tous ses projets ? Cette action est irréversible.",
+      "searchPlaceholder": "Rechercher par nom d'utilisateur ou email…",
+      "count_one": "{{count}} utilisateur",
+      "count_other": "{{count}} utilisateurs",
+      "noResults": "Aucun utilisateur trouvé.",
+      "col": {
+        "username": "Nom d'utilisateur",
+        "email": "Email",
+        "role": "Rôle",
+        "status": "Statut",
+        "projects": "Projets",
+        "compiles": "Compilations",
+        "runs": "Exécutions",
+        "boards": "Cartes",
+        "country": "Pays",
+        "lastActive": "Dernière activité",
+        "joined": "Inscrit le",
+        "actions": "Actions"
+      },
+      "actions": {
+        "activity": "Activité",
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      }
+    },
+    "projects": {
+      "loadFailed": "Échec du chargement des projets.",
+      "deleteFailed": "Échec de la suppression du projet.",
+      "confirmDelete": "Supprimer le projet \"{{name}}\" ? Cette action est irréversible.",
+      "searchPlaceholder": "Rechercher par nom ou propriétaire…",
+      "count_one": "{{count}} projet",
+      "count_other": "{{count}} projets",
+      "noResults": "Aucun projet trouvé.",
+      "private": "privé",
+      "public": "public",
+      "privateTitle": "Projet privé (vue administrateur)",
+      "col": {
+        "name": "Nom",
+        "owner": "Propriétaire",
+        "board": "Carte",
+        "visibility": "Visibilité",
+        "compiles": "Compilations",
+        "runs": "Exécutions",
+        "updates": "Mises à jour",
+        "lastCompile": "Dernière compilation",
+        "updated": "Mis à jour"
+      }
+    }
+  },
   "examples": {
     "heading": "Projets en vedette",
-    "subtitle": "Explorez et exécutez des projets d'exemple — organisés par carte",
+    "subtitle": "Explorez et exécutez des exemples de projets — organisés par carte",
     "searchPlaceholder": "Rechercher des exemples — essayez 'esp32 oled', 'blink', 'dht'…",
     "searchLabel": "Rechercher des exemples",
     "clearSearch": "Effacer la recherche",
@@ -106,7 +212,7 @@
         "advanced": "Avancé"
       }
     },
-    "copyLink": "Copier le lien partageable",
+    "copyLink": "Copier le lien de partage",
     "empty": "Aucun exemple trouvé avec les filtres sélectionnés",
     "emptyForQuery": "Aucun exemple trouvé pour \"{{query}}\" avec les filtres sélectionnés",
     "resetFilters": "Réinitialiser les filtres",
@@ -115,7 +221,7 @@
   "about": {
     "hero": {
       "title": "À propos de Velxio",
-      "subtitle": "Un émulateur de systèmes embarqués gratuit et open-source — créé par un développeur passionné de matériel et d'open source."
+      "subtitle": "Un émulateur de systèmes embarqués gratuit et open-source — créé par un développeur passionné de matériel et d'open-source."
     },
     "story": {
       "heading": "L'histoire"
@@ -124,20 +230,20 @@
       "heading": "Comment ça marche"
     },
     "openSource": {
-      "heading": "Philosophie open source"
+      "heading": "Philosophie open-source"
     },
     "creator": {
       "heading": "Le créateur"
     },
     "releases": {
-      "heading": "Versions récentes"
+      "heading": "Dernières versions"
     },
     "community": {
       "heading": "Communauté et presse"
     },
     "cta": {
       "title": "Prêt à essayer Velxio ?",
-      "subtitle": "Aucune inscription requise. Fonctionne à 100% dans votre navigateur. Gratuit et open source.",
+      "subtitle": "Aucune inscription requise. Fonctionne à 100 % dans votre navigateur. Gratuit et open-source.",
       "openEditor": "Ouvrir l'éditeur"
     }
   },
@@ -145,7 +251,7 @@
     "login": {
       "title": "Connexion",
       "subtitle": "pour continuer vers Velxio",
-      "email": "E-mail",
+      "email": "Email",
       "password": "Mot de passe",
       "signIn": "Se connecter",
       "signingIn": "Connexion en cours…",
@@ -175,13 +281,13 @@
     "toolbar": {
       "languageMode": "Mode de langage",
       "compile": {
-        "addBoard": "Ajoutez une carte pour compiler",
+        "addBoard": "Ajouter une carte pour compiler",
         "loading": "Chargement…",
         "loadMicropython": "Charger MicroPython",
         "compile": "Compiler (Ctrl+B)"
       },
       "run": {
-        "addBoard": "Ajoutez une carte pour exécuter",
+        "addBoard": "Ajouter une carte pour exécuter",
         "runMicropython": "Exécuter MicroPython",
         "run": "Exécuter (compile automatiquement si nécessaire)"
       },
@@ -205,9 +311,9 @@
     },
     "fileExplorer": {
       "workspace": "ESPACE DE TRAVAIL",
-      "newWorkspace": "Nouvel espace de travail (efface cartes, composants, fils et fichiers)",
+      "newWorkspace": "Nouvel espace de travail (efface les cartes, composants, fils et fichiers)",
       "saveProject": "Enregistrer le projet (Ctrl+S)",
-      "clickToEdit": "cliquer pour éditer",
+      "clickToEdit": "cliquer pour modifier",
       "collapse": "Réduire",
       "expand": "Développer",
       "newFileInBoard": "Nouveau fichier dans cette carte",
@@ -294,7 +400,7 @@
       },
       "toggleSerialMonitor": "Afficher/Masquer le moniteur série",
       "serial": "Série",
-      "toggleScope": "Afficher/Masquer l'oscilloscope / analyseur logique",
+      "toggleScope": "Afficher/Masquer l'oscilloscope / l'analyseur logique",
       "scope": "Scope",
       "zoomIn": "Zoom avant",
       "zoomOut": "Zoom arrière",
@@ -312,7 +418,7 @@
         "title": "Retirer {{label}} ?",
         "body": "Cela retirera la carte de l'espace de travail. Cette action est irréversible.",
         "bodyWithWires_one": "Cela retirera la carte de l'espace de travail ainsi que {{count}} fil connecté. Cette action est irréversible.",
-        "bodyWithWires_other": "Cela retirera la carte de l'espace de travail ainsi que {{count}} fils connectés. Cette action est irréversible.",
+        "bodyWithWires_other": "Cela retirera la carte de l'espace de travail ainsi que les {{count}} fils connectés. Cette action est irréversible.",
         "cancel": "Annuler",
         "remove": "Retirer"
       }
@@ -330,7 +436,7 @@
     },
     "libraryManager": {
       "title": "GESTIONNAIRE DE BIBLIOTHÈQUES",
-      "searchTab": "Recherche",
+      "searchTab": "Rechercher",
       "installedTab": "Installées",
       "filterPlaceholder": "Filtrer votre recherche...",
       "searchingFor": "Recherche de \"{{query}}\"…",
@@ -343,13 +449,13 @@
       "uninstall": "DÉSINSTALLER",
       "uninstalling": "Désinstallation...",
       "loadingInstalled": "Chargement des bibliothèques installées...",
-      "noneInstalled": "Aucune bibliothèque installée pour l'instant.",
-      "useSearchTab": "Utilisez l'onglet Recherche pour installer des bibliothèques."
+      "noneInstalled": "Aucune bibliothèque installée pour le moment.",
+      "useSearchTab": "Utilisez l'onglet Rechercher pour installer des bibliothèques."
     },
     "installLibs": {
       "title": "BIBLIOTHÈQUES REQUISES",
       "installingProgress": "Installation de {{done}} sur {{total}}…",
-      "allDone": "Toutes les bibliothèques installées avec succès",
+      "allDone": "Toutes les bibliothèques ont été installées avec succès",
       "required_one": "Ce projet nécessite {{count}} bibliothèque. Installez-la pour compiler correctement.",
       "required_other": "Ce projet nécessite {{count}} bibliothèques. Installez-les pour compiler correctement.",
       "wokwiHosted": "Bibliothèque hébergée par Wokwi",
@@ -361,6 +467,15 @@
       "skip": "Passer",
       "installAll": "Tout installer ({{count}})",
       "installingShort": "Installation…"
+    },
+    "shell": {
+      "code": "Code",
+      "both": "Les deux",
+      "circuit": "Circuit",
+      "showExplorer": "Afficher l'explorateur de fichiers",
+      "hideExplorer": "Masquer l'explorateur de fichiers",
+      "viewMode": "Mode d'affichage",
+      "dragResize": "Faire glisser pour redimensionner"
     },
     "oscilloscope": {
       "title": "Oscilloscope",
@@ -387,14 +502,14 @@
       "confirmDeleteTitle": "Confirmer la suppression",
       "deleteTitle": "Supprimer le composant",
       "rotate90": "Rotation 90°",
-      "rotate": "Pivoter",
+      "rotate": "Rotation",
       "delete": "Supprimer",
       "cancel": "Annuler"
     },
     "selectionBar": {
       "label": "Actions de sélection",
       "rotate90": "Rotation 90°",
-      "rotate": "Pivoter",
+      "rotate": "Rotation",
       "delete": "Supprimer",
       "deselect": "Désélectionner",
       "deleteKind": {
@@ -415,7 +530,7 @@
       "auto": "Auto",
       "clear": "Effacer la sortie",
       "close": "Fermer",
-      "empty": "Aucune sortie de compilation pour l'instant. Cliquez sur Compiler pour commencer."
+      "empty": "Aucune sortie de compilation pour le moment. Cliquez sur Compiler pour commencer."
     },
     "boardPicker": {
       "title": "Ajouter une carte"
@@ -433,7 +548,7 @@
       "compiledOk": "✓ Compilé — {{kb}} Ko",
       "compileFailed": "Échec de la compilation",
       "cancel": "Annuler",
-      "savePlace": "Enregistrer & Placer",
+      "savePlace": "Enregistrer et placer",
       "compileFirst": "Compiler d'abord"
     },
     "serial": {
@@ -447,7 +562,7 @@
       "openIotGateway": "Ouvrir la passerelle IoT",
       "waitingData": "En attente de données série...",
       "startSim": "Démarrez la simulation pour voir la sortie série.",
-      "placeholderText": "Tapez le message à envoyer...",
+      "placeholderText": "Tapez un message à envoyer...",
       "placeholderPython": "Tapez une expression Python... (Ctrl+C pour interrompre)",
       "lineEnd": {
         "none": "Pas de fin de ligne",

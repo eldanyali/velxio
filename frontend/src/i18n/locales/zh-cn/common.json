@@ -23,13 +23,13 @@
     "search": "搜索"
   },
   "footer": {
-    "about": "Velxio 是一款免费开源的电路与微控制器模拟器，完全在浏览器中运行。支持 Arduino、ESP32、RP2040 和 ATtiny85，并具备 SPICE 精度的模拟协同仿真。专为动手实践的学习者、学生和嵌入式工程师打造。采用 AGPLv3 许可。"
+    "about": "Velxio 是一款免费、开源的电路和微控制器模拟器，完全在浏览器中运行。支持 Arduino、ESP32、RP2040 和 ATtiny85，并具有 SPICE 精度的模拟协同仿真。专为动手实践的学习者、学生和嵌入式工程师打造。采用 AGPLv3 许可。"
   },
   "landing": {
     "hero": {
       "titleLine1": "Arduino、ESP32 和 Raspberry Pi。",
       "titleAccent": "就在你的浏览器中。",
-      "subtitle": "编写代码、连接元件、点击运行。19 种开发板、48 多个部件、真实的 CPU 仿真——无需硬件、无需安装、无需云端。",
+      "subtitle": "编写代码，连接元件，点击运行。19 块开发板、48 多个部件、真实的 CPU 仿真——无需硬件，无需安装，无需云端。",
       "ctaPrimary": "免费试用模拟器 →",
       "ctaGithub": "在 GitHub 上查看",
       "trustLine": "无需注册 · 100% 在浏览器中运行 · 免费且开源",
@@ -39,7 +39,7 @@
       "label": "支持的硬件",
       "titleLine1": "每一种架构。",
       "titleLine2": "一个工具。",
-      "subtitle": "涵盖 5 种 CPU 架构的 19 种开发板——AVR8、ARM Cortex-M0+、RISC-V、Xtensa 和 Linux。全部本地运行，无需云端。"
+      "subtitle": "涵盖 5 种 CPU 架构的 19 块开发板——AVR8、ARM Cortex-M0+、RISC-V、Xtensa 和 Linux。全部本地运行，无需云端。"
     },
     "features": {
       "label": "功能特性",
@@ -47,11 +47,11 @@
       "subtitle": "一个完整的 IDE、编译器和多架构模拟器——本地运行，无需外部服务。",
       "spice": {
         "title": "实时 SPICE 模拟",
-        "desc": "ngspice-WASM 引擎——以约 60 Hz 频率执行完整的改进节点分析。电阻、电容、运放、BJT、MOSFET、稳压器表现如同真实硅器件，而非理想化模型。"
+        "desc": "ngspice-WASM 引擎——完整的改进节点分析，约 60 Hz。电阻、电容、运放、BJT、MOSFET、稳压器表现如同真实硅器件，而非理想化模型。"
       },
       "engines": {
         "title": "5 种仿真引擎",
-        "desc": "AVR8（ATmega328P、ATmega2560、ATtiny85）、RP2040（ARM Cortex-M0+）、RV32IMC（ESP32-C3、CH32V003 通过 QEMU）、Xtensa LX6/LX7（ESP32 通过 QEMU）以及 ARM Cortex-A53（Raspberry Pi 3 Linux）。"
+        "desc": "AVR8（ATmega328P、ATmega2560、ATtiny85）、RP2040（ARM Cortex-M0+）、RV32IMC（ESP32-C3、CH32V003 通过 QEMU）、Xtensa LX6/LX7（ESP32 通过 QEMU）和 ARM Cortex-A53（Raspberry Pi 3 Linux）。"
       },
       "customChips": {
         "title": "自定义芯片",
@@ -67,20 +67,126 @@
       },
       "monaco": {
         "title": "Monaco 编辑器 + arduino-cli",
-        "desc": "VS Code 级别的 C++ 编辑器，支持多文件工作区。本地的 arduino-cli 编译生成真实的 .hex / .uf2 / .bin 文件——无需云端往返。"
+        "desc": "VS Code 级别的 C++ 编辑器，支持多文件工作区。本地 arduino-cli 编译生成真实的 .hex / .uf2 / .bin 文件——无需云端往返。"
       }
     },
     "support": {
       "title": "支持项目",
-      "subtitle": "Velxio 免费且开源。如果它为你节省了时间，请考虑支持其开发。",
+      "subtitle": "Velxio 是免费且开源的。如果它为你节省了时间，请考虑支持其开发。",
       "ctaSponsors": "GitHub Sponsors",
       "ctaPaypal": "通过 PayPal 捐赠"
+    }
+  },
+  "profile": {
+    "newProject": "新建项目",
+    "loading": "加载中…",
+    "empty": "暂无公开项目。",
+    "private": "私有",
+    "copyLink": "复制可分享链接",
+    "notFound": "未找到用户。"
+  },
+  "pricing": {
+    "title": "定价",
+    "selfHosted": "此 Velxio 实例基于开源镜像自托管——所有功能对所有用户免费。",
+    "hostedVersion": "托管版本 <link>velxio.dev</link> 提供可选的 Pro 层级，用于资助开发。",
+    "sourceCode": "源代码在 <link>GitHub 上采用 MIT 许可</link>。"
+  },
+  "admin": {
+    "loading": "加载中…",
+    "panel": "管理面板",
+    "logout": "退出登录",
+    "tabs": {
+      "dashboard": "仪表盘",
+      "users": "用户",
+      "projects": "项目",
+      "boards": "开发板"
+    },
+    "errors": {
+      "save": "保存失败。"
+    },
+    "editUser": {
+      "title": "编辑用户",
+      "username": "用户名",
+      "email": "邮箱",
+      "newPassword": "新密码（留空则保持不变）",
+      "passwordPlaceholder": "至少 8 个字符",
+      "admin": "管理员",
+      "active": "活跃",
+      "cancel": "取消",
+      "save": "保存",
+      "saving": "保存中…"
+    },
+    "setup": {
+      "title": "管理员设置",
+      "body": "尚未存在管理员账户。请创建第一个管理员用户以继续。",
+      "password": "密码",
+      "confirmPassword": "确认密码",
+      "passwordMismatch": "密码不匹配。",
+      "creating": "创建中…",
+      "createAdmin": "创建管理员",
+      "failed": "创建管理员失败。"
+    },
+    "notAdmin": {
+      "title": "需要管理员权限",
+      "body": "您必须以管理员身份登录才能访问此面板。",
+      "goLogin": "前往登录"
+    },
+    "users": {
+      "loadFailed": "加载用户失败。",
+      "deleteFailed": "删除用户失败。",
+      "confirmDelete": "删除用户 \"{{username}}\" 及其所有项目？此操作无法撤销。",
+      "searchPlaceholder": "按用户名或邮箱搜索…",
+      "count_one": "{{count}} 个用户",
+      "count_other": "{{count}} 个用户",
+      "noResults": "未找到用户。",
+      "col": {
+        "username": "用户名",
+        "email": "邮箱",
+        "role": "角色",
+        "status": "状态",
+        "projects": "项目数",
+        "compiles": "编译次数",
+        "runs": "运行次数",
+        "boards": "开发板",
+        "country": "国家",
+        "lastActive": "最后活跃",
+        "joined": "加入时间",
+        "actions": "操作"
+      },
+      "actions": {
+        "activity": "活动",
+        "edit": "编辑",
+        "delete": "删除"
+      }
+    },
+    "projects": {
+      "loadFailed": "加载项目失败。",
+      "deleteFailed": "删除项目失败。",
+      "confirmDelete": "删除项目 \"{{name}}\"？此操作无法撤销。",
+      "searchPlaceholder": "按名称或所有者搜索…",
+      "count_one": "{{count}} 个项目",
+      "count_other": "{{count}} 个项目",
+      "noResults": "未找到项目。",
+      "private": "私有",
+      "public": "公开",
+      "privateTitle": "私有项目（管理员视图）",
+      "col": {
+        "name": "名称",
+        "owner": "所有者",
+        "board": "开发板",
+        "visibility": "可见性",
+        "compiles": "编译次数",
+        "runs": "运行次数",
+        "updates": "更新次数",
+        "lastCompile": "最后编译",
+        "updated": "更新于"
+      }
     }
   },
   "examples": {
     "heading": "精选项目",
     "subtitle": "浏览并运行示例项目——按开发板分类",
-    "searchPlaceholder": "搜索示例——试试 'esp32 oled'、'blink'、'dht'……",
+    "searchPlaceholder": "搜索示例——试试 'esp32 oled'、'blink'、'dht'…",
     "searchLabel": "搜索示例",
     "clearSearch": "清除搜索",
     "clear": "清除",
@@ -108,14 +214,14 @@
     },
     "copyLink": "复制可分享链接",
     "empty": "未找到符合所选筛选条件的示例",
-    "emptyForQuery": "未找到符合 \"{{query}}\" 且满足所选筛选条件的示例",
+    "emptyForQuery": "未找到 \"{{query}}\" 且符合所选筛选条件的示例",
     "resetFilters": "重置筛选条件",
     "installing": "正在安装库 ({{done}}/{{total}})"
   },
   "about": {
     "hero": {
       "title": "关于 Velxio",
-      "subtitle": "一款免费开源的嵌入式系统模拟器——由一位热爱硬件与开源的开发者独立打造。"
+      "subtitle": "一款免费、开源的嵌入式系统仿真器——由一位热爱硬件和开源的个人开发者打造。"
     },
     "story": {
       "heading": "故事"
@@ -127,7 +233,7 @@
       "heading": "开源理念"
     },
     "creator": {
-      "heading": "创作者"
+      "heading": "创建者"
     },
     "releases": {
       "heading": "近期发布"
@@ -136,7 +242,7 @@
       "heading": "社区与媒体报道"
     },
     "cta": {
-      "title": "准备好尝试 Velxio 了吗？",
+      "title": "准备好体验 Velxio 了吗？",
       "subtitle": "无需注册。100% 在浏览器中运行。免费且开源。",
       "openEditor": "打开编辑器"
     }
@@ -148,10 +254,10 @@
       "email": "邮箱",
       "password": "密码",
       "signIn": "登录",
-      "signingIn": "正在登录…",
+      "signingIn": "登录中…",
       "or": "或",
       "continueGoogle": "使用 Google 账号继续",
-      "noAccount": "还没有账号？",
+      "noAccount": "没有账号？",
       "failed": "登录失败。"
     },
     "register": {
@@ -161,7 +267,7 @@
       "usernamePlaceholder": "例如 alice",
       "passwordPlaceholder": "至少 8 个字符",
       "create": "创建账号",
-      "creating": "正在创建账号…",
+      "creating": "创建账号中…",
       "haveAccount": "已有账号？",
       "errors": {
         "reserved": "该用户名已被保留。",
@@ -183,7 +289,7 @@
       "run": {
         "addBoard": "添加开发板以运行",
         "runMicropython": "运行 MicroPython",
-        "run": "运行（如需则自动编译）"
+        "run": "运行（如需将自动编译）"
       },
       "stop": "停止",
       "reset": "重置",
@@ -234,7 +340,7 @@
     },
     "loginPrompt": {
       "title": "登录以保存项目",
-      "body": "创建免费账号以保存和分享你的项目。",
+      "body": "创建免费账号以保存和分享您的项目。",
       "createAccount": "创建账号",
       "cancel": "取消"
     },
@@ -251,13 +357,13 @@
       "cancel": "取消",
       "visibility": {
         "public": "公开",
-        "publicHint": "拥有链接的任何人都可以查看",
+        "publicHint": "拥有链接的任何人都可查看",
         "private": "私有",
-        "privateHint": "只有你可以看到"
+        "privateHint": "仅您自己可见"
       },
       "errors": {
-        "nameRequired": "项目名称是必填项。",
-        "unreachable": "服务器不可达。请检查你的连接后重试。",
+        "nameRequired": "项目名称不能为空。",
+        "unreachable": "服务器无法访问。请检查您的连接后重试。",
         "notAuth": "未认证。请登录后重试。",
         "failedStatus": "保存失败 ({{status}})。"
       }
@@ -266,8 +372,8 @@
       "title": "分享项目",
       "public": "公开",
       "private": "私有",
-      "publicHint": "拥有链接的任何人都可以查看此项目",
-      "privateHint": "只有你可以看到此项目",
+      "publicHint": "拥有链接的任何人都可查看此项目",
+      "privateHint": "仅您自己可见此项目",
       "makePrivate": "设为私有",
       "makePublic": "设为公开",
       "copy": "复制",
@@ -281,16 +387,16 @@
       },
       "activeBoard": "当前开发板",
       "noBoard": "无开发板",
-      "noBoardHint": "画布上没有开发板——使用添加按钮添加一个以编译和运行代码",
+      "noBoardHint": "画布上无开发板——使用“添加”按钮添加开发板以编译和运行代码",
       "undo": {
         "label": "撤销",
         "title": "撤销：{{description}} (Ctrl+Z)",
-        "empty": "没有可撤销的操作"
+        "empty": "无操作可撤销"
       },
       "redo": {
         "label": "重做",
         "title": "重做：{{description}} (Ctrl+Y)",
-        "empty": "没有可重做的操作"
+        "empty": "无操作可重做"
       },
       "toggleSerialMonitor": "切换串口监视器",
       "serial": "串口",
@@ -303,7 +409,7 @@
       "componentCount_other": "{{count}} 个元件",
       "addComponentTitle": "添加元件",
       "add": "添加",
-      "dismiss": "关闭",
+      "dismiss": "忽略",
       "removeBoard": "移除开发板",
       "wireCount_one": "{{count}} 根导线",
       "wireCount_other": "{{count}} 根导线",
@@ -311,8 +417,8 @@
         "boardFallback": "开发板",
         "title": "移除 {{label}}？",
         "body": "这将从工作区中移除该开发板。此操作无法撤销。",
-        "bodyWithWires_one": "这将从工作区中移除该开发板以及 {{count}} 根连接的导线。此操作无法撤销。",
-        "bodyWithWires_other": "这将从工作区中移除该开发板以及 {{count}} 根连接的导线。此操作无法撤销。",
+        "bodyWithWires_one": "这将从工作区中移除该开发板及 {{count}} 根连接的导线。此操作无法撤销。",
+        "bodyWithWires_other": "这将从工作区中移除该开发板及 {{count}} 根连接的导线。此操作无法撤销。",
         "cancel": "取消",
         "remove": "移除"
       }
@@ -332,27 +438,27 @@
       "title": "库管理器",
       "searchTab": "搜索",
       "installedTab": "已安装",
-      "filterPlaceholder": "筛选你的搜索...",
+      "filterPlaceholder": "筛选您的搜索...",
       "searchingFor": "正在搜索 \"{{query}}\"…",
       "loadingLibraries": "正在加载库…",
-      "noResults": "没有可用的库",
-      "noResultsFor": "未找到 \"{{query}}\" 相关的库",
-      "byAuthor": "作者：{{author}}",
+      "noResults": "无可用库",
+      "noResultsFor": "未找到 \"{{query}}\" 的相关库",
+      "byAuthor": "作者 {{author}}",
       "install": "安装",
-      "installing": "正在安装...",
+      "installing": "安装中...",
       "uninstall": "卸载",
-      "uninstalling": "正在卸载...",
+      "uninstalling": "卸载中...",
       "loadingInstalled": "正在加载已安装的库...",
       "noneInstalled": "尚未安装任何库。",
-      "useSearchTab": "使用搜索选项卡来安装库。"
+      "useSearchTab": "使用“搜索”选项卡安装库。"
     },
     "installLibs": {
-      "title": "必需的库",
+      "title": "所需库",
       "installingProgress": "正在安装 {{done}}/{{total}}…",
       "allDone": "所有库已成功安装",
       "required_one": "此项目需要 {{count}} 个库。请安装它以正确编译。",
       "required_other": "此项目需要 {{count}} 个库。请安装它们以正确编译。",
-      "wokwiHosted": "Wokwi 托管的库",
+      "wokwiHosted": "Wokwi 托管库",
       "pending": "待处理",
       "installing": "安装中…",
       "installed": "已安装",
@@ -361,6 +467,15 @@
       "skip": "跳过",
       "installAll": "全部安装 ({{count}})",
       "installingShort": "安装中…"
+    },
+    "shell": {
+      "code": "代码",
+      "both": "两者",
+      "circuit": "电路",
+      "showExplorer": "显示文件浏览器",
+      "hideExplorer": "隐藏文件浏览器",
+      "viewMode": "视图模式",
+      "dragResize": "拖拽调整大小"
     },
     "oscilloscope": {
       "title": "示波器",
@@ -371,10 +486,10 @@
       "resumeTitle": "恢复捕获",
       "pause": "暂停",
       "run": "运行",
-      "clearTitle": "清除所有已捕获的样本",
+      "clearTitle": "清除所有捕获的样本",
       "clear": "清除",
       "noChannels": "未添加通道。",
-      "noChannelsHint": "点击 \"+ 添加通道\" 来监视一个引脚。",
+      "noChannelsHint": "点击“+ 添加通道”以监控引脚。",
       "removeChannel": "移除 {{label}}"
     },
     "componentProps": {
@@ -415,7 +530,7 @@
       "auto": "自动",
       "clear": "清除输出",
       "close": "关闭",
-      "empty": "尚无编译输出。点击编译开始。"
+      "empty": "尚无编译输出。点击“编译”开始。"
     },
     "boardPicker": {
       "title": "添加开发板"

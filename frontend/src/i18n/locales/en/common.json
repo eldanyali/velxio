@@ -77,6 +77,112 @@
       "ctaPaypal": "Donate via PayPal"
     }
   },
+  "profile": {
+    "newProject": "New project",
+    "loading": "Loading…",
+    "empty": "No public projects yet.",
+    "private": "Private",
+    "copyLink": "Copy shareable link",
+    "notFound": "User not found."
+  },
+  "pricing": {
+    "title": "Pricing",
+    "selfHosted": "This Velxio instance is self-hosted from the open-source image — all features are free for everyone using it.",
+    "hostedVersion": "The hosted version at <link>velxio.dev</link> offers an optional Pro tier that helps fund development.",
+    "sourceCode": "Source code is <link>MIT-licensed on GitHub</link>."
+  },
+  "admin": {
+    "loading": "Loading…",
+    "panel": "Admin panel",
+    "logout": "Logout",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "projects": "Projects",
+      "boards": "Boards"
+    },
+    "errors": {
+      "save": "Failed to save."
+    },
+    "editUser": {
+      "title": "Edit user",
+      "username": "Username",
+      "email": "Email",
+      "newPassword": "New password (leave blank to keep)",
+      "passwordPlaceholder": "Min. 8 characters",
+      "admin": "Admin",
+      "active": "Active",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…"
+    },
+    "setup": {
+      "title": "Admin setup",
+      "body": "No admin account exists yet. Create the first admin user to proceed.",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "passwordMismatch": "Passwords do not match.",
+      "creating": "Creating…",
+      "createAdmin": "Create admin",
+      "failed": "Failed to create admin."
+    },
+    "notAdmin": {
+      "title": "Admin access required",
+      "body": "You must be logged in as an admin to access this panel.",
+      "goLogin": "Go to login"
+    },
+    "users": {
+      "loadFailed": "Failed to load users.",
+      "deleteFailed": "Failed to delete user.",
+      "confirmDelete": "Delete user \"{{username}}\" and all their projects? This cannot be undone.",
+      "searchPlaceholder": "Search by username or email…",
+      "count_one": "{{count}} user",
+      "count_other": "{{count}} users",
+      "noResults": "No users found.",
+      "col": {
+        "username": "Username",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "projects": "Projects",
+        "compiles": "Compiles",
+        "runs": "Runs",
+        "boards": "Boards",
+        "country": "Country",
+        "lastActive": "Last active",
+        "joined": "Joined",
+        "actions": "Actions"
+      },
+      "actions": {
+        "activity": "Activity",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    },
+    "projects": {
+      "loadFailed": "Failed to load projects.",
+      "deleteFailed": "Failed to delete project.",
+      "confirmDelete": "Delete project \"{{name}}\"? This cannot be undone.",
+      "searchPlaceholder": "Search by name or owner…",
+      "count_one": "{{count}} project",
+      "count_other": "{{count}} projects",
+      "noResults": "No projects found.",
+      "private": "private",
+      "public": "public",
+      "privateTitle": "Private project (admin view)",
+      "col": {
+        "name": "Name",
+        "owner": "Owner",
+        "board": "Board",
+        "visibility": "Visibility",
+        "compiles": "Compiles",
+        "runs": "Runs",
+        "updates": "Updates",
+        "lastCompile": "Last compile",
+        "updated": "Updated"
+      }
+    }
+  },
   "examples": {
     "heading": "Featured Projects",
     "subtitle": "Explore and run example projects — organized by board",
@@ -349,6 +455,15 @@
       "skip": "Skip",
       "installAll": "Install All ({{count}})",
       "installingShort": "Installing…"
+    },
+    "shell": {
+      "code": "Code",
+      "both": "Both",
+      "circuit": "Circuit",
+      "showExplorer": "Show file explorer",
+      "hideExplorer": "Hide file explorer",
+      "viewMode": "View mode",
+      "dragResize": "Drag to resize"
     },
     "oscilloscope": {
       "title": "Oscilloscope",

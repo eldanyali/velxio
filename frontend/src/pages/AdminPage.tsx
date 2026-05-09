@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSEO } from '../utils/useSEO';
 import {
@@ -46,6 +47,7 @@ function EditUserModal({
   onClose: () => void;
   onSave: (id: string, body: AdminUserUpdateRequest) => Promise<void>;
 }) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState(user.username);
   const [email, setEmail] = useState(user.email);
   const [password, setPassword] = useState('');
@@ -67,7 +69,7 @@ function EditUserModal({
       await onSave(user.id, body);
       onClose();
     } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Failed to save.');
+      setError(err?.response?.data?.detail || t('admin.errors.save'));
     } finally {
       setSaving(false);
     }
@@ -76,26 +78,26 @@ function EditUserModal({
   return (
     <div style={modalStyles.overlay} onClick={onClose}>
       <div style={modalStyles.box} onClick={(e) => e.stopPropagation()}>
-        <h2 style={modalStyles.title}>Edit user</h2>
+        <h2 style={modalStyles.title}>{t('admin.editUser.title')}</h2>
         {error && <div style={modalStyles.error}>{error}</div>}
 
-        <label style={modalStyles.label}>Username</label>
+        <label style={modalStyles.label}>{t('admin.editUser.username')}</label>
         <input
           style={modalStyles.input}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
 
-        <label style={modalStyles.label}>Email</label>
+        <label style={modalStyles.label}>{t('admin.editUser.email')}</label>
         <input style={modalStyles.input} value={email} onChange={(e) => setEmail(e.target.value)} />
 
-        <label style={modalStyles.label}>New password (leave blank to keep)</label>
+        <label style={modalStyles.label}>{t('admin.editUser.newPassword')}</label>
         <input
           style={modalStyles.input}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Min. 8 characters"
+          placeholder={t('admin.editUser.passwordPlaceholder')}
         />
 
         <div style={modalStyles.checkRow}>
@@ -106,7 +108,7 @@ function EditUserModal({
             onChange={(e) => setIsAdmin(e.target.checked)}
           />
           <label htmlFor="is_admin" style={modalStyles.checkLabel}>
-            Admin
+            {t('admin.editUser.admin')}
           </label>
         </div>
 
@@ -118,16 +120,16 @@ function EditUserModal({
             onChange={(e) => setIsActive(e.target.checked)}
           />
           <label htmlFor="is_active" style={modalStyles.checkLabel}>
-            Active
+            {t('admin.editUser.active')}
           </label>
         </div>
 
         <div style={modalStyles.actions}>
           <button style={modalStyles.cancelBtn} onClick={onClose} disabled={saving}>
-            Cancel
+            {t('admin.editUser.cancel')}
           </button>
           <button style={modalStyles.saveBtn} onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving…' : 'Save'}
+            {saving ? t('admin.editUser.saving') : t('admin.editUser.save')}
           </button>
         </div>
       </div>
@@ -200,6 +202,7 @@ const modalStyles: Record<string, React.CSSProperties> = {
 // ── Setup screen ──────────────────────────────────────────────────────────────
 
 function SetupScreen({ onDone }: { onDone: () => void }) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -212,7 +215,7 @@ function SetupScreen({ onDone }: { onDone: () => void }) {
     e.preventDefault();
     setError('');
     if (password !== confirm) {
-      setError('Passwords do not match.');
+      setError(t('admin.setup.passwordMismatch'));
       return;
     }
     setLoading(true);
@@ -221,7 +224,7 @@ function SetupScreen({ onDone }: { onDone: () => void }) {
       onDone();
       navigate('/login?redirect=/admin');
     } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Failed to create admin.');
+      setError(err?.response?.data?.detail || t('admin.setup.failed'));
     } finally {
       setLoading(false);
     }
@@ -230,11 +233,11 @@ function SetupScreen({ onDone }: { onDone: () => void }) {
   return (
     <div style={s.page}>
       <div style={s.card}>
-        <h1 style={s.cardTitle}>Admin setup</h1>
-        <p style={s.muted}>No admin account exists yet. Create the first admin user to proceed.</p>
+        <h1 style={s.cardTitle}>{t('admin.setup.title')}</h1>
+        <p style={s.muted}>{t('admin.setup.body')}</p>
         {error && <div style={s.error}>{error}</div>}
         <form onSubmit={handleCreate} style={s.form}>
-          <label style={s.label}>Username</label>
+          <label style={s.label}>{t('admin.editUser.username')}</label>
           <input
             style={s.input}
             value={username}
@@ -243,7 +246,7 @@ function SetupScreen({ onDone }: { onDone: () => void }) {
             autoFocus
             placeholder="admin"
           />
-          <label style={s.label}>Email</label>
+          <label style={s.label}>{t('admin.editUser.email')}</label>
           <input
             style={s.input}
             type="email"
@@ -252,16 +255,16 @@ function SetupScreen({ onDone }: { onDone: () => void }) {
             required
             placeholder="admin@example.com"
           />
-          <label style={s.label}>Password</label>
+          <label style={s.label}>{t('admin.setup.password')}</label>
           <input
             style={s.input}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            placeholder="Min. 8 characters"
+            placeholder={t('admin.editUser.passwordPlaceholder')}
           />
-          <label style={s.label}>Confirm password</label>
+          <label style={s.label}>{t('admin.setup.confirmPassword')}</label>
           <input
             style={s.input}
             type="password"
@@ -270,7 +273,7 @@ function SetupScreen({ onDone }: { onDone: () => void }) {
             required
           />
           <button type="submit" disabled={loading} style={s.primaryBtn}>
-            {loading ? 'Creating…' : 'Create admin'}
+            {loading ? t('admin.setup.creating') : t('admin.setup.createAdmin')}
           </button>
         </form>
       </div>
@@ -281,13 +284,14 @@ function SetupScreen({ onDone }: { onDone: () => void }) {
 // ── Not-admin screen ──────────────────────────────────────────────────────────
 
 function NotAdminScreen() {
+  const { t } = useTranslation();
   return (
     <div style={s.page}>
       <div style={s.card}>
-        <h1 style={s.cardTitle}>Admin access required</h1>
-        <p style={s.muted}>You must be logged in as an admin to access this panel.</p>
+        <h1 style={s.cardTitle}>{t('admin.notAdmin.title')}</h1>
+        <p style={s.muted}>{t('admin.notAdmin.body')}</p>
         <Link to="/login?redirect=/admin" style={s.primaryBtn}>
-          Go to login
+          {t('admin.notAdmin.goLogin')}
         </Link>
       </div>
     </div>
@@ -297,6 +301,7 @@ function NotAdminScreen() {
 // ── Users tab ─────────────────────────────────────────────────────────────────
 
 function UsersTab({ currentUserId }: { currentUserId: string }) {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<AdminUserResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -308,7 +313,7 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
     setLoading(true);
     adminListUsers()
       .then(setUsers)
-      .catch(() => setError('Failed to load users.'))
+      .catch(() => setError(t('admin.users.loadFailed')))
       .finally(() => setLoading(false));
   };
 
@@ -320,13 +325,13 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
   };
 
   const handleDelete = async (user: AdminUserResponse) => {
-    if (!confirm(`Delete user "${user.username}" and all their projects? This cannot be undone.`))
+    if (!confirm(t('admin.users.confirmDelete', { username: user.username })))
       return;
     try {
       await adminDeleteUser(user.id);
       setUsers((prev) => prev.filter((u) => u.id !== user.id));
     } catch (err: any) {
-      alert(err?.response?.data?.detail || 'Failed to delete user.');
+      alert(err?.response?.data?.detail || t('admin.users.deleteFailed'));
     }
   };
 
@@ -342,34 +347,34 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
       <div style={s.searchRow}>
         <input
           style={s.searchInput}
-          placeholder="Search by username or email…"
+          placeholder={t('admin.users.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <span style={s.muted}>
-          {filtered.length} user{filtered.length !== 1 ? 's' : ''}
+          {t('admin.users.count', { count: filtered.length })}
         </span>
       </div>
 
       {loading ? (
-        <p style={s.muted}>Loading…</p>
+        <p style={s.muted}>{t('admin.loading')}</p>
       ) : (
         <div style={s.tableWrap}>
           <table style={s.table}>
             <thead>
               <tr>
-                <th style={s.th}>Username</th>
-                <th style={s.th}>Email</th>
-                <th style={s.th}>Role</th>
-                <th style={s.th}>Status</th>
-                <th style={s.th}>Projects</th>
-                <th style={s.th}>Compiles</th>
-                <th style={s.th}>Runs</th>
-                <th style={s.th}>Boards</th>
-                <th style={s.th}>Country</th>
-                <th style={s.th}>Last active</th>
-                <th style={s.th}>Joined</th>
-                <th style={s.th}>Actions</th>
+                <th style={s.th}>{t('admin.users.col.username')}</th>
+                <th style={s.th}>{t('admin.users.col.email')}</th>
+                <th style={s.th}>{t('admin.users.col.role')}</th>
+                <th style={s.th}>{t('admin.users.col.status')}</th>
+                <th style={s.th}>{t('admin.users.col.projects')}</th>
+                <th style={s.th}>{t('admin.users.col.compiles')}</th>
+                <th style={s.th}>{t('admin.users.col.runs')}</th>
+                <th style={s.th}>{t('admin.users.col.boards')}</th>
+                <th style={s.th}>{t('admin.users.col.country')}</th>
+                <th style={s.th}>{t('admin.users.col.lastActive')}</th>
+                <th style={s.th}>{t('admin.users.col.joined')}</th>
+                <th style={s.th}>{t('admin.users.col.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -427,14 +432,14 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
                     <td style={s.td}>{new Date(u.created_at).toLocaleDateString()}</td>
                     <td style={s.td}>
                       <button style={s.activityBtn} onClick={() => setActivityUser(u)}>
-                        Activity
+                        {t('admin.users.actions.activity')}
                       </button>
                       <button style={s.editBtn} onClick={() => setEditUser(u)}>
-                        Edit
+                        {t('admin.users.actions.edit')}
                       </button>
                       {u.id !== currentUserId && (
                         <button style={s.deleteBtn} onClick={() => handleDelete(u)}>
-                          Delete
+                          {t('admin.users.actions.delete')}
                         </button>
                       )}
                     </td>
@@ -444,7 +449,7 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={12} style={{ ...s.td, textAlign: 'center', color: '#666' }}>
-                    No users found.
+                    {t('admin.users.noResults')}
                   </td>
                 </tr>
               )}
@@ -471,6 +476,7 @@ function UsersTab({ currentUserId }: { currentUserId: string }) {
 // ── Projects tab ──────────────────────────────────────────────────────────────
 
 function ProjectsTab() {
+  const { t } = useTranslation();
   const [projects, setProjects] = useState<AdminProjectResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -479,17 +485,17 @@ function ProjectsTab() {
   useEffect(() => {
     adminListProjects()
       .then(setProjects)
-      .catch(() => setError('Failed to load projects.'))
+      .catch(() => setError(t('admin.projects.loadFailed')))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   const handleDelete = async (project: AdminProjectResponse) => {
-    if (!confirm(`Delete project "${project.name}"? This cannot be undone.`)) return;
+    if (!confirm(t('admin.projects.confirmDelete', { name: project.name }))) return;
     try {
       await adminDeleteProject(project.id);
       setProjects((prev) => prev.filter((p) => p.id !== project.id));
     } catch (err: any) {
-      alert(err?.response?.data?.detail || 'Failed to delete project.');
+      alert(err?.response?.data?.detail || t('admin.projects.deleteFailed'));
     }
   };
 
@@ -505,32 +511,32 @@ function ProjectsTab() {
       <div style={s.searchRow}>
         <input
           style={s.searchInput}
-          placeholder="Search by name or owner…"
+          placeholder={t('admin.projects.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <span style={s.muted}>
-          {filtered.length} project{filtered.length !== 1 ? 's' : ''}
+          {t('admin.projects.count', { count: filtered.length })}
         </span>
       </div>
 
       {loading ? (
-        <p style={s.muted}>Loading…</p>
+        <p style={s.muted}>{t('admin.loading')}</p>
       ) : (
         <div style={s.tableWrap}>
           <table style={s.table}>
             <thead>
               <tr>
-                <th style={s.th}>Name</th>
-                <th style={s.th}>Owner</th>
-                <th style={s.th}>Board</th>
-                <th style={s.th}>Visibility</th>
-                <th style={s.th}>Compiles</th>
-                <th style={s.th}>Runs</th>
-                <th style={s.th}>Updates</th>
-                <th style={s.th}>Last compile</th>
-                <th style={s.th}>Updated</th>
-                <th style={s.th}>Actions</th>
+                <th style={s.th}>{t('admin.projects.col.name')}</th>
+                <th style={s.th}>{t('admin.projects.col.owner')}</th>
+                <th style={s.th}>{t('admin.projects.col.board')}</th>
+                <th style={s.th}>{t('admin.projects.col.visibility')}</th>
+                <th style={s.th}>{t('admin.projects.col.compiles')}</th>
+                <th style={s.th}>{t('admin.projects.col.runs')}</th>
+                <th style={s.th}>{t('admin.projects.col.updates')}</th>
+                <th style={s.th}>{t('admin.projects.col.lastCompile')}</th>
+                <th style={s.th}>{t('admin.projects.col.updated')}</th>
+                <th style={s.th}>{t('admin.users.col.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -541,7 +547,7 @@ function ProjectsTab() {
                       to={`/project/${p.id}`}
                       style={{ color: '#4fc3f7', textDecoration: 'none' }}
                       target="_blank"
-                      title={p.is_public ? undefined : 'Private project (admin view)'}
+                      title={p.is_public ? undefined : t('admin.projects.privateTitle')}
                     >
                       {p.name}
                       {!p.is_public && <span style={s.lockIcon}> 🔒</span>}
@@ -559,7 +565,7 @@ function ProjectsTab() {
                   <td style={s.td}>{p.board_type}</td>
                   <td style={s.td}>
                     <span style={p.is_public ? s.activeBadge : s.inactiveBadge}>
-                      {p.is_public ? 'public' : 'private'}
+                      {p.is_public ? t('admin.projects.public') : t('admin.projects.private')}
                     </span>
                   </td>
                   <td style={s.td}>
@@ -574,7 +580,7 @@ function ProjectsTab() {
                   <td style={s.td}>{new Date(p.updated_at).toLocaleDateString()}</td>
                   <td style={s.td}>
                     <button style={s.deleteBtn} onClick={() => handleDelete(p)}>
-                      Delete
+                      {t('admin.users.actions.delete')}
                     </button>
                   </td>
                 </tr>
@@ -582,7 +588,7 @@ function ProjectsTab() {
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={10} style={{ ...s.td, textAlign: 'center', color: '#666' }}>
-                    No projects found.
+                    {t('admin.projects.noResults')}
                   </td>
                 </tr>
               )}
@@ -597,6 +603,7 @@ function ProjectsTab() {
 // ── Admin dashboard ───────────────────────────────────────────────────────────
 
 function AdminDashboard() {
+  const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('dashboard');
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
@@ -615,12 +622,12 @@ function AdminDashboard() {
             Velxio
           </Link>
           <span style={s.headerSep}>/</span>
-          <span style={s.headerTitle}>Admin panel</span>
+          <span style={s.headerTitle}>{t('admin.panel')}</span>
         </div>
         <div style={s.headerRight}>
           <span style={s.adminLabel}>{user?.username}</span>
           <button style={s.logoutBtn} onClick={handleLogout}>
-            Logout
+            {t('admin.logout')}
           </button>
         </div>
       </div>
@@ -630,22 +637,22 @@ function AdminDashboard() {
           style={tab === 'dashboard' ? s.tabActive : s.tabBtn}
           onClick={() => setTab('dashboard')}
         >
-          Dashboard
+          {t('admin.tabs.dashboard')}
         </button>
         <button style={tab === 'users' ? s.tabActive : s.tabBtn} onClick={() => setTab('users')}>
-          Users
+          {t('admin.tabs.users')}
         </button>
         <button
           style={tab === 'projects' ? s.tabActive : s.tabBtn}
           onClick={() => setTab('projects')}
         >
-          Projects
+          {t('admin.tabs.projects')}
         </button>
         <button
           style={tab === 'boards' ? s.tabActive : s.tabBtn}
           onClick={() => setTab('boards')}
         >
-          Boards
+          {t('admin.tabs.boards')}
         </button>
       </div>
       <div data-velxio-slot="admin-tab-content" />

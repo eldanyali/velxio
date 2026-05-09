@@ -32,7 +32,7 @@
       "subtitle": "Escribe código, conecta componentes, pulsa ejecutar. 19 placas, más de 48 componentes, emulación real de CPU — sin hardware, sin instalación, sin nube.",
       "ctaPrimary": "Probar el simulador gratis →",
       "ctaGithub": "Ver en GitHub",
-      "trustLine": "Sin registro necesario · Funciona 100% en tu navegador · Gratuito y de código abierto",
+      "trustLine": "Sin registro necesario · Funciona al 100% en tu navegador · Gratuito y de código abierto",
       "imageAlt": "Editor de Velxio con circuito de semáforo en Arduino Uno"
     },
     "boards": {
@@ -44,10 +44,10 @@
     "features": {
       "label": "Características",
       "title": "Todo lo que necesitas.",
-      "subtitle": "Un IDE completo, compilador y simulador multiarquitectura — funciona localmente sin servicios externos.",
+      "subtitle": "Un IDE completo, compilador y simulador multiarquitectura — que funciona localmente sin necesidad de servicios externos.",
       "spice": {
         "title": "Analógico SPICE en tiempo real",
-        "desc": "Motor ngspice-WASM — Análisis Modal Completo a ~60 Hz. Resistencias, condensadores, amplificadores operacionales, BJT, MOSFET, reguladores se comportan como silicio real, no como modelos idealizados."
+        "desc": "Motor ngspice-WASM: análisis nodal modificado completo a ~60 Hz. Resistencias, condensadores, amplificadores operacionales, BJT, MOSFET, reguladores se comportan como silicio real, no como modelos idealizados."
       },
       "engines": {
         "title": "5 motores de emulación",
@@ -59,7 +59,7 @@
       },
       "components": {
         "title": "Más de 100 componentes",
-        "desc": "Componentes analógicos precisos con SPICE y más de 48 componentes visuales de wokwi: LEDs, LCD, pantalla TFT ILI9341, servos, zumbadores, sensores ultrasónicos, teclados, tiras de NeoPixel."
+        "desc": "Componentes analógicos precisos con SPICE y más de 48 componentes visuales de wokwi: LED, LCD, pantalla TFT ILI9341, servos, zumbadores, sensores ultrasónicos, teclados, tiras de NeoPixel."
       },
       "instruments": {
         "title": "Instrumentos en vivo",
@@ -67,7 +67,7 @@
       },
       "monaco": {
         "title": "Editor Monaco + arduino-cli",
-        "desc": "Editor C++ de nivel VS Code con espacio de trabajo de varios archivos. arduino-cli local compila a archivos .hex / .uf2 / .bin reales — sin viaje de ida y vuelta a la nube."
+        "desc": "Editor de C++ de nivel VS Code con espacio de trabajo de varios archivos. arduino-cli local compila a archivos .hex / .uf2 / .bin reales — sin viaje de ida y vuelta a la nube."
       }
     },
     "support": {
@@ -75,6 +75,112 @@
       "subtitle": "Velxio es gratuito y de código abierto. Si te ahorra tiempo, considera apoyar su desarrollo.",
       "ctaSponsors": "GitHub Sponsors",
       "ctaPaypal": "Donar mediante PayPal"
+    }
+  },
+  "profile": {
+    "newProject": "Nuevo proyecto",
+    "loading": "Cargando…",
+    "empty": "Aún no hay proyectos públicos.",
+    "private": "Privado",
+    "copyLink": "Copiar enlace compartible",
+    "notFound": "Usuario no encontrado."
+  },
+  "pricing": {
+    "title": "Precios",
+    "selfHosted": "Esta instancia de Velxio está autoalojada desde la imagen de código abierto: todas las funciones son gratuitas para todos los que la usan.",
+    "hostedVersion": "La versión alojada en <link>velxio.dev</link> ofrece un nivel Pro opcional que ayuda a financiar el desarrollo.",
+    "sourceCode": "El código fuente tiene <link>licencia MIT en GitHub</link>."
+  },
+  "admin": {
+    "loading": "Cargando…",
+    "panel": "Panel de administración",
+    "logout": "Cerrar sesión",
+    "tabs": {
+      "dashboard": "Panel",
+      "users": "Usuarios",
+      "projects": "Proyectos",
+      "boards": "Placas"
+    },
+    "errors": {
+      "save": "Error al guardar."
+    },
+    "editUser": {
+      "title": "Editar usuario",
+      "username": "Nombre de usuario",
+      "email": "Correo electrónico",
+      "newPassword": "Nueva contraseña (déjalo en blanco para mantenerla)",
+      "passwordPlaceholder": "Mín. 8 caracteres",
+      "admin": "Administrador",
+      "active": "Activo",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando…"
+    },
+    "setup": {
+      "title": "Configuración de administrador",
+      "body": "Aún no existe ninguna cuenta de administrador. Crea el primer usuario administrador para continuar.",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "passwordMismatch": "Las contraseñas no coinciden.",
+      "creating": "Creando…",
+      "createAdmin": "Crear administrador",
+      "failed": "Error al crear el administrador."
+    },
+    "notAdmin": {
+      "title": "Se requiere acceso de administrador",
+      "body": "Debes haber iniciado sesión como administrador para acceder a este panel.",
+      "goLogin": "Ir a iniciar sesión"
+    },
+    "users": {
+      "loadFailed": "Error al cargar los usuarios.",
+      "deleteFailed": "Error al eliminar el usuario.",
+      "confirmDelete": "¿Eliminar al usuario \"{{username}}\" y todos sus proyectos? Esta acción no se puede deshacer.",
+      "searchPlaceholder": "Buscar por nombre de usuario o correo…",
+      "count_one": "{{count}} usuario",
+      "count_other": "{{count}} usuarios",
+      "noResults": "No se encontraron usuarios.",
+      "col": {
+        "username": "Nombre de usuario",
+        "email": "Correo electrónico",
+        "role": "Rol",
+        "status": "Estado",
+        "projects": "Proyectos",
+        "compiles": "Compilaciones",
+        "runs": "Ejecuciones",
+        "boards": "Placas",
+        "country": "País",
+        "lastActive": "Última actividad",
+        "joined": "Registrado",
+        "actions": "Acciones"
+      },
+      "actions": {
+        "activity": "Actividad",
+        "edit": "Editar",
+        "delete": "Eliminar"
+      }
+    },
+    "projects": {
+      "loadFailed": "Error al cargar los proyectos.",
+      "deleteFailed": "Error al eliminar el proyecto.",
+      "confirmDelete": "¿Eliminar el proyecto \"{{name}}\"? Esta acción no se puede deshacer.",
+      "searchPlaceholder": "Buscar por nombre o propietario…",
+      "count_one": "{{count}} proyecto",
+      "count_other": "{{count}} proyectos",
+      "noResults": "No se encontraron proyectos.",
+      "private": "privado",
+      "public": "público",
+      "privateTitle": "Proyecto privado (vista de administrador)",
+      "col": {
+        "name": "Nombre",
+        "owner": "Propietario",
+        "board": "Placa",
+        "visibility": "Visibilidad",
+        "compiles": "Compilaciones",
+        "runs": "Ejecuciones",
+        "updates": "Actualizaciones",
+        "lastCompile": "Última compilación",
+        "updated": "Actualizado"
+      }
     }
   },
   "examples": {
@@ -110,7 +216,7 @@
     "empty": "No se encontraron ejemplos con los filtros seleccionados",
     "emptyForQuery": "No se encontraron ejemplos para \"{{query}}\" con los filtros seleccionados",
     "resetFilters": "Restablecer filtros",
-    "installing": "Instalando librerías ({{done}}/{{total}})"
+    "installing": "Instalando bibliotecas ({{done}}/{{total}})"
   },
   "about": {
     "hero": {
@@ -137,7 +243,7 @@
     },
     "cta": {
       "title": "¿Listo para probar Velxio?",
-      "subtitle": "Sin registro necesario. Funciona 100% en tu navegador. Gratuito y de código abierto.",
+      "subtitle": "Sin necesidad de registro. Funciona al 100% en tu navegador. Gratuito y de código abierto.",
       "openEditor": "Abrir editor"
     }
   },
@@ -151,7 +257,7 @@
       "signingIn": "Iniciando sesión…",
       "or": "o",
       "continueGoogle": "Continuar con Google",
-      "noAccount": "¿No tienes cuenta?",
+      "noAccount": "¿No tienes una cuenta?",
       "failed": "Error al iniciar sesión."
     },
     "register": {
@@ -162,7 +268,7 @@
       "passwordPlaceholder": "Al menos 8 caracteres",
       "create": "Crear cuenta",
       "creating": "Creando cuenta…",
-      "haveAccount": "¿Ya tienes cuenta?",
+      "haveAccount": "¿Ya tienes una cuenta?",
       "errors": {
         "reserved": "Ese nombre de usuario está reservado.",
         "usernameRules": "El nombre de usuario debe tener entre 3 y 30 caracteres (a-z, 0-9, _, -)",
@@ -190,16 +296,16 @@
       "compileAll": "Compilar todas las placas",
       "runAll": "Ejecutar todas las placas",
       "libraries": {
-        "title": "Buscar e instalar librerías de Arduino",
-        "label": "Librerías"
+        "title": "Buscar e instalar bibliotecas de Arduino",
+        "label": "Bibliotecas"
       },
       "import": "Importar un proyecto desde un archivo .zip",
-      "export": "Exportar el proyecto actual como archivo .zip",
+      "export": "Exportar el proyecto actual como un archivo .zip",
       "uploadFirmware": "Subir firmware (.hex, .bin, .elf, .ihex) para omitir la compilación",
       "toggleConsole": "Alternar consola de salida",
       "libHint": {
-        "message": "¿Falta una librería? Instálala desde el",
-        "cta": "Gestor de librerías",
+        "message": "¿Falta una biblioteca? Instálala desde el",
+        "cta": "Administrador de bibliotecas",
         "dismiss": "Descartar"
       }
     },
@@ -251,9 +357,9 @@
       "cancel": "Cancelar",
       "visibility": {
         "public": "Público",
-        "publicHint": "Cualquiera con el enlace puede verlo",
+        "publicHint": "Cualquier persona con el enlace puede verlo",
         "private": "Privado",
-        "privateHint": "Solo tú puedes verlo"
+        "privateHint": "Solo tú puedes ver esto"
       },
       "errors": {
         "nameRequired": "El nombre del proyecto es obligatorio.",
@@ -266,7 +372,7 @@
       "title": "Compartir proyecto",
       "public": "Público",
       "private": "Privado",
-      "publicHint": "Cualquiera con el enlace puede ver este proyecto",
+      "publicHint": "Cualquier persona con el enlace puede ver este proyecto",
       "privateHint": "Solo tú puedes ver este proyecto",
       "makePrivate": "Hacer privado",
       "makePublic": "Hacer público",
@@ -281,7 +387,7 @@
       },
       "activeBoard": "Placa activa",
       "noBoard": "Sin placa",
-      "noBoardHint": "No hay ninguna placa en el lienzo — añade una con el botón Añadir para compilar y ejecutar código",
+      "noBoardHint": "No hay ninguna placa en el lienzo: añade una con el botón Añadir para compilar y ejecutar código",
       "undo": {
         "label": "Deshacer",
         "title": "Deshacer: {{description}} (Ctrl+Z)",
@@ -329,30 +435,30 @@
       "clearFilters": "Limpiar filtros"
     },
     "libraryManager": {
-      "title": "GESTOR DE LIBRERÍAS",
+      "title": "ADMINISTRADOR DE BIBLIOTECAS",
       "searchTab": "Buscar",
       "installedTab": "Instaladas",
       "filterPlaceholder": "Filtrar tu búsqueda...",
       "searchingFor": "Buscando \"{{query}}\"…",
-      "loadingLibraries": "Cargando librerías…",
-      "noResults": "No hay librerías disponibles",
-      "noResultsFor": "No se encontraron librerías para \"{{query}}\"",
+      "loadingLibraries": "Cargando bibliotecas…",
+      "noResults": "No hay bibliotecas disponibles",
+      "noResultsFor": "No se encontraron bibliotecas para \"{{query}}\"",
       "byAuthor": "por {{author}}",
       "install": "INSTALAR",
       "installing": "Instalando...",
       "uninstall": "DESINSTALAR",
       "uninstalling": "Desinstalando...",
-      "loadingInstalled": "Cargando librerías instaladas...",
-      "noneInstalled": "Aún no hay librerías instaladas.",
-      "useSearchTab": "Usa la pestaña Buscar para instalar librerías."
+      "loadingInstalled": "Cargando bibliotecas instaladas...",
+      "noneInstalled": "Aún no hay bibliotecas instaladas.",
+      "useSearchTab": "Usa la pestaña Buscar para instalar bibliotecas."
     },
     "installLibs": {
-      "title": "LIBRERÍAS REQUERIDAS",
+      "title": "BIBLIOTECAS REQUERIDAS",
       "installingProgress": "Instalando {{done}} de {{total}}…",
-      "allDone": "Todas las librerías se instalaron correctamente",
-      "required_one": "Este proyecto requiere {{count}} librería. Instálala para compilar correctamente.",
-      "required_other": "Este proyecto requiere {{count}} librerías. Instálalas para compilar correctamente.",
-      "wokwiHosted": "Librería alojada por Wokwi",
+      "allDone": "Todas las bibliotecas se instalaron correctamente",
+      "required_one": "Este proyecto requiere {{count}} biblioteca. Instálala para compilar correctamente.",
+      "required_other": "Este proyecto requiere {{count}} bibliotecas. Instálalas para compilar correctamente.",
+      "wokwiHosted": "Biblioteca alojada por Wokwi",
       "pending": "pendiente",
       "installing": "instalando…",
       "installed": "instalada",
@@ -361,6 +467,15 @@
       "skip": "Omitir",
       "installAll": "Instalar todas ({{count}})",
       "installingShort": "Instalando…"
+    },
+    "shell": {
+      "code": "Código",
+      "both": "Ambos",
+      "circuit": "Circuito",
+      "showExplorer": "Mostrar explorador de archivos",
+      "hideExplorer": "Ocultar explorador de archivos",
+      "viewMode": "Modo de vista",
+      "dragResize": "Arrastrar para redimensionar"
     },
     "oscilloscope": {
       "title": "Osciloscopio",
@@ -374,7 +489,7 @@
       "clearTitle": "Borrar todas las muestras capturadas",
       "clear": "Borrar",
       "noChannels": "No se añadieron canales.",
-      "noChannelsHint": "Haz clic en \"+ Añadir canal\" para monitorizar un pin.",
+      "noChannelsHint": "Haz clic en \"+ Añadir canal\" para monitorear un pin.",
       "removeChannel": "Eliminar {{label}}"
     },
     "componentProps": {
@@ -382,7 +497,7 @@
       "tapToConnect": "Toca un pin para conectar:",
       "tapToWire": "Toca un pin para cablear:",
       "pinRoles": "Funciones de los pines:",
-      "arduinoPin": "Pin Arduino:",
+      "arduinoPin": "Pin de Arduino:",
       "confirmDelete": "¿Eliminar {{name}}?",
       "confirmDeleteTitle": "Confirmar eliminación",
       "deleteTitle": "Eliminar componente",
@@ -407,11 +522,11 @@
       "title": "Salida",
       "errorCount_one": "{{count}} error",
       "errorCount_other": "{{count}} errores",
-      "warningCount_one": "{{count}} aviso",
-      "warningCount_other": "{{count}} avisos",
+      "warningCount_one": "{{count}} advertencia",
+      "warningCount_other": "{{count}} advertencias",
       "filterAll": "Todo",
       "filterErrors": "Errores",
-      "filterWarnings": "Avisos",
+      "filterWarnings": "Advertencias",
       "auto": "Auto",
       "clear": "Limpiar salida",
       "close": "Cerrar",
@@ -450,7 +565,7 @@
       "placeholderText": "Escribe el mensaje a enviar...",
       "placeholderPython": "Escribe una expresión de Python... (Ctrl+C para interrumpir)",
       "lineEnd": {
-        "none": "Sin fin de línea",
+        "none": "Sin final de línea",
         "nl": "Nueva línea",
         "cr": "Retorno de carro",
         "both": "Ambos NL y CR"

@@ -3,6 +3,7 @@
  */
 
 import React, { useRef, useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import { useTranslation } from 'react-i18next';
 import { wireElectricalSolver } from '../simulation/spice/subscribeToStore';
 import { useSEO } from '../utils/useSEO';
 import { CodeEditor } from '../components/editor/CodeEditor';
@@ -53,6 +54,7 @@ const resizeHandleStyle: React.CSSProperties = {
 };
 
 export const EditorPage: React.FC = () => {
+  const { t } = useTranslation();
   useSEO({
     title: 'Multi-Board Simulator Editor — Arduino, ESP32, RP2040, RISC-V | Velxio',
     description:
@@ -337,7 +339,7 @@ export const EditorPage: React.FC = () => {
               <polyline points="16 18 22 12 16 6" />
               <polyline points="8 6 2 12 8 18" />
             </svg>
-            <span>&lt;/&gt; Code</span>
+            <span>&lt;/&gt; {t('editor.shell.code')}</span>
           </button>
           <button
             className={`mobile-tab-btn${mobileView === 'circuit' ? ' mobile-tab-btn--active' : ''}`}
@@ -358,7 +360,7 @@ export const EditorPage: React.FC = () => {
               <line x1="12" y1="12" x2="12" y2="16" />
               <line x1="10" y1="14" x2="14" y2="14" />
             </svg>
-            <span>Circuit</span>
+            <span>{t('editor.shell.circuit')}</span>
           </button>
         </nav>
       )}
@@ -394,7 +396,7 @@ export const EditorPage: React.FC = () => {
               the mobile bottom-nav. */}
           <div
             role="group"
-            aria-label="View mode"
+            aria-label={t('editor.shell.viewMode')}
             className="view-mode-toggle"
             style={{
               display: 'flex',
@@ -409,9 +411,9 @@ export const EditorPage: React.FC = () => {
           >
             {(
               [
-                { key: 'code', label: 'Code', path: 'M16 18l6-6-6-6M8 6l-6 6 6 6' },
-                { key: 'both', label: 'Both', path: 'M3 3h7v18H3zM14 3h7v18h-7z' },
-                { key: 'circuit', label: 'Circuit', path: 'M5 12h14M12 5v14' },
+                { key: 'code', label: t('editor.shell.code'), path: 'M16 18l6-6-6-6M8 6l-6 6 6 6' },
+                { key: 'both', label: t('editor.shell.both'), path: 'M3 3h7v18H3zM14 3h7v18h-7z' },
+                { key: 'circuit', label: t('editor.shell.circuit'), path: 'M5 12h14M12 5v14' },
               ] as const
             ).map((m) => (
               <button
@@ -564,7 +566,7 @@ export const EditorPage: React.FC = () => {
                 <div
                   onMouseDown={handleBottomPanelResizeMouseDown}
                   style={resizeHandleStyle}
-                  title="Drag to resize"
+                  title={t('editor.shell.dragResize')}
                 />
                 <div style={{ height: bottomPanelHeight, flexShrink: 0 }}>
                   <CompilationConsole
@@ -612,7 +614,7 @@ export const EditorPage: React.FC = () => {
               <div
                 onMouseDown={handleBottomPanelResizeMouseDown}
                 style={resizeHandleStyle}
-                title="Drag to resize"
+                title={t('editor.shell.dragResize')}
               />
               <div style={{ height: bottomPanelHeight, flexShrink: 0 }}>
                 <SerialMonitor />
@@ -624,7 +626,7 @@ export const EditorPage: React.FC = () => {
               <div
                 onMouseDown={handleBottomPanelResizeMouseDown}
                 style={resizeHandleStyle}
-                title="Drag to resize"
+                title={t('editor.shell.dragResize')}
               />
               <div style={{ height: bottomPanelHeight, flexShrink: 0 }}>
                 <Oscilloscope />

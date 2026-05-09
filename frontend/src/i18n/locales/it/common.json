@@ -23,7 +23,7 @@
     "search": "Cerca"
   },
   "footer": {
-    "about": "Velxio è un simulatore gratuito e open-source di circuiti e microcontrollori che funziona interamente nel tuo browser. Arduino, ESP32, RP2040 e ATtiny85, con co-simulazione analogica SPICE-accurata. Creato per maker, studenti e ingegneri embedded che imparano facendo. AGPLv3."
+    "about": "Velxio è un simulatore gratuito e open-source di circuiti e microcontrollori che funziona interamente nel tuo browser. Arduino, ESP32, RP2040 e ATtiny85, con co-simulazione analogica SPICE accurata. Creato per maker, studenti e ingegneri embedded che imparano facendo. AGPLv3."
   },
   "landing": {
     "hero": {
@@ -32,22 +32,22 @@
       "subtitle": "Scrivi codice, collega componenti, premi esegui. 19 schede, 48+ parti, emulazione CPU reale — niente hardware, niente installazione, niente cloud.",
       "ctaPrimary": "Prova il Simulatore Gratis →",
       "ctaGithub": "Vedi su GitHub",
-      "trustLine": "Nessuna registrazione richiesta · Funziona al 100% nel tuo browser · Gratuito e open-source",
+      "trustLine": "Nessuna registrazione richiesta · Funziona al 100% nel browser · Gratuito e open-source",
       "imageAlt": "Editor Velxio con circuito semaforico Arduino Uno"
     },
     "boards": {
       "label": "Hardware Supportato",
       "titleLine1": "Ogni architettura.",
       "titleLine2": "Un solo strumento.",
-      "subtitle": "19 schede su 5 architetture CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tutto in esecuzione localmente, senza cloud."
+      "subtitle": "19 schede su 5 architetture CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tutto in esecuzione localmente, senza bisogno del cloud."
     },
     "features": {
       "label": "Funzionalità",
-      "title": "Tutto ciò di cui hai bisogno.",
+      "title": "Tutto ciò che ti serve.",
       "subtitle": "Un IDE completo, compilatore e simulatore multi-architettura — in esecuzione localmente senza servizi esterni.",
       "spice": {
         "title": "Analogico SPICE in Tempo Reale",
-        "desc": "Motore ngspice-WASM — Analisi Nodale Modificata completa a ~60 Hz. Resistori, condensatori, amplificatori operazionali, BJT, MOSFET, regolatori si comportano come silicio reale, non modelli idealizzati."
+        "desc": "Motore ngspice-WASM — Analisi Nodale Modificata completa a ~60 Hz. Resistenze, condensatori, amplificatori operazionali, BJT, MOSFET, regolatori si comportano come silicio reale, non modelli idealizzati."
       },
       "engines": {
         "title": "5 Motori di Emulazione",
@@ -55,11 +55,11 @@
       },
       "customChips": {
         "title": "Chip Personalizzati",
-        "desc": "Crea i tuoi circuiti integrati in C, Rust o AssemblyScript usando l'API Wokwi Custom Chips. Compila in WebAssembly e riutilizzali tra i progetti."
+        "desc": "Crea i tuoi circuiti integrati in C, Rust o AssemblyScript usando l'API Custom Chips di Wokwi. Compila in WebAssembly e riutilizzali tra i progetti."
       },
       "components": {
         "title": "100+ Componenti",
-        "desc": "Parti analogiche SPICE-accurate più 48+ componenti visivi wokwi — LED, LCD, TFT ILI9341, servo, buzzer, sensori a ultrasuoni, tastierini, strisce NeoPixel."
+        "desc": "Parti analogiche SPICE accurate più 48+ componenti visivi wokwi — LED, LCD, TFT ILI9341, servo, buzzer, sensori a ultrasuoni, tastierini, strisce NeoPixel."
       },
       "instruments": {
         "title": "Strumenti Live",
@@ -77,6 +77,112 @@
       "ctaPaypal": "Dona tramite PayPal"
     }
   },
+  "profile": {
+    "newProject": "Nuovo progetto",
+    "loading": "Caricamento…",
+    "empty": "Nessun progetto pubblico ancora.",
+    "private": "Privato",
+    "copyLink": "Copia link condivisibile",
+    "notFound": "Utente non trovato."
+  },
+  "pricing": {
+    "title": "Prezzi",
+    "selfHosted": "Questa istanza di Velxio è auto-ospitata dall'immagine open-source — tutte le funzionalità sono gratuite per chiunque la utilizzi.",
+    "hostedVersion": "La versione ospitata su <link>velxio.dev</link> offre un livello Pro opzionale che aiuta a finanziare lo sviluppo.",
+    "sourceCode": "Il codice sorgente è <link>concesso in licenza MIT su GitHub</link>."
+  },
+  "admin": {
+    "loading": "Caricamento…",
+    "panel": "Pannello di amministrazione",
+    "logout": "Esci",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "users": "Utenti",
+      "projects": "Progetti",
+      "boards": "Schede"
+    },
+    "errors": {
+      "save": "Salvataggio fallito."
+    },
+    "editUser": {
+      "title": "Modifica utente",
+      "username": "Nome utente",
+      "email": "Email",
+      "newPassword": "Nuova password (lascia vuoto per mantenere)",
+      "passwordPlaceholder": "Min. 8 caratteri",
+      "admin": "Amministratore",
+      "active": "Attivo",
+      "cancel": "Annulla",
+      "save": "Salva",
+      "saving": "Salvataggio…"
+    },
+    "setup": {
+      "title": "Configurazione amministratore",
+      "body": "Non esiste ancora un account amministratore. Crea il primo utente amministratore per procedere.",
+      "password": "Password",
+      "confirmPassword": "Conferma password",
+      "passwordMismatch": "Le password non corrispondono.",
+      "creating": "Creazione…",
+      "createAdmin": "Crea amministratore",
+      "failed": "Creazione amministratore fallita."
+    },
+    "notAdmin": {
+      "title": "Accesso amministratore richiesto",
+      "body": "Devi aver effettuato l'accesso come amministratore per accedere a questo pannello.",
+      "goLogin": "Vai al login"
+    },
+    "users": {
+      "loadFailed": "Caricamento utenti fallito.",
+      "deleteFailed": "Eliminazione utente fallita.",
+      "confirmDelete": "Eliminare l'utente \"{{username}}\" e tutti i suoi progetti? Questa operazione non può essere annullata.",
+      "searchPlaceholder": "Cerca per nome utente o email…",
+      "count_one": "{{count}} utente",
+      "count_other": "{{count}} utenti",
+      "noResults": "Nessun utente trovato.",
+      "col": {
+        "username": "Nome utente",
+        "email": "Email",
+        "role": "Ruolo",
+        "status": "Stato",
+        "projects": "Progetti",
+        "compiles": "Compilazioni",
+        "runs": "Esecuzioni",
+        "boards": "Schede",
+        "country": "Paese",
+        "lastActive": "Ultima attività",
+        "joined": "Iscritto",
+        "actions": "Azioni"
+      },
+      "actions": {
+        "activity": "Attività",
+        "edit": "Modifica",
+        "delete": "Elimina"
+      }
+    },
+    "projects": {
+      "loadFailed": "Caricamento progetti fallito.",
+      "deleteFailed": "Eliminazione progetto fallita.",
+      "confirmDelete": "Eliminare il progetto \"{{name}}\"? Questa operazione non può essere annullata.",
+      "searchPlaceholder": "Cerca per nome o proprietario…",
+      "count_one": "{{count}} progetto",
+      "count_other": "{{count}} progetti",
+      "noResults": "Nessun progetto trovato.",
+      "private": "privato",
+      "public": "pubblico",
+      "privateTitle": "Progetto privato (vista amministratore)",
+      "col": {
+        "name": "Nome",
+        "owner": "Proprietario",
+        "board": "Scheda",
+        "visibility": "Visibilità",
+        "compiles": "Compilazioni",
+        "runs": "Esecuzioni",
+        "updates": "Aggiornamenti",
+        "lastCompile": "Ultima compilazione",
+        "updated": "Aggiornato"
+      }
+    }
+  },
   "examples": {
     "heading": "Progetti in Evidenza",
     "subtitle": "Esplora ed esegui progetti di esempio — organizzati per scheda",
@@ -84,13 +190,13 @@
     "searchLabel": "Cerca esempi",
     "clearSearch": "Cancella ricerca",
     "clear": "Cancella",
-    "matchCount_one": "{{count}} risultato",
-    "matchCount_other": "{{count}} risultati",
+    "matchCount_one": "{{count}} corrispondenza",
+    "matchCount_other": "{{count}} corrispondenze",
     "filters": {
       "categoryLabel": "Categoria:",
       "difficultyLabel": "Difficoltà:",
       "category": {
-        "all": "Tutti",
+        "all": "Tutte",
         "basics": "Base",
         "sensors": "Sensori",
         "displays": "Display",
@@ -161,7 +267,7 @@
       "usernamePlaceholder": "es. alice",
       "passwordPlaceholder": "Almeno 8 caratteri",
       "create": "Crea account",
-      "creating": "Creazione account in corso…",
+      "creating": "Creazione account…",
       "haveAccount": "Hai già un account?",
       "errors": {
         "reserved": "Questo nome utente è riservato.",
@@ -183,7 +289,7 @@
       "run": {
         "addBoard": "Aggiungi una scheda per eseguire",
         "runMicropython": "Esegui MicroPython",
-        "run": "Esegui (compila automaticamente se necessario)"
+        "run": "Esegui (auto-compila se necessario)"
       },
       "stop": "Ferma",
       "reset": "Reimposta",
@@ -196,7 +302,7 @@
       "import": "Importa un progetto da un file .zip",
       "export": "Esporta il progetto corrente come file .zip",
       "uploadFirmware": "Carica firmware (.hex, .bin, .elf, .ihex) per saltare la compilazione",
-      "toggleConsole": "Attiva/Disattiva Console di Output",
+      "toggleConsole": "Mostra/Nascondi Console di Output",
       "libHint": {
         "message": "Libreria mancante? Installala dal",
         "cta": "Gestore Librerie",
@@ -258,7 +364,7 @@
       "errors": {
         "nameRequired": "Il nome del progetto è obbligatorio.",
         "unreachable": "Server non raggiungibile. Controlla la connessione e riprova.",
-        "notAuth": "Non autenticato. Effettua l'accesso e riprova.",
+        "notAuth": "Non autenticato. Effettua il login e riprova.",
         "failedStatus": "Salvataggio fallito ({{status}})."
       }
     },
@@ -281,7 +387,7 @@
       },
       "activeBoard": "Scheda attiva",
       "noBoard": "Nessuna scheda",
-      "noBoardHint": "Nessuna scheda nell'area di disegno — aggiungine una con il pulsante Aggiungi per compilare ed eseguire il codice",
+      "noBoardHint": "Nessuna scheda nell'area di disegno — aggiungine una con il pulsante Aggiungi per compilare ed eseguire codice",
       "undo": {
         "label": "Annulla",
         "title": "Annulla: {{description}} (Ctrl+Z)",
@@ -292,9 +398,9 @@
         "title": "Ripeti: {{description}} (Ctrl+Y)",
         "empty": "Niente da ripetere"
       },
-      "toggleSerialMonitor": "Attiva/Disattiva Monitor Seriale",
+      "toggleSerialMonitor": "Mostra/Nascondi Monitor Seriale",
       "serial": "Seriale",
-      "toggleScope": "Attiva/Disattiva Oscilloscopio / Analizzatore Logico",
+      "toggleScope": "Mostra/Nascondi Oscilloscopio / Analizzatore Logico",
       "scope": "Oscilloscopio",
       "zoomIn": "Ingrandisci",
       "zoomOut": "Riduci",
@@ -310,9 +416,9 @@
       "removeConfirm": {
         "boardFallback": "Scheda",
         "title": "Rimuovere {{label}}?",
-        "body": "Questo rimuoverà la scheda dall'area di lavoro. Questa azione non può essere annullata.",
-        "bodyWithWires_one": "Questo rimuoverà la scheda dall'area di lavoro e {{count}} cavo collegato. Questa azione non può essere annullata.",
-        "bodyWithWires_other": "Questo rimuoverà la scheda dall'area di lavoro e {{count}} cavi collegati. Questa azione non può essere annullata.",
+        "body": "Questo rimuoverà la scheda dall'area di lavoro. Questa operazione non può essere annullata.",
+        "bodyWithWires_one": "Questo rimuoverà la scheda dall'area di lavoro e {{count}} cavo collegato. Questa operazione non può essere annullata.",
+        "bodyWithWires_other": "Questo rimuoverà la scheda dall'area di lavoro e {{count}} cavi collegati. Questa operazione non può essere annullata.",
         "cancel": "Annulla",
         "remove": "Rimuovi"
       }
@@ -339,11 +445,11 @@
       "noResultsFor": "Nessuna libreria trovata per \"{{query}}\"",
       "byAuthor": "di {{author}}",
       "install": "INSTALLA",
-      "installing": "Installazione in corso...",
+      "installing": "Installazione...",
       "uninstall": "DISINSTALLA",
-      "uninstalling": "Disinstallazione in corso...",
+      "uninstalling": "Disinstallazione...",
       "loadingInstalled": "Caricamento librerie installate...",
-      "noneInstalled": "Nessuna libreria installata.",
+      "noneInstalled": "Nessuna libreria installata ancora.",
       "useSearchTab": "Usa la scheda Cerca per installare librerie."
     },
     "installLibs": {
@@ -362,16 +468,25 @@
       "installAll": "Installa Tutte ({{count}})",
       "installingShort": "Installazione…"
     },
+    "shell": {
+      "code": "Codice",
+      "both": "Entrambi",
+      "circuit": "Circuito",
+      "showExplorer": "Mostra esplora file",
+      "hideExplorer": "Nascondi esplora file",
+      "viewMode": "Modalità visualizzazione",
+      "dragResize": "Trascina per ridimensionare"
+    },
     "oscilloscope": {
       "title": "Oscilloscopio",
       "addChannelTitle": "Aggiungi un canale pin",
       "addChannel": "Aggiungi Canale",
       "timeDiv": "Tempo/div:",
-      "pauseTitle": "Metti in pausa la cattura",
-      "resumeTitle": "Riprendi la cattura",
+      "pauseTitle": "Metti in pausa acquisizione",
+      "resumeTitle": "Riprendi acquisizione",
       "pause": "Pausa",
       "run": "Esegui",
-      "clearTitle": "Cancella tutti i campioni catturati",
+      "clearTitle": "Cancella tutti i campioni acquisiti",
       "clear": "Cancella",
       "noChannels": "Nessun canale aggiunto.",
       "noChannelsHint": "Clicca \"+ Aggiungi Canale\" per monitorare un pin.",
@@ -434,7 +549,7 @@
       "compileFailed": "Compilazione fallita",
       "cancel": "Annulla",
       "savePlace": "Salva e Posiziona",
-      "compileFirst": "Prima compila"
+      "compileFirst": "Compila prima"
     },
     "serial": {
       "title": "Monitor Seriale",
@@ -448,11 +563,11 @@
       "waitingData": "In attesa di dati seriali...",
       "startSim": "Avvia la simulazione per vedere l'output seriale.",
       "placeholderText": "Scrivi il messaggio da inviare...",
-      "placeholderPython": "Scrivi un'espressione Python... (Ctrl+C per interrompere)",
+      "placeholderPython": "Scrivi espressione Python... (Ctrl+C per interrompere)",
       "lineEnd": {
         "none": "Nessun terminatore",
-        "nl": "Newline",
-        "cr": "Carriage return",
+        "nl": "Nuova riga",
+        "cr": "Ritorno a capo",
         "both": "Entrambi NL e CR"
       }
     }

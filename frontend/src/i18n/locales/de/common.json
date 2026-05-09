@@ -8,7 +8,7 @@
       "documentation": "Dokumentation",
       "examples": "Beispiele",
       "editor": "Editor",
-      "about": "Über uns",
+      "about": "Über",
       "blog": "Blog",
       "github": "GitHub",
       "discord": "Discord"
@@ -32,14 +32,14 @@
       "subtitle": "Code schreiben, Komponenten verdrahten, auf Start drücken. 19 Boards, 48+ Teile, echte CPU-Emulation – keine Hardware, keine Installation, keine Cloud.",
       "ctaPrimary": "Simulator kostenlos testen →",
       "ctaGithub": "Auf GitHub ansehen",
-      "trustLine": "Keine Anmeldung erforderlich · Läuft zu 100 % in Ihrem Browser · Kostenlos & quelloffen",
+      "trustLine": "Keine Registrierung erforderlich · Läuft zu 100 % im Browser · Kostenlos & quelloffen",
       "imageAlt": "Velxio-Editor mit Arduino Uno-Ampelschaltung"
     },
     "boards": {
       "label": "Unterstützte Hardware",
       "titleLine1": "Jede Architektur.",
       "titleLine2": "Ein Werkzeug.",
-      "subtitle": "19 Boards über 5 CPU-Architekturen – AVR8, ARM Cortex-M0+, RISC-V, Xtensa und Linux. Alle laufen lokal, keine Cloud erforderlich."
+      "subtitle": "19 Boards mit 5 CPU-Architekturen – AVR8, ARM Cortex-M0+, RISC-V, Xtensa und Linux. Alle laufen lokal, keine Cloud erforderlich."
     },
     "features": {
       "label": "Funktionen",
@@ -55,19 +55,19 @@
       },
       "customChips": {
         "title": "Benutzerdefinierte Chips",
-        "desc": "Erstellen Sie eigene integrierte Schaltungen in C, Rust oder AssemblyScript mit der Wokwi Custom Chips API. Kompilieren Sie zu WebAssembly und verwenden Sie sie projektübergreifend wieder."
+        "desc": "Erstellen Sie eigene integrierte Schaltungen in C, Rust oder AssemblyScript mit der Wokwi Custom Chips API. Kompilieren Sie zu WebAssembly und verwenden Sie sie projektübergreifend."
       },
       "components": {
         "title": "100+ Komponenten",
-        "desc": "SPICE-genaue analoge Teile plus 48+ wokwi visuelle Komponenten – LEDs, LCDs, ILI9341 TFT, Servos, Summer, Ultraschallsensoren, Tastenfelder, NeoPixel-Streifen."
+        "desc": "SPICE-genaue analoge Teile plus 48+ wokwi-Visualkomponenten – LEDs, LCDs, ILI9341 TFT, Servos, Summer, Ultraschallsensoren, Tastenfelder, NeoPixel-Streifen."
       },
       "instruments": {
         "title": "Live-Instrumente",
-        "desc": "Mehrkanal-Oszilloskop, Voltmeter, Amperemeter, Signalgenerator. Platzieren Sie sie an einem beliebigen Knoten und beobachten Sie Wellenformen in Echtzeit, während die Simulation läuft."
+        "desc": "Mehrkanal-Oszilloskop, Voltmeter, Amperemeter, Signalgenerator. Auf jeden Knoten legen und Wellenformen in Echtzeit während der Simulation beobachten."
       },
       "monaco": {
         "title": "Monaco Editor + arduino-cli",
-        "desc": "VS Code-gerechter C++-Editor mit Multi-File-Workspace. Lokales arduino-cli kompiliert zu echten .hex / .uf2 / .bin-Dateien – kein Cloud-Roundtrip."
+        "desc": "C++-Editor auf VS-Code-Niveau mit Multi-File-Workspace. Lokales arduino-cli kompiliert zu echten .hex/.uf2/.bin-Dateien – kein Cloud-Roundtrip."
       }
     },
     "support": {
@@ -77,9 +77,115 @@
       "ctaPaypal": "Spenden via PayPal"
     }
   },
+  "profile": {
+    "newProject": "Neues Projekt",
+    "loading": "Lädt…",
+    "empty": "Noch keine öffentlichen Projekte.",
+    "private": "Privat",
+    "copyLink": "Teilbaren Link kopieren",
+    "notFound": "Benutzer nicht gefunden."
+  },
+  "pricing": {
+    "title": "Preise",
+    "selfHosted": "Diese Velxio-Instanz wird selbst gehostet aus dem quelloffenen Image – alle Funktionen sind für alle Nutzer kostenlos.",
+    "hostedVersion": "Die gehostete Version unter <link>velxio.dev</link> bietet eine optionale Pro-Stufe, die die Entwicklung finanziert.",
+    "sourceCode": "Der Quellcode ist <link>MIT-lizenziert auf GitHub</link>."
+  },
+  "admin": {
+    "loading": "Lädt…",
+    "panel": "Admin-Bereich",
+    "logout": "Abmelden",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "users": "Benutzer",
+      "projects": "Projekte",
+      "boards": "Boards"
+    },
+    "errors": {
+      "save": "Speichern fehlgeschlagen."
+    },
+    "editUser": {
+      "title": "Benutzer bearbeiten",
+      "username": "Benutzername",
+      "email": "E-Mail",
+      "newPassword": "Neues Passwort (leer lassen, um es zu behalten)",
+      "passwordPlaceholder": "Mind. 8 Zeichen",
+      "admin": "Admin",
+      "active": "Aktiv",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "saving": "Speichert…"
+    },
+    "setup": {
+      "title": "Admin-Einrichtung",
+      "body": "Es existiert noch kein Admin-Konto. Erstellen Sie den ersten Admin-Benutzer, um fortzufahren.",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "passwordMismatch": "Passwörter stimmen nicht überein.",
+      "creating": "Erstellt…",
+      "createAdmin": "Admin erstellen",
+      "failed": "Admin-Erstellung fehlgeschlagen."
+    },
+    "notAdmin": {
+      "title": "Admin-Zugriff erforderlich",
+      "body": "Sie müssen als Admin angemeldet sein, um auf diesen Bereich zuzugreifen.",
+      "goLogin": "Zur Anmeldung"
+    },
+    "users": {
+      "loadFailed": "Benutzer konnten nicht geladen werden.",
+      "deleteFailed": "Benutzer konnte nicht gelöscht werden.",
+      "confirmDelete": "Benutzer \"{{username}}\" und alle seine Projekte löschen? Dies kann nicht rückgängig gemacht werden.",
+      "searchPlaceholder": "Nach Benutzername oder E-Mail suchen…",
+      "count_one": "{{count}} Benutzer",
+      "count_other": "{{count}} Benutzer",
+      "noResults": "Keine Benutzer gefunden.",
+      "col": {
+        "username": "Benutzername",
+        "email": "E-Mail",
+        "role": "Rolle",
+        "status": "Status",
+        "projects": "Projekte",
+        "compiles": "Kompilierungen",
+        "runs": "Ausführungen",
+        "boards": "Boards",
+        "country": "Land",
+        "lastActive": "Zuletzt aktiv",
+        "joined": "Beigetreten",
+        "actions": "Aktionen"
+      },
+      "actions": {
+        "activity": "Aktivität",
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      }
+    },
+    "projects": {
+      "loadFailed": "Projekte konnten nicht geladen werden.",
+      "deleteFailed": "Projekt konnte nicht gelöscht werden.",
+      "confirmDelete": "Projekt \"{{name}}\" löschen? Dies kann nicht rückgängig gemacht werden.",
+      "searchPlaceholder": "Nach Name oder Besitzer suchen…",
+      "count_one": "{{count}} Projekt",
+      "count_other": "{{count}} Projekte",
+      "noResults": "Keine Projekte gefunden.",
+      "private": "privat",
+      "public": "öffentlich",
+      "privateTitle": "Privates Projekt (Admin-Ansicht)",
+      "col": {
+        "name": "Name",
+        "owner": "Besitzer",
+        "board": "Board",
+        "visibility": "Sichtbarkeit",
+        "compiles": "Kompilierungen",
+        "runs": "Ausführungen",
+        "updates": "Updates",
+        "lastCompile": "Letzte Kompilierung",
+        "updated": "Aktualisiert"
+      }
+    }
+  },
   "examples": {
-    "heading": "Vorgestellte Projekte",
-    "subtitle": "Beispielprojekte erkunden und ausführen – nach Board organisiert",
+    "heading": "Ausgewählte Projekte",
+    "subtitle": "Beispielprojekte erkunden und ausführen – nach Board sortiert",
     "searchPlaceholder": "Beispiele durchsuchen – versuchen Sie 'esp32 oled', 'blink', 'dht'…",
     "searchLabel": "Beispiele durchsuchen",
     "clearSearch": "Suche löschen",
@@ -110,7 +216,7 @@
     "empty": "Keine Beispiele mit den ausgewählten Filtern gefunden",
     "emptyForQuery": "Keine Beispiele für \"{{query}}\" mit den ausgewählten Filtern gefunden",
     "resetFilters": "Filter zurücksetzen",
-    "installing": "Bibliotheken werden installiert ({{done}}/{{total}})"
+    "installing": "Installiere Bibliotheken ({{done}}/{{total}})"
   },
   "about": {
     "hero": {
@@ -121,7 +227,7 @@
       "heading": "Die Geschichte"
     },
     "howItWorks": {
-      "heading": "So funktioniert es"
+      "heading": "Wie es funktioniert"
     },
     "openSource": {
       "heading": "Open-Source-Philosophie"
@@ -130,14 +236,14 @@
       "heading": "Der Entwickler"
     },
     "releases": {
-      "heading": "Aktuelle Versionen"
+      "heading": "Aktuelle Veröffentlichungen"
     },
     "community": {
       "heading": "Community & Presse"
     },
     "cta": {
       "title": "Bereit, Velxio auszuprobieren?",
-      "subtitle": "Keine Anmeldung erforderlich. Läuft zu 100 % in Ihrem Browser. Kostenlos und quelloffen.",
+      "subtitle": "Keine Registrierung erforderlich. Läuft zu 100 % in Ihrem Browser. Kostenlos und quelloffen.",
       "openEditor": "Editor öffnen"
     }
   },
@@ -148,7 +254,7 @@
       "email": "E-Mail",
       "password": "Passwort",
       "signIn": "Anmelden",
-      "signingIn": "Anmeldung läuft…",
+      "signingIn": "Melde an…",
       "or": "oder",
       "continueGoogle": "Mit Google fortfahren",
       "noAccount": "Noch kein Konto?",
@@ -175,13 +281,13 @@
     "toolbar": {
       "languageMode": "Sprachmodus",
       "compile": {
-        "addBoard": "Fügen Sie ein Board zum Kompilieren hinzu",
-        "loading": "Laden…",
+        "addBoard": "Board zum Kompilieren hinzufügen",
+        "loading": "Lädt…",
         "loadMicropython": "MicroPython laden",
         "compile": "Kompilieren (Strg+B)"
       },
       "run": {
-        "addBoard": "Fügen Sie ein Board zum Ausführen hinzu",
+        "addBoard": "Board zum Ausführen hinzufügen",
         "runMicropython": "MicroPython ausführen",
         "run": "Ausführen (kompiliert bei Bedarf automatisch)"
       },
@@ -193,12 +299,12 @@
         "title": "Arduino-Bibliotheken suchen und installieren",
         "label": "Bibliotheken"
       },
-      "import": "Ein Projekt aus einer .zip-Datei importieren",
-      "export": "Das aktuelle Projekt als .zip-Datei exportieren",
-      "uploadFirmware": "Firmware hochladen (.hex, .bin, .elf, .ihex) um Kompilierung zu überspringen",
-      "toggleConsole": "Ausgabekonsole umschalten",
+      "import": "Projekt aus einer .zip-Datei importieren",
+      "export": "Aktuelles Projekt als .zip-Datei exportieren",
+      "uploadFirmware": "Firmware hochladen (.hex, .bin, .elf, .ihex) um Kompilierung zu umgehen",
+      "toggleConsole": "Ausgabekonsole ein-/ausblenden",
       "libHint": {
-        "message": "Bibliothek fehlt? Installieren Sie sie aus dem",
+        "message": "Bibliothek fehlt? Installieren Sie sie über den",
         "cta": "Bibliotheksverwaltung",
         "dismiss": "Schließen"
       }
@@ -233,7 +339,7 @@
       "cancel": "Abbrechen"
     },
     "loginPrompt": {
-      "title": "Melden Sie sich an, um Ihr Projekt zu speichern",
+      "title": "Anmelden, um Ihr Projekt zu speichern",
       "body": "Erstellen Sie ein kostenloses Konto, um Ihre Projekte zu speichern und zu teilen.",
       "createAccount": "Konto erstellen",
       "cancel": "Abbrechen"
@@ -247,7 +353,7 @@
       "descriptionPlaceholder": "Optional",
       "save": "Speichern",
       "update": "Aktualisieren",
-      "saving": "Speichern…",
+      "saving": "Speichert…",
       "cancel": "Abbrechen",
       "visibility": {
         "public": "Öffentlich",
@@ -281,7 +387,7 @@
       },
       "activeBoard": "Aktives Board",
       "noBoard": "Kein Board",
-      "noBoardHint": "Kein Board auf der Leinwand – fügen Sie eines mit der Schaltfläche 'Hinzufügen' hinzu, um Code zu kompilieren und auszuführen",
+      "noBoardHint": "Kein Board auf der Leinwand – fügen Sie eines mit der Schaltfläche \"Hinzufügen\" hinzu, um Code zu kompilieren und auszuführen",
       "undo": {
         "label": "Rückgängig",
         "title": "Rückgängig: {{description}} (Strg+Z)",
@@ -292,13 +398,13 @@
         "title": "Wiederholen: {{description}} (Strg+Y)",
         "empty": "Nichts zu wiederholen"
       },
-      "toggleSerialMonitor": "Seriellen Monitor umschalten",
+      "toggleSerialMonitor": "Seriellen Monitor ein-/ausblenden",
       "serial": "Seriell",
-      "toggleScope": "Oszilloskop / Logikanalysator umschalten",
+      "toggleScope": "Oszilloskop/Logikanalysator ein-/ausblenden",
       "scope": "Oszilloskop",
       "zoomIn": "Vergrößern",
       "zoomOut": "Verkleinern",
-      "resetView": "Ansicht zurücksetzen (zum Zurücksetzen klicken)",
+      "resetView": "Ansicht zurücksetzen (klicken zum Zurücksetzen)",
       "componentCount_one": "{{count}} Komponente",
       "componentCount_other": "{{count}} Komponenten",
       "addComponentTitle": "Komponente hinzufügen",
@@ -310,9 +416,9 @@
       "removeConfirm": {
         "boardFallback": "Board",
         "title": "{{label}} entfernen?",
-        "body": "Dadurch wird das Board aus dem Arbeitsbereich entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
-        "bodyWithWires_one": "Dadurch wird das Board aus dem Arbeitsbereich und {{count}} verbundene Leitung entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
-        "bodyWithWires_other": "Dadurch wird das Board aus dem Arbeitsbereich und {{count}} verbundene Leitungen entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "body": "Dies entfernt das Board aus dem Arbeitsbereich. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "bodyWithWires_one": "Dies entfernt das Board aus dem Arbeitsbereich und {{count}} verbundene Leitung. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "bodyWithWires_other": "Dies entfernt das Board aus dem Arbeitsbereich und {{count}} verbundene Leitungen. Diese Aktion kann nicht rückgängig gemacht werden.",
         "cancel": "Abbrechen",
         "remove": "Entfernen"
       }
@@ -344,7 +450,7 @@
       "uninstalling": "Deinstalliere...",
       "loadingInstalled": "Installierte Bibliotheken werden geladen...",
       "noneInstalled": "Noch keine Bibliotheken installiert.",
-      "useSearchTab": "Verwenden Sie die Registerkarte 'Suchen', um Bibliotheken zu installieren."
+      "useSearchTab": "Verwenden Sie die Registerkarte \"Suchen\", um Bibliotheken zu installieren."
     },
     "installLibs": {
       "title": "ERFORDERLICHE BIBLIOTHEKEN",
@@ -362,16 +468,25 @@
       "installAll": "Alle installieren ({{count}})",
       "installingShort": "Installiere…"
     },
+    "shell": {
+      "code": "Code",
+      "both": "Beide",
+      "circuit": "Schaltung",
+      "showExplorer": "Dateiexplorer anzeigen",
+      "hideExplorer": "Dateiexplorer ausblenden",
+      "viewMode": "Ansichtsmodus",
+      "dragResize": "Zum Größenändern ziehen"
+    },
     "oscilloscope": {
       "title": "Oszilloskop",
-      "addChannelTitle": "Einen Pin-Kanal hinzufügen",
+      "addChannelTitle": "Pin-Kanal hinzufügen",
       "addChannel": "Kanal hinzufügen",
-      "timeDiv": "Zeit/Teil:",
+      "timeDiv": "Zeit/Div:",
       "pauseTitle": "Aufnahme pausieren",
       "resumeTitle": "Aufnahme fortsetzen",
       "pause": "Pause",
       "run": "Starten",
-      "clearTitle": "Alle aufgezeichneten Samples löschen",
+      "clearTitle": "Alle erfassten Samples löschen",
       "clear": "Löschen",
       "noChannels": "Keine Kanäle hinzugefügt.",
       "noChannelsHint": "Klicken Sie auf \"+ Kanal hinzufügen\", um einen Pin zu überwachen.",
@@ -415,7 +530,7 @@
       "auto": "Auto",
       "clear": "Ausgabe löschen",
       "close": "Schließen",
-      "empty": "Noch keine Kompilierungsausgabe. Klicken Sie auf 'Kompilieren', um zu beginnen."
+      "empty": "Noch keine Kompilierungsausgabe. Klicken Sie auf Kompilieren, um zu beginnen."
     },
     "boardPicker": {
       "title": "Board hinzufügen"

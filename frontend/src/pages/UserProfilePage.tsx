@@ -1,12 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { getUserProjects, type ProjectResponse } from '../services/projectService';
 import { useAuthStore } from '../store/useAuthStore';
 import { AppHeader } from '../components/layout/AppHeader';
+import { useLocalizedHref } from '../i18n/useLocalizedNavigate';
 import { useSEO } from '../utils/useSEO';
 import './UserProfilePage.css';
 
 export const UserProfilePage: React.FC = () => {
+  const { t } = useTranslation();
+  const localize = useLocalizedHref();
   const { username } = useParams<{ username: string }>();
 
   useSEO({
@@ -25,7 +29,7 @@ export const UserProfilePage: React.FC = () => {
     setLoading(true);
     getUserProjects(username)
       .then(setProjects)
-      .catch(() => setError('User not found.'))
+      .catch(() => setError(t('profile.notFound')))
       .finally(() => setLoading(false));
   }, [username]);
 
@@ -50,16 +54,16 @@ export const UserProfilePage: React.FC = () => {
           <div className="profile-avatar">{username?.[0]?.toUpperCase()}</div>
           <h1 className="profile-username">{username}</h1>
           {isOwn && (
-            <Link to="/editor" className="profile-new-btn">
-              + New project
+            <Link to={localize('/editor')} className="profile-new-btn">
+              + {t('profile.newProject')}
             </Link>
           )}
         </div>
 
-        {loading && <p className="profile-muted">Loading…</p>}
+        {loading && <p className="profile-muted">{t('profile.loading')}</p>}
         {error && <p className="profile-error">{error}</p>}
         {!loading && !error && projects.length === 0 && (
-          <p className="profile-muted">No public projects yet.</p>
+          <p className="profile-muted">{t('profile.empty')}</p>
         )}
 
         <div className="profile-grid">
@@ -70,14 +74,14 @@ export const UserProfilePage: React.FC = () => {
               <div className="profile-card-meta">
                 <span className="profile-badge">{p.board_type}</span>
                 {!p.is_public && (
-                  <span className="profile-badge profile-badge-private">Private</span>
+                  <span className="profile-badge profile-badge-private">{t('profile.private')}</span>
                 )}
                 <span className="profile-date">{new Date(p.updated_at).toLocaleDateString()}</span>
                 {p.is_public && (
                   <button
                     className="profile-share-btn"
                     onClick={(e) => handleCopyLink(e, p.id)}
-                    title="Copy shareable link"
+                    title={t('profile.copyLink')}
                   >
                     {copiedId === p.id ? (
                       <svg
