@@ -317,7 +317,20 @@ def main() -> None:  # noqa: C901  (complexity OK for inline worker)
         # The compiler trims trailing 0xFF padding before serializing (issue
         # #101 — full 4 MB images blew nginx buffers). Re-pad here so QEMU's
         # MTD layer sees a valid power-of-2 flash size.
-        from app.services.esp32_flash_image import pad_to_flash_size
+        # Imported via fallback because this file runs as a subprocess and
+        # `app.*` is not on sys.path; mirrors the esp32_i2c_slaves pattern
+        # at the top of the file.
+        try:
+            from app.services.esp32_flash_image import pad_to_flash_size  # type: ignore[import-not-found]
+        except ImportError:
+            import importlib.util as _ilu, pathlib as _pl
+            _spec = _ilu.spec_from_file_location(
+                'esp32_flash_image',
+                _pl.Path(__file__).parent / 'esp32_flash_image.py',
+            )
+            _mod = _ilu.module_from_spec(_spec)  # type: ignore[arg-type]
+            _spec.loader.exec_module(_mod)  # type: ignore[union-attr]
+            pad_to_flash_size = _mod.pad_to_flash_size
         fw_bytes = pad_to_flash_size(base64.b64decode(firmware_b64))
         tmp = tempfile.NamedTemporaryFile(suffix='.bin', delete=False)
         tmp.write(fw_bytes)
