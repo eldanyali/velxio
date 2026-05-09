@@ -23,56 +23,56 @@
     "search": "Cerca"
   },
   "footer": {
-    "about": "Velxio è un simulatore gratuito e open-source di circuiti e microcontrollori che funziona interamente nel browser. Arduino, ESP32, RP2040 e ATtiny85, con co-simulazione analogica SPICE accurata. Creato per maker, studenti e ingegneri embedded che imparano facendo. AGPLv3."
+    "about": "Velxio è un simulatore gratuito e open-source di circuiti e microcontrollori che funziona interamente nel tuo browser. Arduino, ESP32, RP2040 e ATtiny85, con co-simulazione analogica SPICE accurata. Creato per maker, studenti e ingegneri embedded che imparano facendo. AGPLv3."
   },
   "landing": {
     "hero": {
       "titleLine1": "Arduino, ESP32 e Raspberry Pi.",
       "titleAccent": "Direttamente nel tuo browser.",
       "subtitle": "Scrivi codice, collega componenti, premi esegui. 19 schede, 48+ parti, emulazione CPU reale — nessun hardware, nessuna installazione, nessun cloud.",
-      "ctaPrimary": "Prova il Simulatore Gratis →",
+      "ctaPrimary": "Prova il simulatore gratis →",
       "ctaGithub": "Vedi su GitHub",
       "trustLine": "Nessuna registrazione richiesta · Funziona al 100% nel browser · Gratuito e open-source",
       "imageAlt": "Editor Velxio con circuito semaforico Arduino Uno"
     },
     "boards": {
-      "label": "Hardware Supportato",
+      "label": "Hardware supportato",
       "titleLine1": "Ogni architettura.",
       "titleLine2": "Un solo strumento.",
-      "subtitle": "19 schede su 5 architetture CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tutte eseguite localmente, senza cloud."
+      "subtitle": "19 schede su 5 architetture CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tutte in esecuzione localmente, senza cloud."
     },
     "features": {
       "label": "Funzionalità",
-      "title": "Tutto ciò di cui hai bisogno.",
-      "subtitle": "Un IDE completo, compilatore e simulatore multi-architettura — eseguito localmente senza servizi esterni.",
+      "title": "Tutto ciò che ti serve.",
+      "subtitle": "Un IDE completo, compilatore e simulatore multi-architettura — in esecuzione locale senza servizi esterni.",
       "spice": {
-        "title": "Analogico SPICE in Tempo Reale",
-        "desc": "Motore ngspice-WASM — Analisi Nodale Modificata completa a ~60 Hz. Resistenze, condensatori, amplificatori operazionali, BJT, MOSFET, regolatori si comportano come silicio reale, non modelli idealizzati."
+        "title": "Analogico SPICE in tempo reale",
+        "desc": "Motore ngspice-WASM — analisi nodale modificata completa a ~60 Hz. Resistenze, condensatori, amplificatori operazionali, BJT, MOSFET, regolatori si comportano come silicio reale, non modelli idealizzati."
       },
       "engines": {
-        "title": "5 Motori di Emulazione",
+        "title": "5 motori di emulazione",
         "desc": "AVR8 (ATmega328P, ATmega2560, ATtiny85), RP2040 (ARM Cortex-M0+), RV32IMC (ESP32-C3, CH32V003 tramite QEMU), Xtensa LX6/LX7 (ESP32 tramite QEMU) e ARM Cortex-A53 (Raspberry Pi 3 Linux)."
       },
       "customChips": {
-        "title": "Chip Personalizzati",
-        "desc": "Crea i tuoi circuiti integrati in C, Rust o AssemblyScript usando l'API Custom Chips di Wokwi. Compila in WebAssembly e riutilizzali tra progetti."
+        "title": "Chip personalizzati",
+        "desc": "Crea i tuoi circuiti integrati in C, Rust o AssemblyScript usando l'API Wokwi Custom Chips. Compila in WebAssembly e riutilizzali tra i progetti."
       },
       "components": {
-        "title": "100+ Componenti",
+        "title": "100+ componenti",
         "desc": "Parti analogiche SPICE accurate più 48+ componenti visivi wokwi — LED, LCD, TFT ILI9341, servo, buzzer, sensori a ultrasuoni, tastierini, strisce NeoPixel."
       },
       "instruments": {
-        "title": "Strumenti Live",
+        "title": "Strumenti live",
         "desc": "Oscilloscopio multicanale, voltmetro, amperometro, generatore di segnali. Posiziona su qualsiasi nodo e guarda le forme d'onda aggiornarsi in tempo reale mentre la simulazione è in esecuzione."
       },
       "monaco": {
         "title": "Editor Monaco + arduino-cli",
-        "desc": "Editor C++ di livello VS Code con workspace multi-file. arduino-cli locale compila in file .hex / .uf2 / .bin reali — nessun round-trip cloud."
+        "desc": "Editor C++ di livello VS Code con area di lavoro multi-file. arduino-cli locale compila in file .hex / .uf2 / .bin reali — nessun round-trip sul cloud."
       }
     },
     "support": {
       "title": "Supporta il progetto",
-      "subtitle": "Velxio è gratuito e open-source. Se ti fa risparmiare tempo, considera di supportare il suo sviluppo.",
+      "subtitle": "Velxio è gratuito e open source. Se ti fa risparmiare tempo, considera di supportarne lo sviluppo.",
       "ctaSponsors": "GitHub Sponsors",
       "ctaPaypal": "Dona tramite PayPal"
     }
@@ -121,7 +121,7 @@
       "body": "Non esiste ancora un account amministratore. Crea il primo utente amministratore per procedere.",
       "password": "Password",
       "confirmPassword": "Conferma password",
-      "passwordMismatch": "Le password non corrispondono.",
+      "passwordMismatch": "Le password non coincidono.",
       "creating": "Creazione…",
       "createAdmin": "Crea amministratore",
       "failed": "Creazione amministratore fallita."
@@ -201,9 +201,9 @@
         "boardCount_one": "{{count}} scheda",
         "boardCount_other": "{{count}} schede",
         "noDataYet": "Nessun dato ancora.",
-        "topFqbn": "Schede più usate per FQBN ({{days}}gg)",
+        "topFqbn": "Schede principali per FQBN ({{days}}gg)",
         "topCountries": "Paesi principali ({{days}}gg)",
-        "countriesSubtitle": "Dall'intestazione CF-IPCountry di Cloudflare. \"Utenti\" = paese di residenza attuale, \"Registrazioni\" = dove si sono registrati, \"Attivi\" = utenti distinti con attività in questo intervallo.",
+        "countriesSubtitle": "Dall'intestazione CF-IPCountry di Cloudflare. \"Utenti\" = paese di residenza attuale, \"Iscrizioni\" = dove si sono registrati, \"Attivi\" = utenti distinti con attività in questo intervallo.",
         "noCountryData": "Nessun dato paese ancora (probabilmente in esecuzione al di fuori di Cloudflare).",
         "topUsers": "Utenti principali per compilazioni",
         "topProjects": "Progetti principali per compilazioni"
@@ -211,7 +211,7 @@
       "col": {
         "country": "Paese",
         "users": "Utenti",
-        "signups": "Registrazioni",
+        "signups": "Iscrizioni",
         "activeRange": "Attivi ({{days}}gg)",
         "user": "Utente"
       }
@@ -255,7 +255,7 @@
     }
   },
   "examples": {
-    "heading": "Progetti in Evidenza",
+    "heading": "Progetti in evidenza",
     "subtitle": "Esplora ed esegui progetti di esempio — organizzati per scheda",
     "searchPlaceholder": "Cerca esempi — prova 'esp32 oled', 'blink', 'dht'…",
     "searchLabel": "Cerca esempi",
@@ -299,35 +299,6 @@
     "cta": "Metti stella su GitHub",
     "dismiss": "Ignora"
   },
-  "about": {
-    "hero": {
-      "title": "Informazioni su Velxio",
-      "subtitle": "Un emulatore di sistemi embedded gratuito e open-source — creato da un singolo sviluppatore con passione per l'hardware e l'open source."
-    },
-    "story": {
-      "heading": "La Storia"
-    },
-    "howItWorks": {
-      "heading": "Come Funziona"
-    },
-    "openSource": {
-      "heading": "Filosofia Open Source"
-    },
-    "creator": {
-      "heading": "Il Creatore"
-    },
-    "releases": {
-      "heading": "Versioni recenti"
-    },
-    "community": {
-      "heading": "Community e Stampa"
-    },
-    "cta": {
-      "title": "Pronto a provare Velxio?",
-      "subtitle": "Nessuna registrazione richiesta. Funziona al 100% nel browser. Gratuito e open source.",
-      "openEditor": "Apri Editor"
-    }
-  },
   "auth": {
     "login": {
       "title": "Accedi",
@@ -355,327 +326,6 @@
         "usernameRules": "Il nome utente deve essere di 3-30 caratteri (a-z, 0-9, _, -)",
         "passwordTooShort": "La password deve essere di almeno 8 caratteri.",
         "failed": "Registrazione fallita."
-      }
-    }
-  },
-  "editor": {
-    "toolbar": {
-      "languageMode": "Modalità linguaggio",
-      "compile": {
-        "addBoard": "Aggiungi una scheda per compilare",
-        "loading": "Caricamento…",
-        "loadMicropython": "Carica MicroPython",
-        "compile": "Compila (Ctrl+B)"
-      },
-      "run": {
-        "addBoard": "Aggiungi una scheda per eseguire",
-        "runMicropython": "Esegui MicroPython",
-        "run": "Esegui (auto-compila se necessario)"
-      },
-      "stop": "Ferma",
-      "reset": "Ripristina",
-      "compileAll": "Compila tutte le schede",
-      "runAll": "Esegui tutte le schede",
-      "libraries": {
-        "title": "Cerca e installa librerie Arduino",
-        "label": "Librerie"
-      },
-      "import": "Importa un progetto da file .zip",
-      "export": "Esporta il progetto corrente come file .zip",
-      "uploadFirmware": "Carica firmware (.hex, .bin, .elf, .ihex) per saltare la compilazione",
-      "toggleConsole": "Attiva/Disattiva Console di Output",
-      "libHint": {
-        "message": "Libreria mancante? Installala dal",
-        "cta": "Gestore Librerie",
-        "dismiss": "Ignora"
-      }
-    },
-    "fileExplorer": {
-      "workspace": "WORKSPACE",
-      "newWorkspace": "Nuovo workspace (cancella schede, componenti, cavi e file)",
-      "saveProject": "Salva progetto (Ctrl+S)",
-      "clickToEdit": "clicca per modificare",
-      "collapse": "Comprimi",
-      "expand": "Espandi",
-      "newFileInBoard": "Nuovo file in questa scheda",
-      "unsavedChanges": "Modifiche non salvate",
-      "unsavedSuffix": "non salvato",
-      "emptyState": "Aggiungi una scheda al canvas per iniziare a modificare il codice.",
-      "confirmDelete": "Eliminare questo file?",
-      "status": {
-        "running": "In esecuzione",
-        "compiled": "Compilato",
-        "idle": "Inattivo"
-      },
-      "contextMenu": {
-        "rename": "Rinomina",
-        "delete": "Elimina"
-      }
-    },
-    "fileTabs": {
-      "unsavedChanges": "Modifiche non salvate",
-      "close": "Chiudi",
-      "confirmClose": "Chiudere il file con modifiche non salvate?",
-      "closeAnyway": "Chiudi comunque",
-      "cancel": "Annulla"
-    },
-    "loginPrompt": {
-      "title": "Accedi per salvare il progetto",
-      "body": "Crea un account gratuito per salvare e condividere i tuoi progetti.",
-      "createAccount": "Crea account",
-      "cancel": "Annulla"
-    },
-    "saveProject": {
-      "titleSave": "Salva progetto",
-      "titleUpdate": "Aggiorna progetto",
-      "nameLabel": "Nome progetto *",
-      "namePlaceholder": "Il mio fantastico progetto",
-      "descriptionLabel": "Descrizione",
-      "descriptionPlaceholder": "Opzionale",
-      "save": "Salva",
-      "update": "Aggiorna",
-      "saving": "Salvataggio…",
-      "cancel": "Annulla",
-      "visibility": {
-        "public": "Pubblico",
-        "publicHint": "Chiunque abbia il link può visualizzare",
-        "private": "Privato",
-        "privateHint": "Solo tu puoi vedere questo"
-      },
-      "errors": {
-        "nameRequired": "Il nome del progetto è obbligatorio.",
-        "unreachable": "Server non raggiungibile. Controlla la connessione e riprova.",
-        "notAuth": "Non autenticato. Effettua il login e riprova.",
-        "failedStatus": "Salvataggio fallito ({{status}})."
-      }
-    },
-    "share": {
-      "title": "Condividi progetto",
-      "public": "Pubblico",
-      "private": "Privato",
-      "publicHint": "Chiunque abbia il link può visualizzare questo progetto",
-      "privateHint": "Solo tu puoi vedere questo progetto",
-      "makePrivate": "Rendi privato",
-      "makePublic": "Rendi pubblico",
-      "copy": "Copia",
-      "privateWarning": "Questo progetto è privato. Altri vedranno un errore 403 all'apertura di questo link.",
-      "close": "Chiudi"
-    },
-    "canvas": {
-      "status": {
-        "running": "In esecuzione",
-        "stopped": "Fermato"
-      },
-      "activeBoard": "Scheda attiva",
-      "noBoard": "Nessuna scheda",
-      "noBoardHint": "Nessuna scheda sul canvas — aggiungine una con il pulsante Aggiungi per compilare ed eseguire codice",
-      "undo": {
-        "label": "Annulla",
-        "title": "Annulla: {{description}} (Ctrl+Z)",
-        "empty": "Niente da annullare"
-      },
-      "redo": {
-        "label": "Ripeti",
-        "title": "Ripeti: {{description}} (Ctrl+Y)",
-        "empty": "Niente da ripetere"
-      },
-      "toggleSerialMonitor": "Attiva/Disattiva Monitor Seriale",
-      "serial": "Seriale",
-      "toggleScope": "Attiva/Disattiva Oscilloscopio / Analizzatore Logico",
-      "scope": "Oscilloscopio",
-      "zoomIn": "Ingrandisci",
-      "zoomOut": "Riduci",
-      "resetView": "Reimposta vista (clicca per reimpostare)",
-      "componentCount_one": "{{count}} componente",
-      "componentCount_other": "{{count}} componenti",
-      "addComponentTitle": "Aggiungi Componente",
-      "add": "Aggiungi",
-      "dismiss": "Ignora",
-      "removeBoard": "Rimuovi scheda",
-      "wireCount_one": "{{count}} cavo",
-      "wireCount_other": "{{count}} cavi",
-      "removeConfirm": {
-        "boardFallback": "Scheda",
-        "title": "Rimuovere {{label}}?",
-        "body": "Questo rimuoverà la scheda dal workspace. Questa operazione non può essere annullata.",
-        "bodyWithWires_one": "Questo rimuoverà la scheda dal workspace e {{count}} cavo collegato. Questa operazione non può essere annullata.",
-        "bodyWithWires_other": "Questo rimuoverà la scheda dal workspace e {{count}} cavi collegati. Questa operazione non può essere annullata.",
-        "cancel": "Annulla",
-        "remove": "Rimuovi"
-      }
-    },
-    "componentPicker": {
-      "title": "Aggiungi Componente",
-      "close": "Chiudi",
-      "searchPlaceholder": "Cerca componenti...",
-      "clearSearch": "Cancella ricerca",
-      "allComponents": "Tutti i Componenti",
-      "boards": "Schede",
-      "loading": "Caricamento componenti...",
-      "noResults": "Nessun componente trovato",
-      "clearFilters": "Cancella filtri"
-    },
-    "libraryManager": {
-      "title": "GESTORE LIBRERIE",
-      "searchTab": "Cerca",
-      "installedTab": "Installate",
-      "filterPlaceholder": "Filtra la tua ricerca...",
-      "searchingFor": "Ricerca \"{{query}}\"…",
-      "loadingLibraries": "Caricamento librerie…",
-      "noResults": "Nessuna libreria disponibile",
-      "noResultsFor": "Nessuna libreria trovata per \"{{query}}\"",
-      "byAuthor": "di {{author}}",
-      "install": "INSTALLA",
-      "installing": "Installazione...",
-      "uninstall": "DISINSTALLA",
-      "uninstalling": "Disinstallazione...",
-      "loadingInstalled": "Caricamento librerie installate...",
-      "noneInstalled": "Nessuna libreria installata ancora.",
-      "useSearchTab": "Usa la scheda Cerca per installare librerie."
-    },
-    "installLibs": {
-      "title": "LIBRERIE RICHIESTE",
-      "installingProgress": "Installazione {{done}} di {{total}}…",
-      "allDone": "Tutte le librerie installate con successo",
-      "required_one": "Questo progetto richiede {{count}} libreria. Installala per compilare correttamente.",
-      "required_other": "Questo progetto richiede {{count}} librerie. Installale per compilare correttamente.",
-      "wokwiHosted": "Libreria ospitata da Wokwi",
-      "pending": "in attesa",
-      "installing": "installazione…",
-      "installed": "installata",
-      "errorStatus": "errore",
-      "close": "Chiudi",
-      "skip": "Salta",
-      "installAll": "Installa Tutte ({{count}})",
-      "installingShort": "Installazione…"
-    },
-    "shell": {
-      "code": "Codice",
-      "both": "Entrambi",
-      "circuit": "Circuito",
-      "showExplorer": "Mostra esplora file",
-      "hideExplorer": "Nascondi esplora file",
-      "viewMode": "Modalità vista",
-      "dragResize": "Trascina per ridimensionare"
-    },
-    "oscilloscope": {
-      "title": "Oscilloscopio",
-      "addChannelTitle": "Aggiungi un canale pin",
-      "addChannel": "Aggiungi Canale",
-      "timeDiv": "Tempo/div:",
-      "pauseTitle": "Metti in pausa acquisizione",
-      "resumeTitle": "Riprendi acquisizione",
-      "pause": "Pausa",
-      "run": "Esegui",
-      "clearTitle": "Cancella tutti i campioni acquisiti",
-      "clear": "Cancella",
-      "noChannels": "Nessun canale aggiunto.",
-      "noChannelsHint": "Clicca \"+ Aggiungi Canale\" per monitorare un pin.",
-      "removeChannel": "Rimuovi {{label}}"
-    },
-    "componentProps": {
-      "close": "Chiudi",
-      "tapToConnect": "Tocca un pin per connettere:",
-      "tapToWire": "Tocca un pin per cablare:",
-      "pinRoles": "Ruoli Pin:",
-      "arduinoPin": "Pin Arduino:",
-      "confirmDelete": "Eliminare {{name}}?",
-      "confirmDeleteTitle": "Conferma eliminazione",
-      "deleteTitle": "Elimina componente",
-      "rotate90": "Ruota 90°",
-      "rotate": "Ruota",
-      "delete": "Elimina",
-      "cancel": "Annulla"
-    },
-    "selectionBar": {
-      "label": "Azioni di selezione",
-      "rotate90": "Ruota 90°",
-      "rotate": "Ruota",
-      "delete": "Elimina",
-      "deselect": "Deseleziona",
-      "deleteKind": {
-        "wire": "Elimina cavo",
-        "component": "Elimina componente",
-        "board": "Elimina scheda"
-      }
-    },
-    "console": {
-      "title": "Output",
-      "errorCount_one": "{{count}} errore",
-      "errorCount_other": "{{count}} errori",
-      "warningCount_one": "{{count}} avviso",
-      "warningCount_other": "{{count}} avvisi",
-      "filterAll": "Tutti",
-      "filterErrors": "Errori",
-      "filterWarnings": "Avvisi",
-      "auto": "Auto",
-      "clear": "Cancella output",
-      "close": "Chiudi",
-      "empty": "Nessun output di compilazione ancora. Clicca Compila per iniziare."
-    },
-    "boardPicker": {
-      "title": "Aggiungi Scheda"
-    },
-    "pinPicker": {
-      "close": "Chiudi",
-      "filterPins": "Filtra pin…",
-      "noMatch": "Nessun pin corrisponde.",
-      "rotate": "Ruota",
-      "delete": "Elimina"
-    },
-    "pi": {
-      "connected": "Connesso",
-      "starting": "Avvio…",
-      "offline": "Offline",
-      "powerOnTitle": "Accendi il Raspberry Pi",
-      "startPi": "Avvia Pi",
-      "connectTitle": "Connetti terminale al Pi",
-      "connect": "Connetti",
-      "disconnectTitle": "Disconnetti terminale",
-      "disconnect": "Disconnetti",
-      "terminal": "Terminale",
-      "close": "Chiudi",
-      "offlineTitle": "Raspberry Pi 3B è spento",
-      "offlineSubtitle": "Avvia il Pi per aprire un terminale e interagire con il sistema Linux.",
-      "offlineNote1": "Nota: L'esplora file mostra un'area di staging.",
-      "offlineNote2": "Usa \"Carica su Pi\" dopo l'avvio per trasferire file al Pi in esecuzione.",
-      "loadingTerminal": "Caricamento terminale…",
-      "selectFile": "Seleziona un file dall'esplora per modificarlo."
-    },
-    "sensorPanel": {
-      "close": "Chiudi"
-    },
-    "customChip": {
-      "title": "Chip Personalizzato — {{chipName}}",
-      "tabExamples": "Esempi",
-      "tabEditor": "Editor",
-      "attributes": "Attributi",
-      "compiling": "Compilazione…",
-      "compile": "Compila",
-      "compiledOk": "✓ Compilato — {{kb}} KB",
-      "compileFailed": "Compilazione fallita",
-      "cancel": "Annulla",
-      "savePlace": "Salva e Posiziona",
-      "compileFirst": "Prima compila"
-    },
-    "serial": {
-      "title": "Monitor Seriale",
-      "addBoard": "Aggiungi una scheda per avviare il monitor seriale.",
-      "autoscroll": "Scorrimento automatico",
-      "clearTitle": "Cancella output per questa scheda",
-      "clear": "Cancella",
-      "send": "Invia",
-      "iotGatewayTitle": "Clicca per aprire tramite IoT Gateway",
-      "openIotGateway": "Apri IoT Gateway",
-      "waitingData": "In attesa di dati seriali...",
-      "startSim": "Avvia la simulazione per vedere l'output seriale.",
-      "placeholderText": "Scrivi messaggio da inviare...",
-      "placeholderPython": "Scrivi espressione Python... (Ctrl+C per interrompere)",
-      "lineEnd": {
-        "none": "Nessun terminatore",
-        "nl": "Nuova riga",
-        "cr": "Ritorno a capo",
-        "both": "Entrambi NL e CR"
       }
     }
   }

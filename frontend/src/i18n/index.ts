@@ -20,6 +20,7 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
 import enCommon from "./locales/en/common.json";
+import enCommon2 from "./locales/en/common2.json";
 import enReleases from "./locales/en/releases.json";
 import enDocs from "./locales/en/docs.json";
 import enDocs2 from "./locales/en/docs2.json";
@@ -74,6 +75,7 @@ void i18n
       en: {
         common: {
           ...enCommon,
+          ...enCommon2,
           ...enReleases,
           seo: {
             ...enSeo.seo,
@@ -113,6 +115,7 @@ export async function loadLocale(locale: Locale): Promise<void> {
   if (i18n.hasResourceBundle(locale, "common")) return;
   const [
     commonMod,
+    common2Mod,
     releasesMod,
     docsMod,
     docs2Mod,
@@ -122,6 +125,7 @@ export async function loadLocale(locale: Locale): Promise<void> {
     seo4Mod,
   ] = await Promise.all([
     import(`./locales/${locale}/common.json`),
+    import(`./locales/${locale}/common2.json`).catch(() => ({ default: {} })),
     import(`./locales/${locale}/releases.json`),
     import(`./locales/${locale}/docs.json`),
     import(`./locales/${locale}/docs2.json`),
@@ -140,6 +144,7 @@ export async function loadLocale(locale: Locale): Promise<void> {
   };
   const merged = {
     ...(commonMod.default ?? commonMod),
+    ...(common2Mod.default ?? common2Mod),
     ...(releasesMod.default ?? releasesMod),
     seo: seoBody,
     docs: { ...docs1Body, ...docs2Body },

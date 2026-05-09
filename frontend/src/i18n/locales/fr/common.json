@@ -44,7 +44,7 @@
     "features": {
       "label": "Fonctionnalités",
       "title": "Tout ce dont vous avez besoin.",
-      "subtitle": "Un IDE complet, compilateur et simulateur multi-architecture — fonctionnant localement sans services externes.",
+      "subtitle": "Un IDE complet, compilateur et simulateur multi-architecture — fonctionnant localement sans services externes requis.",
       "spice": {
         "title": "Analogique SPICE en temps réel",
         "desc": "Moteur ngspice-WASM — analyse nodale modifiée complète à ~60 Hz. Résistances, condensateurs, amplificateurs opérationnels, BJT, MOSFET, régulateurs se comportent comme du vrai silicium, pas des modèles idéalisés."
@@ -59,7 +59,7 @@
       },
       "components": {
         "title": "100+ composants",
-        "desc": "Pièces analogiques précises SPICE plus 48+ composants visuels wokwi — LED, LCD, TFT ILI9341, servos, buzzers, capteurs ultrasoniques, claviers, bandes NeoPixel."
+        "desc": "Pièces analogiques précises SPICE plus 48+ composants visuels wokwi — LED, LCD, écran TFT ILI9341, servos, buzzers, capteurs ultrasoniques, claviers, bandes NeoPixel."
       },
       "instruments": {
         "title": "Instruments en direct",
@@ -150,7 +150,7 @@
         "boards": "Cartes",
         "country": "Pays",
         "lastActive": "Dernière activité",
-        "joined": "Inscrit le",
+        "joined": "Inscrit",
         "actions": "Actions"
       },
       "actions": {
@@ -196,7 +196,7 @@
         "activityOverTime": "Activité dans le temps",
         "noActivity": "Aucune activité dans cette plage.",
         "compilesByFamily": "Compilations par famille de cartes ({{days}}j)",
-        "diversityTitle": "Combien de familles de cartes par utilisateur",
+        "diversityTitle": "Nombre de familles de cartes par utilisateur",
         "diversitySubtitle": "Signal de tarification — les utilisateurs multi-cartes justifient probablement des niveaux payants.",
         "boardCount_one": "{{count}} carte",
         "boardCount_other": "{{count}} cartes",
@@ -219,7 +219,7 @@
     "activity": {
       "loadFailed": "Échec du chargement de l'activité.",
       "title": "Activité quotidienne — {{username}}",
-      "subtitle": "Nombre de compilations et d'exécutions par jour et par projet pour cet utilisateur.",
+      "subtitle": "Comptes de compilations et d'exécutions par jour et par projet pour cet utilisateur.",
       "noActivity": "Aucune activité dans la plage sélectionnée.",
       "projectCount_one": "{{count}} projet",
       "projectCount_other": "{{count}} projets",
@@ -267,7 +267,7 @@
       "categoryLabel": "Catégorie :",
       "difficultyLabel": "Difficulté :",
       "category": {
-        "all": "Tout",
+        "all": "Toutes",
         "basics": "Bases",
         "sensors": "Capteurs",
         "displays": "Afficheurs",
@@ -277,7 +277,7 @@
         "circuits": "Circuits"
       },
       "difficulty": {
-        "all": "Tout",
+        "all": "Toutes",
         "beginner": "Débutant",
         "intermediate": "Intermédiaire",
         "advanced": "Avancé"
@@ -299,39 +299,10 @@
     "cta": "Mettre une étoile sur GitHub",
     "dismiss": "Ignorer"
   },
-  "about": {
-    "hero": {
-      "title": "À propos de Velxio",
-      "subtitle": "Un émulateur de systèmes embarqués gratuit et open-source — créé par un seul développeur passionné de matériel et d'open source."
-    },
-    "story": {
-      "heading": "L'histoire"
-    },
-    "howItWorks": {
-      "heading": "Comment ça marche"
-    },
-    "openSource": {
-      "heading": "Philosophie open source"
-    },
-    "creator": {
-      "heading": "Le créateur"
-    },
-    "releases": {
-      "heading": "Dernières versions"
-    },
-    "community": {
-      "heading": "Communauté et presse"
-    },
-    "cta": {
-      "title": "Prêt à essayer Velxio ?",
-      "subtitle": "Aucune inscription requise. Fonctionne à 100% dans votre navigateur. Gratuit et open source.",
-      "openEditor": "Ouvrir l'éditeur"
-    }
-  },
   "auth": {
     "login": {
       "title": "Connexion",
-      "subtitle": "pour continuer vers Velxio",
+      "subtitle": "pour continuer sur Velxio",
       "email": "Email",
       "password": "Mot de passe",
       "signIn": "Se connecter",
@@ -352,330 +323,9 @@
       "haveAccount": "Déjà un compte ?",
       "errors": {
         "reserved": "Ce nom d'utilisateur est réservé.",
-        "usernameRules": "Le nom d'utilisateur doit comporter 3 à 30 caractères (a-z, 0-9, _, -)",
+        "usernameRules": "Le nom d'utilisateur doit faire 3 à 30 caractères (a-z, 0-9, _, -)",
         "passwordTooShort": "Le mot de passe doit comporter au moins 8 caractères.",
         "failed": "Échec de l'inscription."
-      }
-    }
-  },
-  "editor": {
-    "toolbar": {
-      "languageMode": "Mode de langage",
-      "compile": {
-        "addBoard": "Ajouter une carte à compiler",
-        "loading": "Chargement…",
-        "loadMicropython": "Charger MicroPython",
-        "compile": "Compiler (Ctrl+B)"
-      },
-      "run": {
-        "addBoard": "Ajouter une carte à exécuter",
-        "runMicropython": "Exécuter MicroPython",
-        "run": "Exécuter (compile automatiquement si nécessaire)"
-      },
-      "stop": "Arrêter",
-      "reset": "Réinitialiser",
-      "compileAll": "Compiler toutes les cartes",
-      "runAll": "Exécuter toutes les cartes",
-      "libraries": {
-        "title": "Rechercher et installer des bibliothèques Arduino",
-        "label": "Bibliothèques"
-      },
-      "import": "Importer un projet depuis un fichier .zip",
-      "export": "Exporter le projet actuel en fichier .zip",
-      "uploadFirmware": "Téléverser un firmware (.hex, .bin, .elf, .ihex) pour contourner la compilation",
-      "toggleConsole": "Afficher/Masquer la console de sortie",
-      "libHint": {
-        "message": "Bibliothèque manquante ? Installez-la depuis le",
-        "cta": "Gestionnaire de bibliothèques",
-        "dismiss": "Ignorer"
-      }
-    },
-    "fileExplorer": {
-      "workspace": "ESPACE DE TRAVAIL",
-      "newWorkspace": "Nouvel espace de travail (efface les cartes, composants, fils et fichiers)",
-      "saveProject": "Enregistrer le projet (Ctrl+S)",
-      "clickToEdit": "cliquer pour éditer",
-      "collapse": "Réduire",
-      "expand": "Développer",
-      "newFileInBoard": "Nouveau fichier dans cette carte",
-      "unsavedChanges": "Modifications non enregistrées",
-      "unsavedSuffix": "non enregistré",
-      "emptyState": "Ajoutez une carte au canevas pour commencer à éditer du code.",
-      "confirmDelete": "Supprimer ce fichier ?",
-      "status": {
-        "running": "En cours",
-        "compiled": "Compilé",
-        "idle": "Inactif"
-      },
-      "contextMenu": {
-        "rename": "Renommer",
-        "delete": "Supprimer"
-      }
-    },
-    "fileTabs": {
-      "unsavedChanges": "Modifications non enregistrées",
-      "close": "Fermer",
-      "confirmClose": "Fermer le fichier avec des modifications non enregistrées ?",
-      "closeAnyway": "Fermer quand même",
-      "cancel": "Annuler"
-    },
-    "loginPrompt": {
-      "title": "Connectez-vous pour enregistrer votre projet",
-      "body": "Créez un compte gratuit pour enregistrer et partager vos projets.",
-      "createAccount": "Créer un compte",
-      "cancel": "Annuler"
-    },
-    "saveProject": {
-      "titleSave": "Enregistrer le projet",
-      "titleUpdate": "Mettre à jour le projet",
-      "nameLabel": "Nom du projet *",
-      "namePlaceholder": "Mon super projet",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Optionnel",
-      "save": "Enregistrer",
-      "update": "Mettre à jour",
-      "saving": "Enregistrement…",
-      "cancel": "Annuler",
-      "visibility": {
-        "public": "Public",
-        "publicHint": "Toute personne ayant le lien peut voir",
-        "private": "Privé",
-        "privateHint": "Vous seul pouvez voir ceci"
-      },
-      "errors": {
-        "nameRequired": "Le nom du projet est requis.",
-        "unreachable": "Serveur inaccessible. Vérifiez votre connexion et réessayez.",
-        "notAuth": "Non authentifié. Veuillez vous connecter et réessayer.",
-        "failedStatus": "Échec de l'enregistrement ({{status}})."
-      }
-    },
-    "share": {
-      "title": "Partager le projet",
-      "public": "Public",
-      "private": "Privé",
-      "publicHint": "Toute personne ayant le lien peut voir ce projet",
-      "privateHint": "Vous seul pouvez voir ce projet",
-      "makePrivate": "Rendre privé",
-      "makePublic": "Rendre public",
-      "copy": "Copier",
-      "privateWarning": "Ce projet est privé. Les autres verront une erreur 403 en ouvrant ce lien.",
-      "close": "Fermer"
-    },
-    "canvas": {
-      "status": {
-        "running": "En cours",
-        "stopped": "Arrêté"
-      },
-      "activeBoard": "Carte active",
-      "noBoard": "Aucune carte",
-      "noBoardHint": "Aucune carte sur le canevas — ajoutez-en une avec le bouton Ajouter pour compiler et exécuter du code",
-      "undo": {
-        "label": "Annuler",
-        "title": "Annuler : {{description}} (Ctrl+Z)",
-        "empty": "Rien à annuler"
-      },
-      "redo": {
-        "label": "Rétablir",
-        "title": "Rétablir : {{description}} (Ctrl+Y)",
-        "empty": "Rien à rétablir"
-      },
-      "toggleSerialMonitor": "Afficher/Masquer le moniteur série",
-      "serial": "Série",
-      "toggleScope": "Afficher/Masquer l'oscilloscope / analyseur logique",
-      "scope": "Scope",
-      "zoomIn": "Zoom avant",
-      "zoomOut": "Zoom arrière",
-      "resetView": "Réinitialiser la vue (cliquer pour réinitialiser)",
-      "componentCount_one": "{{count}} composant",
-      "componentCount_other": "{{count}} composants",
-      "addComponentTitle": "Ajouter un composant",
-      "add": "Ajouter",
-      "dismiss": "Ignorer",
-      "removeBoard": "Supprimer la carte",
-      "wireCount_one": "{{count}} fil",
-      "wireCount_other": "{{count}} fils",
-      "removeConfirm": {
-        "boardFallback": "Carte",
-        "title": "Supprimer {{label}} ?",
-        "body": "Cela supprimera la carte de l'espace de travail. Cette action est irréversible.",
-        "bodyWithWires_one": "Cela supprimera la carte de l'espace de travail et {{count}} fil connecté. Cette action est irréversible.",
-        "bodyWithWires_other": "Cela supprimera la carte de l'espace de travail et {{count}} fils connectés. Cette action est irréversible.",
-        "cancel": "Annuler",
-        "remove": "Supprimer"
-      }
-    },
-    "componentPicker": {
-      "title": "Ajouter un composant",
-      "close": "Fermer",
-      "searchPlaceholder": "Rechercher des composants...",
-      "clearSearch": "Effacer la recherche",
-      "allComponents": "Tous les composants",
-      "boards": "Cartes",
-      "loading": "Chargement des composants...",
-      "noResults": "Aucun composant trouvé",
-      "clearFilters": "Effacer les filtres"
-    },
-    "libraryManager": {
-      "title": "GESTIONNAIRE DE BIBLIOTHÈQUES",
-      "searchTab": "Rechercher",
-      "installedTab": "Installées",
-      "filterPlaceholder": "Filtrer votre recherche...",
-      "searchingFor": "Recherche de \"{{query}}\"…",
-      "loadingLibraries": "Chargement des bibliothèques…",
-      "noResults": "Aucune bibliothèque disponible",
-      "noResultsFor": "Aucune bibliothèque trouvée pour \"{{query}}\"",
-      "byAuthor": "par {{author}}",
-      "install": "INSTALLER",
-      "installing": "Installation...",
-      "uninstall": "DÉSINSTALLER",
-      "uninstalling": "Désinstallation...",
-      "loadingInstalled": "Chargement des bibliothèques installées...",
-      "noneInstalled": "Aucune bibliothèque installée pour l'instant.",
-      "useSearchTab": "Utilisez l'onglet Rechercher pour installer des bibliothèques."
-    },
-    "installLibs": {
-      "title": "BIBLIOTHÈQUES REQUISES",
-      "installingProgress": "Installation de {{done}} sur {{total}}…",
-      "allDone": "Toutes les bibliothèques installées avec succès",
-      "required_one": "Ce projet nécessite {{count}} bibliothèque. Installez-la pour compiler correctement.",
-      "required_other": "Ce projet nécessite {{count}} bibliothèques. Installez-les pour compiler correctement.",
-      "wokwiHosted": "Bibliothèque hébergée par Wokwi",
-      "pending": "en attente",
-      "installing": "installation…",
-      "installed": "installée",
-      "errorStatus": "erreur",
-      "close": "Fermer",
-      "skip": "Passer",
-      "installAll": "Tout installer ({{count}})",
-      "installingShort": "Installation…"
-    },
-    "shell": {
-      "code": "Code",
-      "both": "Les deux",
-      "circuit": "Circuit",
-      "showExplorer": "Afficher l'explorateur de fichiers",
-      "hideExplorer": "Masquer l'explorateur de fichiers",
-      "viewMode": "Mode d'affichage",
-      "dragResize": "Glisser pour redimensionner"
-    },
-    "oscilloscope": {
-      "title": "Oscilloscope",
-      "addChannelTitle": "Ajouter un canal de broche",
-      "addChannel": "Ajouter un canal",
-      "timeDiv": "Temps/div :",
-      "pauseTitle": "Mettre en pause la capture",
-      "resumeTitle": "Reprendre la capture",
-      "pause": "Pause",
-      "run": "Exécuter",
-      "clearTitle": "Effacer tous les échantillons capturés",
-      "clear": "Effacer",
-      "noChannels": "Aucun canal ajouté.",
-      "noChannelsHint": "Cliquez sur \"+ Ajouter un canal\" pour surveiller une broche.",
-      "removeChannel": "Supprimer {{label}}"
-    },
-    "componentProps": {
-      "close": "Fermer",
-      "tapToConnect": "Appuyez sur une broche pour connecter :",
-      "tapToWire": "Appuyez sur une broche pour câbler :",
-      "pinRoles": "Rôles des broches :",
-      "arduinoPin": "Broche Arduino :",
-      "confirmDelete": "Supprimer {{name}} ?",
-      "confirmDeleteTitle": "Confirmer la suppression",
-      "deleteTitle": "Supprimer le composant",
-      "rotate90": "Rotation 90°",
-      "rotate": "Rotation",
-      "delete": "Supprimer",
-      "cancel": "Annuler"
-    },
-    "selectionBar": {
-      "label": "Actions de sélection",
-      "rotate90": "Rotation 90°",
-      "rotate": "Rotation",
-      "delete": "Supprimer",
-      "deselect": "Désélectionner",
-      "deleteKind": {
-        "wire": "Supprimer le fil",
-        "component": "Supprimer le composant",
-        "board": "Supprimer la carte"
-      }
-    },
-    "console": {
-      "title": "Sortie",
-      "errorCount_one": "{{count}} erreur",
-      "errorCount_other": "{{count}} erreurs",
-      "warningCount_one": "{{count}} avertissement",
-      "warningCount_other": "{{count}} avertissements",
-      "filterAll": "Tout",
-      "filterErrors": "Erreurs",
-      "filterWarnings": "Avertissements",
-      "auto": "Auto",
-      "clear": "Effacer la sortie",
-      "close": "Fermer",
-      "empty": "Aucune sortie de compilation pour l'instant. Cliquez sur Compiler pour commencer."
-    },
-    "boardPicker": {
-      "title": "Ajouter une carte"
-    },
-    "pinPicker": {
-      "close": "Fermer",
-      "filterPins": "Filtrer les broches…",
-      "noMatch": "Aucune broche correspondante.",
-      "rotate": "Rotation",
-      "delete": "Supprimer"
-    },
-    "pi": {
-      "connected": "Connecté",
-      "starting": "Démarrage…",
-      "offline": "Hors ligne",
-      "powerOnTitle": "Allumer le Raspberry Pi",
-      "startPi": "Démarrer Pi",
-      "connectTitle": "Connecter le terminal au Pi",
-      "connect": "Connecter",
-      "disconnectTitle": "Déconnecter le terminal",
-      "disconnect": "Déconnecter",
-      "terminal": "Terminal",
-      "close": "Fermer",
-      "offlineTitle": "Raspberry Pi 3B est éteint",
-      "offlineSubtitle": "Démarrez le Pi pour ouvrir un terminal et interagir avec le système Linux.",
-      "offlineNote1": "Remarque : L'explorateur de fichiers affiche une zone de préparation.",
-      "offlineNote2": "Utilisez \"Téléverser vers Pi\" après le démarrage pour transférer des fichiers vers le Pi en cours d'exécution.",
-      "loadingTerminal": "Chargement du terminal…",
-      "selectFile": "Sélectionnez un fichier dans l'explorateur pour l'éditer."
-    },
-    "sensorPanel": {
-      "close": "Fermer"
-    },
-    "customChip": {
-      "title": "Puce personnalisée — {{chipName}}",
-      "tabExamples": "Exemples",
-      "tabEditor": "Éditeur",
-      "attributes": "Attributs",
-      "compiling": "Compilation…",
-      "compile": "Compiler",
-      "compiledOk": "✓ Compilé — {{kb}} Ko",
-      "compileFailed": "Échec de la compilation",
-      "cancel": "Annuler",
-      "savePlace": "Enregistrer & Placer",
-      "compileFirst": "Compiler d'abord"
-    },
-    "serial": {
-      "title": "Moniteur série",
-      "addBoard": "Ajoutez une carte pour démarrer le moniteur série.",
-      "autoscroll": "Défilement auto",
-      "clearTitle": "Effacer la sortie pour cette carte",
-      "clear": "Effacer",
-      "send": "Envoyer",
-      "iotGatewayTitle": "Cliquez pour ouvrir via la passerelle IoT",
-      "openIotGateway": "Ouvrir la passerelle IoT",
-      "waitingData": "Attente de données série...",
-      "startSim": "Démarrez la simulation pour voir la sortie série.",
-      "placeholderText": "Tapez le message à envoyer...",
-      "placeholderPython": "Tapez une expression Python... (Ctrl+C pour interrompre)",
-      "lineEnd": {
-        "none": "Pas de fin de ligne",
-        "nl": "Nouvelle ligne",
-        "cr": "Retour chariot",
-        "both": "NL et CR"
       }
     }
   }
