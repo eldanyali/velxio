@@ -305,22 +305,67 @@
       "subtitle": "A free, open-source embedded systems emulator — built by a single developer with a passion for hardware and open source."
     },
     "story": {
-      "heading": "The Story"
+      "heading": "The Story",
+      "p1": "Velxio started as a personal exploration into how microcontroller emulators work internally — CPU instructions, memory management, peripheral timing, and low-level architecture. What began as a learning project during a vacation quickly grew into something bigger.",
+      "p2": "The idea was simple: <strong>what if anyone could simulate Arduino, ESP32, and Raspberry Pi boards directly in the browser, without buying hardware, without installing toolchains, without cloud accounts?</strong>",
+      "p3": "Velxio v1 launched on Product Hunt and Hacker News, supporting Arduino Uno and Raspberry Pi Pico. The feedback from the maker and embedded community was incredible — and it pushed the project forward.",
+      "p4": "<strong>Velxio 2.0</strong> shipped with ESP32 emulation via QEMU (using the lcgamboa fork), a Raspberry Pi 3 running real Linux, RISC-V support for ESP32-C3 and CH32V003, realistic sensor simulation (DHT22, HC-SR04, WS2812B NeoPixel), and 19 boards across 5 CPU architectures — all running real compiled code.",
+      "p5": "The v2 launch hit the <strong>front page of Hacker News for over 20 hours</strong>, reaching nearly 600 GitHub stars and thousands of visitors in less than 24 hours. It's now being used by students, professors, and makers around the world."
     },
     "howItWorks": {
-      "heading": "How It Works"
+      "heading": "How It Works",
+      "avrRp2040Body": "Cycle-accurate emulation runs entirely in your browser using avr8js and rp2040js. No backend needed for simulation.",
+      "esp32Body": "Xtensa ESP32 and ESP32-S3 run on backend QEMU (lcgamboa fork) with real flash images, GPIO, ADC, and timers.",
+      "riscvBody": "ESP32-C3 (DevKit, XIAO, SuperMini) and CH32V003 are emulated through the QEMU lcgamboa fork with libqemu-riscv32, the same backend pattern as Xtensa ESP32.",
+      "raspiBody": "Full ARM Cortex-A53 Linux via QEMU raspi3b — boots real Raspberry Pi OS and runs Python with RPi.GPIO."
     },
     "openSource": {
-      "heading": "Open Source Philosophy"
+      "heading": "Open Source Philosophy",
+      "lead": "Velxio is <strong>100% open source</strong> under the AGPLv3 license. No cloud dependency, no student accounts, no data leaving your network. Universities and bootcamps can deploy it on their own servers with a single Docker command and give every student access to a complete embedded development environment — for free.",
+      "creditsIntro": "The project builds on top of amazing open-source work from the community:",
+      "credits": {
+        "avr8js": "AVR8 CPU emulation by Wokwi",
+        "rp2040js": "RP2040 emulation by Wokwi",
+        "wokwiElements": "48+ visual electronic components by Wokwi",
+        "qemuLcgamboa": "ESP32 and Raspberry Pi QEMU emulation",
+        "arduinoCli": "Arduino compilation toolchain"
+      },
+      "inspiredBy": "Velxio was inspired by <a>Wokwi</a>, which is a fantastic tool. The goal of Velxio is to take a different path: fully open source, self-hostable, and supporting multiple heterogeneous boards in the same circuit."
     },
     "creator": {
-      "heading": "The Creator"
+      "heading": "The Creator",
+      "role": "Application Architect @ IBM · Montevideo, Uruguay",
+      "bio1": "Application Architect with over 10 years of experience leading the development of large-scale enterprise ecosystems. Specialist in Generative AI (LLMs, RAG, LangChain), Cloud-Native architectures (OpenShift, Kubernetes), and certified Odoo ERP expert. Currently at IBM working on enterprise applications for the Uruguayan State Insurance Bank (BSE).",
+      "bio2": "Studied Computer Science Engineering at Universidad de Oriente in Cuba (2012-2017), then moved to Uruguay where he built a career spanning roles at Quanam (Odoo implementations for government institutions), and IBM (enterprise architecture for BPS and BSE).",
+      "bio3": "Programming and robotics enthusiast. Creator of other open-source projects including a <a>3D racing game running on an ESP32</a> (viral on Reddit with 40K+ views) and an iPod Classic clone for Raspberry Pi.",
+      "techStack": "Tech Stack"
     },
     "releases": {
-      "heading": "Recent releases"
+      "heading": "Recent releases",
+      "latest": "Latest",
+      "v25Tagline": "Arduino meets SPICE in your browser",
+      "v25Blurb": "Real-time analog circuit simulation via ngspice-WASM, wired to Arduino, ESP32 and Raspberry Pi Pico. 100+ SPICE-accurate components, live ammeters and voltmeters, 40 new analog/hybrid examples — co-simulated with your firmware.",
+      "v2Tagline": "Multi-board canvas, ESP32, Raspberry Pi 3",
+      "v2Blurb": "Full QEMU-driven ESP32 emulation with WiFi/BLE, Raspberry Pi 3B Linux, MicroPython support across Pico/ESP32, custom WASM chips, and a redesigned canvas with multi-board co-simulation.",
+      "readNotes": "Read the launch notes →"
+    },
+    "quote": {
+      "p1": "\"I studied Computer Science in Cuba from 2012 to 2017, and when I moved to Uruguay, the most common question was: <em>'How did you graduate as an engineer without internet, without a computer, without YouTube?'</em>",
+      "p2": "I only had 4 words for the answer: <strong>Perseverance! Perseverance! Perseverance! Perseverance!</strong>",
+      "p3": "There is no better motivation than not having a plan B.\""
     },
     "community": {
-      "heading": "Community & Press"
+      "heading": "Community & Press",
+      "stats": {
+        "githubStars": "GitHub Stars",
+        "countries": "Countries",
+        "supportedBoards": "Supported Boards",
+        "cpuArchitectures": "CPU Architectures"
+      },
+      "featuredOn": "Featured on:",
+      "press": {
+        "hackerNews": "Hacker News (Front Page)"
+      }
     },
     "cta": {
       "title": "Ready to try Velxio?",

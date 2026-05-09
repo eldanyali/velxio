@@ -23,6 +23,10 @@ import enCommon from "./locales/en/common.json";
 import enReleases from "./locales/en/releases.json";
 import enDocs from "./locales/en/docs.json";
 import enDocs2 from "./locales/en/docs2.json";
+import enSeo from "./locales/en/seo.json";
+import enSeo2 from "./locales/en/seo2.json";
+import enSeo3 from "./locales/en/seo3.json";
+import enSeo4 from "./locales/en/seo4.json";
 import { DEFAULT_LOCALE, LOCALES, isLocale, type Locale } from "./config";
 import { getLocaleFromPath } from "./path";
 import { readLocaleCookie } from "./cookie";
@@ -71,6 +75,12 @@ void i18n
         common: {
           ...enCommon,
           ...enReleases,
+          seo: {
+            ...enSeo.seo,
+            ...enSeo2.seo,
+            ...enSeo3.seo,
+            ...enSeo4.seo,
+          },
           docs: { ...enDocs.docs, ...enDocs2.docs },
         },
       },
@@ -101,17 +111,37 @@ void i18n
 export async function loadLocale(locale: Locale): Promise<void> {
   if (locale === DEFAULT_LOCALE) return;
   if (i18n.hasResourceBundle(locale, "common")) return;
-  const [commonMod, releasesMod, docsMod, docs2Mod] = await Promise.all([
+  const [
+    commonMod,
+    releasesMod,
+    docsMod,
+    docs2Mod,
+    seoMod,
+    seo2Mod,
+    seo3Mod,
+    seo4Mod,
+  ] = await Promise.all([
     import(`./locales/${locale}/common.json`),
     import(`./locales/${locale}/releases.json`),
     import(`./locales/${locale}/docs.json`),
     import(`./locales/${locale}/docs2.json`),
+    import(`./locales/${locale}/seo.json`).catch(() => ({ default: { seo: {} } })),
+    import(`./locales/${locale}/seo2.json`).catch(() => ({ default: { seo: {} } })),
+    import(`./locales/${locale}/seo3.json`).catch(() => ({ default: { seo: {} } })),
+    import(`./locales/${locale}/seo4.json`).catch(() => ({ default: { seo: {} } })),
   ]);
   const docs1Body = (docsMod.default ?? docsMod).docs ?? {};
   const docs2Body = (docs2Mod.default ?? docs2Mod).docs ?? {};
+  const seoBody = {
+    ...((seoMod.default ?? seoMod).seo ?? {}),
+    ...((seo2Mod.default ?? seo2Mod).seo ?? {}),
+    ...((seo3Mod.default ?? seo3Mod).seo ?? {}),
+    ...((seo4Mod.default ?? seo4Mod).seo ?? {}),
+  };
   const merged = {
     ...(commonMod.default ?? commonMod),
     ...(releasesMod.default ?? releasesMod),
+    seo: seoBody,
     docs: { ...docs1Body, ...docs2Body },
   };
   i18n.addResourceBundle(locale, "common", merged, true, true);

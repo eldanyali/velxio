@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import { AppHeader } from '../components/layout/AppHeader';
 import { useLocalizedHref } from '../i18n/useLocalizedNavigate';
 import { useSEO } from '../utils/useSEO';
@@ -84,35 +84,16 @@ export const AboutPage: React.FC = () => {
         <div className="about-container">
           <div className="about-story">
             <h2 className="about-heading">{t('about.story.heading')}</h2>
+            <p>{t('about.story.p1')}</p>
             <p>
-              Velxio started as a personal exploration into how microcontroller emulators work
-              internally — CPU instructions, memory management, peripheral timing, and low-level
-              architecture. What began as a learning project during a vacation quickly grew into
-              something bigger.
+              <Trans i18nKey="about.story.p2" components={{ strong: <strong /> }} />
+            </p>
+            <p>{t('about.story.p3')}</p>
+            <p>
+              <Trans i18nKey="about.story.p4" components={{ strong: <strong /> }} />
             </p>
             <p>
-              The idea was simple:{' '}
-              <strong>
-                what if anyone could simulate Arduino, ESP32, and Raspberry Pi boards directly in
-                the browser, without buying hardware, without installing toolchains, without cloud
-                accounts?
-              </strong>
-            </p>
-            <p>
-              Velxio v1 launched on Product Hunt and Hacker News, supporting Arduino Uno and
-              Raspberry Pi Pico. The feedback from the maker and embedded community was incredible —
-              and it pushed the project forward.
-            </p>
-            <p>
-              <strong>Velxio 2.0</strong> shipped with ESP32 emulation via QEMU (using the lcgamboa
-              fork), a Raspberry Pi 3 running real Linux, RISC-V support for ESP32-C3 and CH32V003,
-              realistic sensor simulation (DHT22, HC-SR04, WS2812B NeoPixel), and 19 boards across 5
-              CPU architectures — all running real compiled code.
-            </p>
-            <p>
-              The v2 launch hit the <strong>front page of Hacker News for over 20 hours</strong>,
-              reaching nearly 600 GitHub stars and thousands of visitors in less than 24 hours. It's
-              now being used by students, professors, and makers around the world.
+              <Trans i18nKey="about.story.p5" components={{ strong: <strong /> }} />
             </p>
           </div>
         </div>
@@ -132,10 +113,7 @@ export const AboutPage: React.FC = () => {
                 </svg>
               </div>
               <h3>AVR8 &amp; RP2040</h3>
-              <p>
-                Cycle-accurate emulation runs entirely in your browser using avr8js and rp2040js. No
-                backend needed for simulation.
-              </p>
+              <p>{t('about.howItWorks.avrRp2040Body')}</p>
             </div>
             <div className="about-arch-card">
               <div className="about-arch-icon">
@@ -144,10 +122,7 @@ export const AboutPage: React.FC = () => {
                 </svg>
               </div>
               <h3>ESP32 via QEMU</h3>
-              <p>
-                Xtensa ESP32 and ESP32-S3 run on backend QEMU (lcgamboa fork) with real flash
-                images, GPIO, ADC, and timers.
-              </p>
+              <p>{t('about.howItWorks.esp32Body')}</p>
             </div>
             <div className="about-arch-card">
               <div className="about-arch-icon">
@@ -157,10 +132,7 @@ export const AboutPage: React.FC = () => {
                 </svg>
               </div>
               <h3>RISC-V via QEMU</h3>
-              <p>
-                ESP32-C3 (DevKit, XIAO, SuperMini) and CH32V003 are emulated through the QEMU
-                lcgamboa fork with libqemu-riscv32, the same backend pattern as Xtensa ESP32.
-              </p>
+              <p>{t('about.howItWorks.riscvBody')}</p>
             </div>
             <div className="about-arch-card">
               <div className="about-arch-icon">
@@ -171,10 +143,7 @@ export const AboutPage: React.FC = () => {
                 </svg>
               </div>
               <h3>Raspberry Pi 3</h3>
-              <p>
-                Full ARM Cortex-A53 Linux via QEMU raspi3b — boots real Raspberry Pi OS and runs
-                Python with RPi.GPIO.
-              </p>
+              <p>{t('about.howItWorks.raspiBody')}</p>
             </div>
           </div>
         </div>
@@ -185,24 +154,21 @@ export const AboutPage: React.FC = () => {
         <div className="about-container">
           <h2 className="about-heading">{t('about.openSource.heading')}</h2>
           <p>
-            Velxio is <strong>100% open source</strong> under the AGPLv3 license. No cloud
-            dependency, no student accounts, no data leaving your network. Universities and
-            bootcamps can deploy it on their own servers with a single Docker command and give every
-            student access to a complete embedded development environment — for free.
+            <Trans i18nKey="about.openSource.lead" components={{ strong: <strong /> }} />
           </p>
-          <p>The project builds on top of amazing open-source work from the community:</p>
+          <p>{t('about.openSource.creditsIntro')}</p>
           <ul className="about-credits-list">
             <li>
               <a href="https://github.com/wokwi/avr8js" target="_blank" rel="noopener noreferrer">
                 avr8js
               </a>{' '}
-              — AVR8 CPU emulation by Wokwi
+              — {t('about.openSource.credits.avr8js')}
             </li>
             <li>
               <a href="https://github.com/wokwi/rp2040js" target="_blank" rel="noopener noreferrer">
                 rp2040js
               </a>{' '}
-              — RP2040 emulation by Wokwi
+              — {t('about.openSource.credits.rp2040js')}
             </li>
             <li>
               <a
@@ -212,13 +178,13 @@ export const AboutPage: React.FC = () => {
               >
                 wokwi-elements
               </a>{' '}
-              — 48+ visual electronic components by Wokwi
+              — {t('about.openSource.credits.wokwiElements')}
             </li>
             <li>
               <a href="https://github.com/lcgamboa/qemu" target="_blank" rel="noopener noreferrer">
                 QEMU lcgamboa fork
               </a>{' '}
-              — ESP32 and Raspberry Pi QEMU emulation
+              — {t('about.openSource.credits.qemuLcgamboa')}
             </li>
             <li>
               <a
@@ -228,16 +194,16 @@ export const AboutPage: React.FC = () => {
               >
                 arduino-cli
               </a>{' '}
-              — Arduino compilation toolchain
+              — {t('about.openSource.credits.arduinoCli')}
             </li>
           </ul>
           <p>
-            Velxio was inspired by{' '}
-            <a href="https://wokwi.com" target="_blank" rel="noopener noreferrer">
-              Wokwi
-            </a>
-            , which is a fantastic tool. The goal of Velxio is to take a different path: fully open
-            source, self-hostable, and supporting multiple heterogeneous boards in the same circuit.
+            <Trans
+              i18nKey="about.openSource.inspiredBy"
+              components={{
+                a: <a href="https://wokwi.com" target="_blank" rel="noopener noreferrer" />,
+              }}
+            />
           </p>
         </div>
       </section>
@@ -260,37 +226,26 @@ export const AboutPage: React.FC = () => {
             </div>
             <div className="about-creator-info">
               <h3 className="about-creator-name">David Montero Crespo</h3>
-              <p className="about-creator-role">
-                Application Architect @ IBM &middot; Montevideo, Uruguay
-              </p>
+              <p className="about-creator-role">{t('about.creator.role')}</p>
+              <p className="about-creator-bio">{t('about.creator.bio1')}</p>
+              <p className="about-creator-bio">{t('about.creator.bio2')}</p>
               <p className="about-creator-bio">
-                Application Architect with over 10 years of experience leading the development of
-                large-scale enterprise ecosystems. Specialist in Generative AI (LLMs, RAG,
-                LangChain), Cloud-Native architectures (OpenShift, Kubernetes), and certified Odoo
-                ERP expert. Currently at IBM working on enterprise applications for the Uruguayan
-                State Insurance Bank (BSE).
-              </p>
-              <p className="about-creator-bio">
-                Studied Computer Science Engineering at Universidad de Oriente in Cuba (2012-2017),
-                then moved to Uruguay where he built a career spanning roles at Quanam (Odoo
-                implementations for government institutions), and IBM (enterprise architecture for
-                BPS and BSE).
-              </p>
-              <p className="about-creator-bio">
-                Programming and robotics enthusiast. Creator of other open-source projects including
-                a{' '}
-                <a
-                  href="https://github.com/davidmonterocrespo24"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  3D racing game running on an ESP32
-                </a>{' '}
-                (viral on Reddit with 40K+ views) and an iPod Classic clone for Raspberry Pi.
+                <Trans
+                  i18nKey="about.creator.bio3"
+                  components={{
+                    a: (
+                      <a
+                        href="https://github.com/davidmonterocrespo24"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    ),
+                  }}
+                />
               </p>
 
               <div className="about-creator-stack">
-                <h4>Tech Stack</h4>
+                <h4>{t('about.creator.techStack')}</h4>
                 <div className="about-tags">
                   <span className="about-tag">Java</span>
                   <span className="about-tag">Python</span>
@@ -347,26 +302,18 @@ export const AboutPage: React.FC = () => {
         <div className="about-container">
           <h2 className="about-heading">{t('about.releases.heading')}</h2>
           <div className="about-releases">
-            <Link to="/v2-5" className="about-release-card about-release-card-latest">
-              <span className="about-release-tag">Latest</span>
+            <Link to={localize('/v2-5')} className="about-release-card about-release-card-latest">
+              <span className="about-release-tag">{t('about.releases.latest')}</span>
               <h3>Velxio 2.5</h3>
-              <p className="about-release-tagline">Arduino meets SPICE in your browser</p>
-              <p className="about-release-blurb">
-                Real-time analog circuit simulation via ngspice-WASM, wired to Arduino, ESP32 and
-                Raspberry Pi Pico. 100+ SPICE-accurate components, live ammeters and voltmeters,
-                40 new analog/hybrid examples — co-simulated with your firmware.
-              </p>
-              <span className="about-release-link">Read the launch notes →</span>
+              <p className="about-release-tagline">{t('about.releases.v25Tagline')}</p>
+              <p className="about-release-blurb">{t('about.releases.v25Blurb')}</p>
+              <span className="about-release-link">{t('about.releases.readNotes')}</span>
             </Link>
-            <Link to="/v2" className="about-release-card">
+            <Link to={localize('/v2')} className="about-release-card">
               <h3>Velxio 2.0</h3>
-              <p className="about-release-tagline">Multi-board canvas, ESP32, Raspberry Pi 3</p>
-              <p className="about-release-blurb">
-                Full QEMU-driven ESP32 emulation with WiFi/BLE, Raspberry Pi 3B Linux, MicroPython
-                support across Pico/ESP32, custom WASM chips, and a redesigned canvas with
-                multi-board co-simulation.
-              </p>
-              <span className="about-release-link">Read the launch notes →</span>
+              <p className="about-release-tagline">{t('about.releases.v2Tagline')}</p>
+              <p className="about-release-blurb">{t('about.releases.v2Blurb')}</p>
+              <span className="about-release-link">{t('about.releases.readNotes')}</span>
             </Link>
           </div>
         </div>
@@ -377,18 +324,12 @@ export const AboutPage: React.FC = () => {
         <div className="about-container">
           <blockquote className="about-quote">
             <p>
-              "I studied Computer Science in Cuba from 2012 to 2017, and when I moved to Uruguay,
-              the most common question was:{' '}
-              <em>
-                'How did you graduate as an engineer without internet, without a computer, without
-                YouTube?'
-              </em>
+              <Trans i18nKey="about.quote.p1" components={{ em: <em /> }} />
             </p>
             <p>
-              I only had 4 words for the answer:{' '}
-              <strong>Perseverance! Perseverance! Perseverance! Perseverance!</strong>
+              <Trans i18nKey="about.quote.p2" components={{ strong: <strong /> }} />
             </p>
-            <p>There is no better motivation than not having a plan B."</p>
+            <p>{t('about.quote.p3')}</p>
             <cite>— David Montero Crespo</cite>
           </blockquote>
         </div>
@@ -401,23 +342,23 @@ export const AboutPage: React.FC = () => {
           <div className="about-stats-grid">
             <div className="about-stat">
               <span className="about-stat-number">2,000+</span>
-              <span className="about-stat-label">GitHub Stars</span>
+              <span className="about-stat-label">{t('about.community.stats.githubStars')}</span>
             </div>
             <div className="about-stat">
               <span className="about-stat-number">97+</span>
-              <span className="about-stat-label">Countries</span>
+              <span className="about-stat-label">{t('about.community.stats.countries')}</span>
             </div>
             <div className="about-stat">
               <span className="about-stat-number">17</span>
-              <span className="about-stat-label">Supported Boards</span>
+              <span className="about-stat-label">{t('about.community.stats.supportedBoards')}</span>
             </div>
             <div className="about-stat">
               <span className="about-stat-number">6</span>
-              <span className="about-stat-label">CPU Architectures</span>
+              <span className="about-stat-label">{t('about.community.stats.cpuArchitectures')}</span>
             </div>
           </div>
           <div className="about-press">
-            <p>Featured on:</p>
+            <p>{t('about.community.featuredOn')}</p>
             <div className="about-press-list">
               <a
                 href={HN_THREAD_V2}
@@ -425,7 +366,7 @@ export const AboutPage: React.FC = () => {
                 rel="noopener noreferrer"
                 className="about-press-badge"
               >
-                Hacker News (Front Page)
+                {t('about.community.press.hackerNews')}
               </a>
               <a
                 href={PRODUCT_HUNT_URL}
