@@ -179,6 +179,49 @@
       "copy": "Kopieren",
       "privateWarning": "Dieses Projekt ist privat. Andere sehen beim Öffnen des Links einen 403-Fehler.",
       "close": "Schließen"
+    },
+    "canvas": {
+      "status": {
+        "running": "Läuft",
+        "stopped": "Gestoppt"
+      },
+      "activeBoard": "Aktives Board",
+      "noBoard": "Kein Board",
+      "noBoardHint": "Kein Board auf der Leinwand — füge eines über den Hinzufügen-Button hinzu, um Code zu kompilieren und auszuführen",
+      "undo": {
+        "label": "Rückgängig",
+        "title": "Rückgängig: {{description}} (Strg+Z)",
+        "empty": "Nichts rückgängig zu machen"
+      },
+      "redo": {
+        "label": "Wiederherstellen",
+        "title": "Wiederherstellen: {{description}} (Strg+Y)",
+        "empty": "Nichts wiederherzustellen"
+      },
+      "toggleSerialMonitor": "Serial Monitor umschalten",
+      "serial": "Serial",
+      "toggleScope": "Oszilloskop / Logikanalysator umschalten",
+      "scope": "Scope",
+      "zoomIn": "Vergrößern",
+      "zoomOut": "Verkleinern",
+      "resetView": "Ansicht zurücksetzen (klicken zum Zurücksetzen)",
+      "componentCount_one": "{{count}} Bauteil",
+      "componentCount_other": "{{count}} Bauteile",
+      "addComponentTitle": "Bauteil hinzufügen",
+      "add": "Hinzufügen",
+      "dismiss": "Schließen",
+      "removeBoard": "Board entfernen",
+      "wireCount_one": "{{count}} Draht",
+      "wireCount_other": "{{count}} Drähte",
+      "removeConfirm": {
+        "boardFallback": "Board",
+        "title": "{{label}} entfernen?",
+        "body": "Das Board wird aus dem Arbeitsbereich entfernt. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+        "bodyWithWires_one": "Das Board wird aus dem Arbeitsbereich entfernt zusammen mit {{count}} verbundenen Draht. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+        "bodyWithWires_other": "Das Board wird aus dem Arbeitsbereich entfernt zusammen mit {{count}} verbundenen Drähten. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+        "cancel": "Abbrechen",
+        "remove": "Entfernen"
+      }
     }
   }
 }

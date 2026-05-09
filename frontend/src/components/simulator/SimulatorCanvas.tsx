@@ -2,6 +2,7 @@ import { useSimulatorStore, getEsp32Bridge } from '../../store/useSimulatorStore
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Undo2, Redo2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ESP32_ADC_PIN_MAP } from '../velxio-components/Esp32Element';
 import { ComponentPickerModal } from '../ComponentPickerModal';
 import { ComponentPropertyDialog } from './ComponentPropertyDialog';
@@ -87,6 +88,7 @@ interface SimulatorCanvasProps {
 }
 
 export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
+  const { t } = useTranslation();
   const isTouchDevice = useIsCoarsePointer();
   // Mirror to a ref so the long-lived touch handler effect (deps deliberately
   // narrow to avoid rebinding listeners on every render) can read the latest
@@ -1866,7 +1868,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               cursor: 'pointer',
             }}
           >
-            Dismiss
+            {t('editor.canvas.dismiss')}
           </button>
         </div>
       )}
@@ -1880,7 +1882,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
             {/* Status LED */}
             <span
               className={`status-dot ${running ? 'running' : 'stopped'}`}
-              title={running ? 'Running' : 'Stopped'}
+              title={running ? t('editor.canvas.status.running') : t('editor.canvas.status.stopped')}
             />
 
             {/* Active board selector (multi-board) — hidden when no boards */}
@@ -1890,7 +1892,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                 value={activeBoardId ?? ''}
                 onChange={(e) => useSimulatorStore.getState().setActiveBoardId(e.target.value)}
                 disabled={running}
-                title="Active board"
+                title={t('editor.canvas.activeBoard')}
               >
                 {boards.map((b) => (
                   <option key={b.id} value={b.id}>
@@ -1902,9 +1904,9 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               <span
                 className="board-selector"
                 style={{ opacity: 0.55, fontStyle: 'italic', cursor: 'default' }}
-                title="No board on canvas — add one with the Add button to compile and run code"
+                title={t('editor.canvas.noBoardHint')}
               >
-                No board
+                {t('editor.canvas.noBoard')}
               </span>
             )}
 
@@ -1918,10 +1920,10 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               className="canvas-icon-btn"
               title={
                 historyIndex >= 0
-                  ? `Undo: ${history[historyIndex].description} (Ctrl+Z)`
-                  : 'Nothing to undo'
+                  ? t('editor.canvas.undo.title', { description: history[historyIndex].description })
+                  : t('editor.canvas.undo.empty')
               }
-              aria-label="Undo"
+              aria-label={t('editor.canvas.undo.label')}
             >
               <Undo2 size={16} strokeWidth={2} aria-hidden="true" />
             </button>
@@ -1931,10 +1933,10 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               className="canvas-icon-btn"
               title={
                 historyIndex < history.length - 1
-                  ? `Redo: ${history[historyIndex + 1].description} (Ctrl+Y)`
-                  : 'Nothing to redo'
+                  ? t('editor.canvas.redo.title', { description: history[historyIndex + 1].description })
+                  : t('editor.canvas.redo.empty')
               }
-              aria-label="Redo"
+              aria-label={t('editor.canvas.redo.label')}
             >
               <Redo2 size={16} strokeWidth={2} aria-hidden="true" />
             </button>
@@ -1946,7 +1948,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                 trackToggleSerialMonitor(!serialMonitorOpen);
               }}
               className={`canvas-serial-btn${serialMonitorOpen ? ' canvas-serial-btn-active' : ''}`}
-              title="Toggle Serial Monitor"
+              title={t('editor.canvas.toggleSerialMonitor')}
             >
               <svg
                 width="22"
@@ -1961,7 +1963,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                 <rect x="2" y="3" width="20" height="14" rx="2" />
                 <path d="M8 21h8M12 17v4" />
               </svg>
-              Serial
+              {t('editor.canvas.serial')}
             </button>
 
             {/* ESP32-CAM webcam stream toggle */}
@@ -2045,7 +2047,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
             <button
               onClick={toggleOscilloscope}
               className={`canvas-serial-btn${oscilloscopeOpen ? ' canvas-serial-btn-active' : ''}`}
-              title="Toggle Oscilloscope / Logic Analyzer"
+              title={t('editor.canvas.toggleScope')}
             >
               <svg
                 width="22"
@@ -2059,7 +2061,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               >
                 <polyline points="2 14 6 8 10 14 14 6 18 14 22 10" />
               </svg>
-              Scope
+              {t('editor.canvas.scope')}
             </button>
           </div>
 
@@ -2076,7 +2078,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                     preventDefault: () => {},
                   } as any)
                 }
-                title="Zoom out"
+                title={t('editor.canvas.zoomOut')}
               >
                 <svg
                   width="14"
@@ -2093,7 +2095,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
               <button
                 className="zoom-level"
                 onClick={handleResetView}
-                title="Reset view (click to reset)"
+                title={t('editor.canvas.resetView')}
               >
                 {Math.round(zoom * 100)}%
               </button>
@@ -2107,7 +2109,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                     preventDefault: () => {},
                   } as any)
                 }
-                title="Zoom in"
+                title={t('editor.canvas.zoomIn')}
               >
                 <svg
                   width="14"
@@ -2127,7 +2129,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
             {/* Component count */}
             <span
               className="component-count"
-              title={`${components.length} component${components.length !== 1 ? 's' : ''}`}
+              title={t('editor.canvas.componentCount', { count: components.length })}
             >
               <svg
                 width="15"
@@ -2149,7 +2151,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
             <button
               className="add-component-btn"
               onClick={() => setShowComponentPicker(true)}
-              title="Add Component"
+              title={t('editor.canvas.addComponentTitle')}
               disabled={running}
             >
               <svg
@@ -2165,7 +2167,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              Add
+              {t('editor.canvas.add')}
             </button>
           </div>
         </div>
@@ -2666,10 +2668,10 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                   </svg>
-                  Remove board
+                  {t('editor.canvas.removeBoard')}
                   {connectedWires > 0 && (
                     <span style={{ color: '#888', fontSize: 11 }}>
-                      ({connectedWires} wire{connectedWires > 1 ? 's' : ''})
+                      ({t('editor.canvas.wireCount', { count: connectedWires })})
                     </span>
                   )}
                 </button>
@@ -2682,7 +2684,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
       {boardToRemove &&
         (() => {
           const board = boards.find((b) => b.id === boardToRemove);
-          const label = board ? BOARD_KIND_LABELS[board.boardKind] : 'Board';
+          const label = board ? BOARD_KIND_LABELS[board.boardKind] : t('editor.canvas.removeConfirm.boardFallback');
           const connectedWires = wires.filter(
             (w) => w.start.componentId === boardToRemove || w.end.componentId === boardToRemove,
           ).length;
@@ -2709,20 +2711,12 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                 }}
               >
                 <h3 style={{ margin: '0 0 10px', color: '#e0e0e0', fontSize: 15 }}>
-                  Remove {label}?
+                  {t('editor.canvas.removeConfirm.title', { label })}
                 </h3>
                 <p style={{ margin: '0 0 16px', color: '#999', fontSize: 13, lineHeight: 1.5 }}>
-                  This will remove the board from the workspace
-                  {connectedWires > 0 && (
-                    <>
-                      {' '}
-                      and{' '}
-                      <strong style={{ color: '#e06c75' }}>
-                        {connectedWires} connected wire{connectedWires > 1 ? 's' : ''}
-                      </strong>
-                    </>
-                  )}
-                  . This action cannot be undone.
+                  {connectedWires > 0
+                    ? t('editor.canvas.removeConfirm.bodyWithWires', { count: connectedWires })
+                    : t('editor.canvas.removeConfirm.body')}
                 </p>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                   <button
@@ -2737,7 +2731,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                       fontSize: 13,
                     }}
                   >
-                    Cancel
+                    {t('editor.canvas.removeConfirm.cancel')}
                   </button>
                   <button
                     onClick={() => {
@@ -2754,7 +2748,7 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                       fontSize: 13,
                     }}
                   >
-                    Remove
+                    {t('editor.canvas.removeConfirm.remove')}
                   </button>
                 </div>
               </div>

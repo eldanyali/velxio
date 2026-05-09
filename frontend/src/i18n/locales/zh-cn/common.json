@@ -179,6 +179,46 @@
       "copy": "复制",
       "privateWarning": "此项目为私有。他人打开此链接将看到 403 错误。",
       "close": "关闭"
+    },
+    "canvas": {
+      "status": {
+        "running": "运行中",
+        "stopped": "已停止"
+      },
+      "activeBoard": "当前开发板",
+      "noBoard": "无开发板",
+      "noBoardHint": "画布上没有开发板 —— 点击「添加」按钮以编译并运行代码",
+      "undo": {
+        "label": "撤销",
+        "title": "撤销：{{description}} (Ctrl+Z)",
+        "empty": "无可撤销"
+      },
+      "redo": {
+        "label": "重做",
+        "title": "重做：{{description}} (Ctrl+Y)",
+        "empty": "无可重做"
+      },
+      "toggleSerialMonitor": "切换串口监视器",
+      "serial": "串口",
+      "toggleScope": "切换示波器 / 逻辑分析仪",
+      "scope": "示波器",
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "resetView": "重置视图（点击重置）",
+      "componentCount_other": "{{count}} 个元件",
+      "addComponentTitle": "添加元件",
+      "add": "添加",
+      "dismiss": "关闭",
+      "removeBoard": "移除开发板",
+      "wireCount_other": "{{count}} 根连线",
+      "removeConfirm": {
+        "boardFallback": "开发板",
+        "title": "移除 {{label}}？",
+        "body": "这将从工作区中移除该开发板。此操作无法撤销。",
+        "bodyWithWires_other": "这将从工作区中移除该开发板以及 {{count}} 根连接的线缆。此操作无法撤销。",
+        "cancel": "取消",
+        "remove": "移除"
+      }
     }
   }
 }

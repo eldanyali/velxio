@@ -179,6 +179,49 @@
       "copy": "Copiar",
       "privateWarning": "Este projeto é privado. Outros verão um erro 403 ao abrir este link.",
       "close": "Fechar"
+    },
+    "canvas": {
+      "status": {
+        "running": "Em execução",
+        "stopped": "Parado"
+      },
+      "activeBoard": "Placa ativa",
+      "noBoard": "Sem placa",
+      "noBoardHint": "Sem placa na tela — adicione uma com o botão Adicionar para compilar e executar código",
+      "undo": {
+        "label": "Desfazer",
+        "title": "Desfazer: {{description}} (Ctrl+Z)",
+        "empty": "Nada para desfazer"
+      },
+      "redo": {
+        "label": "Refazer",
+        "title": "Refazer: {{description}} (Ctrl+Y)",
+        "empty": "Nada para refazer"
+      },
+      "toggleSerialMonitor": "Alternar monitor serial",
+      "serial": "Serial",
+      "toggleScope": "Alternar osciloscópio / analisador lógico",
+      "scope": "Osciloscópio",
+      "zoomIn": "Aumentar zoom",
+      "zoomOut": "Reduzir zoom",
+      "resetView": "Redefinir visualização (clique para redefinir)",
+      "componentCount_one": "{{count}} componente",
+      "componentCount_other": "{{count}} componentes",
+      "addComponentTitle": "Adicionar componente",
+      "add": "Adicionar",
+      "dismiss": "Dispensar",
+      "removeBoard": "Remover placa",
+      "wireCount_one": "{{count}} fio",
+      "wireCount_other": "{{count}} fios",
+      "removeConfirm": {
+        "boardFallback": "Placa",
+        "title": "Remover {{label}}?",
+        "body": "Isso vai remover a placa do espaço de trabalho. Esta ação não pode ser desfeita.",
+        "bodyWithWires_one": "Isso vai remover a placa do espaço de trabalho e {{count}} fio conectado. Esta ação não pode ser desfeita.",
+        "bodyWithWires_other": "Isso vai remover a placa do espaço de trabalho e {{count}} fios conectados. Esta ação não pode ser desfeita.",
+        "cancel": "Cancelar",
+        "remove": "Remover"
+      }
     }
   }
 }

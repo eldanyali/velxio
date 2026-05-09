@@ -179,6 +179,49 @@
       "copy": "Copier",
       "privateWarning": "Ce projet est privé. Les autres verront une erreur 403 en ouvrant ce lien.",
       "close": "Fermer"
+    },
+    "canvas": {
+      "status": {
+        "running": "En cours",
+        "stopped": "Arrêté"
+      },
+      "activeBoard": "Carte active",
+      "noBoard": "Aucune carte",
+      "noBoardHint": "Aucune carte sur le canevas — ajoutez-en une avec le bouton Ajouter pour compiler et exécuter du code",
+      "undo": {
+        "label": "Annuler",
+        "title": "Annuler : {{description}} (Ctrl+Z)",
+        "empty": "Rien à annuler"
+      },
+      "redo": {
+        "label": "Rétablir",
+        "title": "Rétablir : {{description}} (Ctrl+Y)",
+        "empty": "Rien à rétablir"
+      },
+      "toggleSerialMonitor": "Afficher/masquer le moniteur série",
+      "serial": "Série",
+      "toggleScope": "Afficher/masquer l'oscilloscope / analyseur logique",
+      "scope": "Oscilloscope",
+      "zoomIn": "Zoom avant",
+      "zoomOut": "Zoom arrière",
+      "resetView": "Réinitialiser la vue (cliquez pour réinitialiser)",
+      "componentCount_one": "{{count}} composant",
+      "componentCount_other": "{{count}} composants",
+      "addComponentTitle": "Ajouter un composant",
+      "add": "Ajouter",
+      "dismiss": "Fermer",
+      "removeBoard": "Retirer la carte",
+      "wireCount_one": "{{count}} fil",
+      "wireCount_other": "{{count}} fils",
+      "removeConfirm": {
+        "boardFallback": "Carte",
+        "title": "Retirer {{label}} ?",
+        "body": "La carte sera retirée de l'espace de travail. Cette action est irréversible.",
+        "bodyWithWires_one": "La carte sera retirée de l'espace de travail ainsi que {{count}} fil connecté. Cette action est irréversible.",
+        "bodyWithWires_other": "La carte sera retirée de l'espace de travail ainsi que {{count}} fils connectés. Cette action est irréversible.",
+        "cancel": "Annuler",
+        "remove": "Retirer"
+      }
     }
   }
 }

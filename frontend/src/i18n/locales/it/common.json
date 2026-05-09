@@ -179,6 +179,49 @@
       "copy": "Copia",
       "privateWarning": "Questo progetto è privato. Gli altri vedranno un errore 403 aprendo il link.",
       "close": "Chiudi"
+    },
+    "canvas": {
+      "status": {
+        "running": "In esecuzione",
+        "stopped": "Fermato"
+      },
+      "activeBoard": "Scheda attiva",
+      "noBoard": "Nessuna scheda",
+      "noBoardHint": "Nessuna scheda sul canvas — aggiungine una con il pulsante Aggiungi per compilare ed eseguire codice",
+      "undo": {
+        "label": "Annulla",
+        "title": "Annulla: {{description}} (Ctrl+Z)",
+        "empty": "Niente da annullare"
+      },
+      "redo": {
+        "label": "Ripeti",
+        "title": "Ripeti: {{description}} (Ctrl+Y)",
+        "empty": "Niente da ripetere"
+      },
+      "toggleSerialMonitor": "Mostra/nascondi monitor seriale",
+      "serial": "Seriale",
+      "toggleScope": "Mostra/nascondi oscilloscopio / analizzatore logico",
+      "scope": "Oscilloscopio",
+      "zoomIn": "Zoom avanti",
+      "zoomOut": "Zoom indietro",
+      "resetView": "Ripristina vista (clic per ripristinare)",
+      "componentCount_one": "{{count}} componente",
+      "componentCount_other": "{{count}} componenti",
+      "addComponentTitle": "Aggiungi componente",
+      "add": "Aggiungi",
+      "dismiss": "Ignora",
+      "removeBoard": "Rimuovi scheda",
+      "wireCount_one": "{{count}} filo",
+      "wireCount_other": "{{count}} fili",
+      "removeConfirm": {
+        "boardFallback": "Scheda",
+        "title": "Rimuovere {{label}}?",
+        "body": "La scheda verrà rimossa dal workspace. Questa azione non può essere annullata.",
+        "bodyWithWires_one": "La scheda verrà rimossa dal workspace insieme a {{count}} filo collegato. Questa azione non può essere annullata.",
+        "bodyWithWires_other": "La scheda verrà rimossa dal workspace insieme a {{count}} fili collegati. Questa azione non può essere annullata.",
+        "cancel": "Annulla",
+        "remove": "Rimuovi"
+      }
     }
   }
 }

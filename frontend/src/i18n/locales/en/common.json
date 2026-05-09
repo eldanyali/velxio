@@ -179,6 +179,49 @@
       "copy": "Copy",
       "privateWarning": "This project is private. Others will see a 403 error when opening this link.",
       "close": "Close"
+    },
+    "canvas": {
+      "status": {
+        "running": "Running",
+        "stopped": "Stopped"
+      },
+      "activeBoard": "Active board",
+      "noBoard": "No board",
+      "noBoardHint": "No board on canvas — add one with the Add button to compile and run code",
+      "undo": {
+        "label": "Undo",
+        "title": "Undo: {{description}} (Ctrl+Z)",
+        "empty": "Nothing to undo"
+      },
+      "redo": {
+        "label": "Redo",
+        "title": "Redo: {{description}} (Ctrl+Y)",
+        "empty": "Nothing to redo"
+      },
+      "toggleSerialMonitor": "Toggle Serial Monitor",
+      "serial": "Serial",
+      "toggleScope": "Toggle Oscilloscope / Logic Analyzer",
+      "scope": "Scope",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "resetView": "Reset view (click to reset)",
+      "componentCount_one": "{{count}} component",
+      "componentCount_other": "{{count}} components",
+      "addComponentTitle": "Add Component",
+      "add": "Add",
+      "dismiss": "Dismiss",
+      "removeBoard": "Remove board",
+      "wireCount_one": "{{count}} wire",
+      "wireCount_other": "{{count}} wires",
+      "removeConfirm": {
+        "boardFallback": "Board",
+        "title": "Remove {{label}}?",
+        "body": "This will remove the board from the workspace. This action cannot be undone.",
+        "bodyWithWires_one": "This will remove the board from the workspace and {{count}} connected wire. This action cannot be undone.",
+        "bodyWithWires_other": "This will remove the board from the workspace and {{count}} connected wires. This action cannot be undone.",
+        "cancel": "Cancel",
+        "remove": "Remove"
+      }
     }
   }
 }
