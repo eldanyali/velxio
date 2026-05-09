@@ -192,7 +192,7 @@ ENV IDF_CCACHE_ENABLE=1
 # embed absolute paths into the command line.
 ENV CCACHE_BASEDIR=/var/lib/velxio-build
 RUN mkdir -p /var/cache/ccache \
-    && ccache --max-size=2G \
+    && ccache --max-size=8G \
     && ccache --set-config=compression=true \
     && ccache --set-config=compression_level=6
 
