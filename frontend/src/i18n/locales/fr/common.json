@@ -304,6 +304,35 @@
         "cancel": "Annuler",
         "remove": "Retirer"
       }
+    },
+    "componentPicker": {
+      "title": "Ajouter un composant",
+      "close": "Fermer",
+      "searchPlaceholder": "Rechercher des composants...",
+      "clearSearch": "Effacer la recherche",
+      "allComponents": "Tous les composants",
+      "boards": "Cartes",
+      "loading": "Chargement des composants...",
+      "noResults": "Aucun composant trouvé",
+      "clearFilters": "Effacer les filtres"
+    },
+    "libraryManager": {
+      "title": "GESTIONNAIRE DE BIBLIOTHÈQUES",
+      "searchTab": "Rechercher",
+      "installedTab": "Installées",
+      "filterPlaceholder": "Filtrer la recherche...",
+      "searchingFor": "Recherche de « {{query}} »…",
+      "loadingLibraries": "Chargement des bibliothèques…",
+      "noResults": "Aucune bibliothèque disponible",
+      "noResultsFor": "Aucune bibliothèque trouvée pour « {{query}} »",
+      "byAuthor": "par {{author}}",
+      "install": "INSTALLER",
+      "installing": "Installation...",
+      "uninstall": "DÉSINSTALLER",
+      "uninstalling": "Désinstallation...",
+      "loadingInstalled": "Chargement des bibliothèques installées...",
+      "noneInstalled": "Aucune bibliothèque installée pour le moment.",
+      "useSearchTab": "Utilisez l'onglet Rechercher pour installer des bibliothèques."
     }
   }
 }

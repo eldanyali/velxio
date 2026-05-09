@@ -312,6 +312,35 @@
         "cancel": "Отмена",
         "remove": "Удалить"
       }
+    },
+    "componentPicker": {
+      "title": "Добавить компонент",
+      "close": "Закрыть",
+      "searchPlaceholder": "Поиск компонентов...",
+      "clearSearch": "Очистить поиск",
+      "allComponents": "Все компоненты",
+      "boards": "Платы",
+      "loading": "Загрузка компонентов...",
+      "noResults": "Компоненты не найдены",
+      "clearFilters": "Сбросить фильтры"
+    },
+    "libraryManager": {
+      "title": "МЕНЕДЖЕР БИБЛИОТЕК",
+      "searchTab": "Поиск",
+      "installedTab": "Установленные",
+      "filterPlaceholder": "Фильтр по поиску...",
+      "searchingFor": "Поиск «{{query}}»…",
+      "loadingLibraries": "Загрузка библиотек…",
+      "noResults": "Нет доступных библиотек",
+      "noResultsFor": "Не найдено библиотек по запросу «{{query}}»",
+      "byAuthor": "автор: {{author}}",
+      "install": "УСТАНОВИТЬ",
+      "installing": "Установка...",
+      "uninstall": "УДАЛИТЬ",
+      "uninstalling": "Удаление...",
+      "loadingInstalled": "Загрузка установленных библиотек...",
+      "noneInstalled": "Пока нет установленных библиотек.",
+      "useSearchTab": "Используйте вкладку Поиск, чтобы установить библиотеки."
     }
   }
 }

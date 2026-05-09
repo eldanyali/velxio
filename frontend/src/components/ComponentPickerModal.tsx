@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ComponentRegistry } from '../services/ComponentRegistry';
 import type { ComponentMetadata, ComponentCategory } from '../types/component-metadata';
 import type { BoardKind } from '../types/board';
@@ -79,6 +80,7 @@ export const ComponentPickerModal: React.FC<ComponentPickerModalProps> = ({
   onSelectComponent,
   onSelectBoard,
 }) => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ComponentCategory | 'all' | 'boards'>(
     'all',
@@ -133,8 +135,8 @@ export const ComponentPickerModal: React.FC<ComponentPickerModalProps> = ({
       <div className="component-picker-modal" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="modal-header">
-          <h2>Add Component</h2>
-          <button className="close-btn" onClick={onClose} aria-label="Close">
+          <h2>{t('editor.componentPicker.title')}</h2>
+          <button className="close-btn" onClick={onClose} aria-label={t('editor.componentPicker.close')}>
             X
           </button>
         </div>
@@ -145,7 +147,7 @@ export const ComponentPickerModal: React.FC<ComponentPickerModalProps> = ({
             <input
               type="text"
               className="search-input"
-              placeholder="Search components..."
+              placeholder={t('editor.componentPicker.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
@@ -154,7 +156,7 @@ export const ComponentPickerModal: React.FC<ComponentPickerModalProps> = ({
               <button
                 className="clear-search-btn"
                 onClick={() => setSearchQuery('')}
-                aria-label="Clear search"
+                aria-label={t('editor.componentPicker.clearSearch')}
               >
                 X
               </button>
@@ -168,7 +170,7 @@ export const ComponentPickerModal: React.FC<ComponentPickerModalProps> = ({
             className={`category-tab ${selectedCategory === 'all' ? 'active' : ''}`}
             onClick={() => setSelectedCategory('all')}
           >
-            All Components
+            {t('editor.componentPicker.allComponents')}
           </button>
           {categories
             .filter((c) => c !== 'boards')
@@ -186,7 +188,7 @@ export const ComponentPickerModal: React.FC<ComponentPickerModalProps> = ({
               className={`category-tab ${selectedCategory === 'boards' ? 'active' : ''}`}
               onClick={() => setSelectedCategory('boards')}
             >
-              Boards
+              {t('editor.componentPicker.boards')}
             </button>
           )}
         </div>
@@ -237,11 +239,11 @@ export const ComponentPickerModal: React.FC<ComponentPickerModalProps> = ({
                 {isLoading ? (
                   <div className="loading-state">
                     <div className="spinner"></div>
-                    <p>Loading components...</p>
+                    <p>{t('editor.componentPicker.loading')}</p>
                   </div>
                 ) : filteredComponents.length === 0 ? (
                   <div className="no-results">
-                    <p>No components found</p>
+                    <p>{t('editor.componentPicker.noResults')}</p>
                     {searchQuery && (
                       <button
                         className="clear-filters-btn"
@@ -250,7 +252,7 @@ export const ComponentPickerModal: React.FC<ComponentPickerModalProps> = ({
                           setSelectedCategory('all');
                         }}
                       >
-                        Clear filters
+                        {t('editor.componentPicker.clearFilters')}
                       </button>
                     )}
                   </div>

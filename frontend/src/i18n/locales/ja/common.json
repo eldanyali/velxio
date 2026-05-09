@@ -300,6 +300,35 @@
         "cancel": "キャンセル",
         "remove": "削除"
       }
+    },
+    "componentPicker": {
+      "title": "コンポーネントを追加",
+      "close": "閉じる",
+      "searchPlaceholder": "コンポーネントを検索...",
+      "clearSearch": "検索をクリア",
+      "allComponents": "すべてのコンポーネント",
+      "boards": "ボード",
+      "loading": "コンポーネントを読み込み中...",
+      "noResults": "コンポーネントが見つかりません",
+      "clearFilters": "フィルタをクリア"
+    },
+    "libraryManager": {
+      "title": "ライブラリマネージャー",
+      "searchTab": "検索",
+      "installedTab": "インストール済み",
+      "filterPlaceholder": "検索を絞り込む...",
+      "searchingFor": "「{{query}}」を検索中…",
+      "loadingLibraries": "ライブラリを読み込み中…",
+      "noResults": "利用可能なライブラリがありません",
+      "noResultsFor": "「{{query}}」に該当するライブラリは見つかりません",
+      "byAuthor": "作成者：{{author}}",
+      "install": "インストール",
+      "installing": "インストール中...",
+      "uninstall": "アンインストール",
+      "uninstalling": "アンインストール中...",
+      "loadingInstalled": "インストール済みライブラリを読み込み中...",
+      "noneInstalled": "まだライブラリはインストールされていません。",
+      "useSearchTab": "ライブラリをインストールするには「検索」タブを使用してください。"
     }
   }
 }

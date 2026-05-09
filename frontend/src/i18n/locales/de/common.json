@@ -304,6 +304,35 @@
         "cancel": "Abbrechen",
         "remove": "Entfernen"
       }
+    },
+    "componentPicker": {
+      "title": "Bauteil hinzufügen",
+      "close": "Schließen",
+      "searchPlaceholder": "Bauteile suchen...",
+      "clearSearch": "Suche zurücksetzen",
+      "allComponents": "Alle Bauteile",
+      "boards": "Boards",
+      "loading": "Bauteile werden geladen...",
+      "noResults": "Keine Bauteile gefunden",
+      "clearFilters": "Filter zurücksetzen"
+    },
+    "libraryManager": {
+      "title": "BIBLIOTHEKSMANAGER",
+      "searchTab": "Suchen",
+      "installedTab": "Installiert",
+      "filterPlaceholder": "Suche filtern...",
+      "searchingFor": "Suche nach „{{query}}\"…",
+      "loadingLibraries": "Bibliotheken werden geladen…",
+      "noResults": "Keine Bibliotheken verfügbar",
+      "noResultsFor": "Keine Bibliotheken für „{{query}}\" gefunden",
+      "byAuthor": "von {{author}}",
+      "install": "INSTALLIEREN",
+      "installing": "Wird installiert...",
+      "uninstall": "DEINSTALLIEREN",
+      "uninstalling": "Wird deinstalliert...",
+      "loadingInstalled": "Installierte Bibliotheken werden geladen...",
+      "noneInstalled": "Noch keine Bibliotheken installiert.",
+      "useSearchTab": "Nutze den Tab Suchen, um Bibliotheken zu installieren."
     }
   }
 }

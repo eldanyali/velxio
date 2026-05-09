@@ -304,6 +304,35 @@
         "cancel": "Annulla",
         "remove": "Rimuovi"
       }
+    },
+    "componentPicker": {
+      "title": "Aggiungi componente",
+      "close": "Chiudi",
+      "searchPlaceholder": "Cerca componenti...",
+      "clearSearch": "Cancella ricerca",
+      "allComponents": "Tutti i componenti",
+      "boards": "Schede",
+      "loading": "Caricamento componenti...",
+      "noResults": "Nessun componente trovato",
+      "clearFilters": "Cancella filtri"
+    },
+    "libraryManager": {
+      "title": "GESTORE LIBRERIE",
+      "searchTab": "Cerca",
+      "installedTab": "Installate",
+      "filterPlaceholder": "Filtra la ricerca...",
+      "searchingFor": "Ricerca di \"{{query}}\"…",
+      "loadingLibraries": "Caricamento librerie…",
+      "noResults": "Nessuna libreria disponibile",
+      "noResultsFor": "Nessuna libreria trovata per \"{{query}}\"",
+      "byAuthor": "di {{author}}",
+      "install": "INSTALLA",
+      "installing": "Installazione...",
+      "uninstall": "DISINSTALLA",
+      "uninstalling": "Disinstallazione...",
+      "loadingInstalled": "Caricamento librerie installate...",
+      "noneInstalled": "Nessuna libreria ancora installata.",
+      "useSearchTab": "Usa la scheda Cerca per installare librerie."
     }
   }
 }

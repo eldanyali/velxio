@@ -304,6 +304,35 @@
         "cancel": "Cancel",
         "remove": "Remove"
       }
+    },
+    "componentPicker": {
+      "title": "Add Component",
+      "close": "Close",
+      "searchPlaceholder": "Search components...",
+      "clearSearch": "Clear search",
+      "allComponents": "All Components",
+      "boards": "Boards",
+      "loading": "Loading components...",
+      "noResults": "No components found",
+      "clearFilters": "Clear filters"
+    },
+    "libraryManager": {
+      "title": "LIBRARY MANAGER",
+      "searchTab": "Search",
+      "installedTab": "Installed",
+      "filterPlaceholder": "Filter your search...",
+      "searchingFor": "Searching \"{{query}}\"…",
+      "loadingLibraries": "Loading libraries…",
+      "noResults": "No libraries available",
+      "noResultsFor": "No libraries found for \"{{query}}\"",
+      "byAuthor": "by {{author}}",
+      "install": "INSTALL",
+      "installing": "Installing...",
+      "uninstall": "UNINSTALL",
+      "uninstalling": "Uninstalling...",
+      "loadingInstalled": "Loading installed libraries...",
+      "noneInstalled": "No libraries installed yet.",
+      "useSearchTab": "Use the Search tab to install libraries."
     }
   }
 }
