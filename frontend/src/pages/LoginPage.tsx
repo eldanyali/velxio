@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { login, initiateGoogleLogin } from '../services/authService';
 import { useAuthStore } from '../store/useAuthStore';
+import { useLocalizedHref } from '../i18n/useLocalizedNavigate';
 import { useSEO } from '../utils/useSEO';
 import { trackLogin } from '../utils/analytics';
 
 export const LoginPage: React.FC = () => {
+  const { t } = useTranslation();
+  const localize = useLocalizedHref();
   useSEO({
     title: 'Sign In — Velxio',
     description:
@@ -29,9 +33,9 @@ export const LoginPage: React.FC = () => {
       const user = await login(email, password);
       trackLogin('email');
       setUser(user);
-      navigate(searchParams.get('redirect') || '/');
+      navigate(searchParams.get('redirect') || localize('/'));
     } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Login failed.');
+      setError(err?.response?.data?.detail || t('auth.login.failed'));
     } finally {
       setLoading(false);
     }
@@ -40,14 +44,14 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="ap-page">
       <div className="ap-card">
-        <h1 className="ap-card-title">Sign in</h1>
-        <p className="ap-card-sub">to continue to Velxio</p>
+        <h1 className="ap-card-title">{t('auth.login.title')}</h1>
+        <p className="ap-card-sub">{t('auth.login.subtitle')}</p>
 
         {error && <div className="ap-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="ap-form">
           <div className="ap-field">
-            <label className="ap-label">Email</label>
+            <label className="ap-label">{t('auth.login.email')}</label>
             <input
               type="email"
               value={email}
@@ -58,7 +62,7 @@ export const LoginPage: React.FC = () => {
             />
           </div>
           <div className="ap-field">
-            <label className="ap-label">Password</label>
+            <label className="ap-label">{t('auth.login.password')}</label>
             <input
               type="password"
               value={password}
@@ -68,11 +72,11 @@ export const LoginPage: React.FC = () => {
             />
           </div>
           <button type="submit" disabled={loading} className="ap-btn-primary">
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading ? t('auth.login.signingIn') : t('auth.login.signIn')}
           </button>
         </form>
 
-        <div className="ap-divider">or</div>
+        <div className="ap-divider">{t('auth.login.or')}</div>
 
         <button
           onClick={() => {
@@ -99,13 +103,13 @@ export const LoginPage: React.FC = () => {
               d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
             />
           </svg>
-          Continue with Google
+          {t('auth.login.continueGoogle')}
         </button>
 
         <p className="ap-footer">
-          Don't have an account?{' '}
-          <Link to="/register" className="ap-link">
-            Sign up
+          {t('auth.login.noAccount')}{' '}
+          <Link to={localize('/register')} className="ap-link">
+            {t('header.auth.signUp')}
           </Link>
         </p>
       </div>

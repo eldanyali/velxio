@@ -77,6 +77,36 @@
       "ctaPaypal": "Donar con PayPal"
     }
   },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "para continuar en Velxio",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "signIn": "Iniciar sesión",
+      "signingIn": "Iniciando sesión…",
+      "or": "o",
+      "continueGoogle": "Continuar con Google",
+      "noAccount": "¿No tienes cuenta?",
+      "failed": "Error al iniciar sesión."
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "subtitle": "Empieza a construir gratis",
+      "username": "Nombre de usuario",
+      "usernamePlaceholder": "ej. alice",
+      "passwordPlaceholder": "Al menos 8 caracteres",
+      "create": "Crear cuenta",
+      "creating": "Creando cuenta…",
+      "haveAccount": "¿Ya tienes cuenta?",
+      "errors": {
+        "reserved": "Ese nombre de usuario está reservado.",
+        "usernameRules": "El usuario debe tener 3-30 caracteres (a-z, 0-9, _, -)",
+        "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+        "failed": "Error al registrarse."
+      }
+    }
+  },
   "editor": {
     "toolbar": {
       "languageMode": "Modo de lenguaje",

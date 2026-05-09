@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { register, initiateGoogleLogin } from '../services/authService';
 import { useAuthStore } from '../store/useAuthStore';
+import { useLocalizedHref } from '../i18n/useLocalizedNavigate';
 import { RESERVED_USERNAMES } from '../utils/reservedUsernames';
 import { useSEO } from '../utils/useSEO';
 import { trackSignUp } from '../utils/analytics';
 
 export const RegisterPage: React.FC = () => {
+  const { t } = useTranslation();
+  const localize = useLocalizedHref();
   useSEO({
     title: 'Create Account — Velxio',
     description:
@@ -24,8 +28,8 @@ export const RegisterPage: React.FC = () => {
 
   const validateUsername = (name: string): string | null => {
     const lower = name.toLowerCase();
-    if (RESERVED_USERNAMES.has(lower)) return 'That username is reserved.';
-    if (!/^[a-z0-9_-]{3,30}$/.test(lower)) return 'Username must be 3-30 chars (a-z, 0-9, _, -)';
+    if (RESERVED_USERNAMES.has(lower)) return t('auth.register.errors.reserved');
+    if (!/^[a-z0-9_-]{3,30}$/.test(lower)) return t('auth.register.errors.usernameRules');
     return null;
   };
 
@@ -38,7 +42,7 @@ export const RegisterPage: React.FC = () => {
       return;
     }
     if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
+      setError(t('auth.register.errors.passwordTooShort'));
       return;
     }
 
@@ -47,9 +51,9 @@ export const RegisterPage: React.FC = () => {
       const user = await register(username.toLowerCase(), email, password);
       trackSignUp('email');
       setUser(user);
-      navigate('/editor');
+      navigate(localize('/editor'));
     } catch (err: any) {
-      setError(err?.response?.data?.detail || 'Registration failed.');
+      setError(err?.response?.data?.detail || t('auth.register.errors.failed'));
     } finally {
       setLoading(false);
     }
@@ -58,14 +62,14 @@ export const RegisterPage: React.FC = () => {
   return (
     <div className="ap-page">
       <div className="ap-card">
-        <h1 className="ap-card-title">Create account</h1>
-        <p className="ap-card-sub">Start building for free</p>
+        <h1 className="ap-card-title">{t('auth.register.title')}</h1>
+        <p className="ap-card-sub">{t('auth.register.subtitle')}</p>
 
         {error && <div className="ap-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="ap-form">
           <div className="ap-field">
-            <label className="ap-label">Username</label>
+            <label className="ap-label">{t('auth.register.username')}</label>
             <input
               type="text"
               value={username}
@@ -73,11 +77,11 @@ export const RegisterPage: React.FC = () => {
               required
               className="ap-input"
               autoFocus
-              placeholder="e.g. alice"
+              placeholder={t('auth.register.usernamePlaceholder')}
             />
           </div>
           <div className="ap-field">
-            <label className="ap-label">Email</label>
+            <label className="ap-label">{t('auth.login.email')}</label>
             <input
               type="email"
               value={email}
@@ -87,22 +91,22 @@ export const RegisterPage: React.FC = () => {
             />
           </div>
           <div className="ap-field">
-            <label className="ap-label">Password</label>
+            <label className="ap-label">{t('auth.login.password')}</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               className="ap-input"
-              placeholder="At least 8 characters"
+              placeholder={t('auth.register.passwordPlaceholder')}
             />
           </div>
           <button type="submit" disabled={loading} className="ap-btn-primary">
-            {loading ? 'Creating account…' : 'Create account'}
+            {loading ? t('auth.register.creating') : t('auth.register.create')}
           </button>
         </form>
 
-        <div className="ap-divider">or</div>
+        <div className="ap-divider">{t('auth.login.or')}</div>
 
         <button
           onClick={() => {
@@ -129,13 +133,13 @@ export const RegisterPage: React.FC = () => {
               d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
             />
           </svg>
-          Continue with Google
+          {t('auth.login.continueGoogle')}
         </button>
 
         <p className="ap-footer">
-          Already have an account?{' '}
-          <Link to="/login" className="ap-link">
-            Sign in
+          {t('auth.register.haveAccount')}{' '}
+          <Link to={localize('/login')} className="ap-link">
+            {t('header.auth.signIn')}
           </Link>
         </p>
       </div>

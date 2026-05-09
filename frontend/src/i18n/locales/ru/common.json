@@ -77,6 +77,36 @@
       "ctaPaypal": "Пожертвовать через PayPal"
     }
   },
+  "auth": {
+    "login": {
+      "title": "Войти",
+      "subtitle": "чтобы продолжить в Velxio",
+      "email": "Email",
+      "password": "Пароль",
+      "signIn": "Войти",
+      "signingIn": "Вход…",
+      "or": "или",
+      "continueGoogle": "Продолжить с Google",
+      "noAccount": "Нет аккаунта?",
+      "failed": "Не удалось войти."
+    },
+    "register": {
+      "title": "Создать аккаунт",
+      "subtitle": "Начните бесплатно",
+      "username": "Имя пользователя",
+      "usernamePlaceholder": "напр. alice",
+      "passwordPlaceholder": "Минимум 8 символов",
+      "create": "Создать аккаунт",
+      "creating": "Создание аккаунта…",
+      "haveAccount": "Уже есть аккаунт?",
+      "errors": {
+        "reserved": "Это имя пользователя зарезервировано.",
+        "usernameRules": "Имя пользователя должно быть 3-30 символов (a-z, 0-9, _, -)",
+        "passwordTooShort": "Пароль должен быть не менее 8 символов.",
+        "failed": "Регистрация не удалась."
+      }
+    }
+  },
   "editor": {
     "toolbar": {
       "languageMode": "Режим языка",

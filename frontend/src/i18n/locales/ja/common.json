@@ -77,6 +77,36 @@
       "ctaPaypal": "PayPal で寄付する"
     }
   },
+  "auth": {
+    "login": {
+      "title": "サインイン",
+      "subtitle": "Velxio を続けるには",
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "signIn": "サインイン",
+      "signingIn": "サインイン中…",
+      "or": "または",
+      "continueGoogle": "Google で続ける",
+      "noAccount": "アカウントをお持ちでないですか？",
+      "failed": "サインインに失敗しました。"
+    },
+    "register": {
+      "title": "アカウント作成",
+      "subtitle": "無料で始めましょう",
+      "username": "ユーザー名",
+      "usernamePlaceholder": "例：alice",
+      "passwordPlaceholder": "8 文字以上",
+      "create": "アカウント作成",
+      "creating": "アカウントを作成中…",
+      "haveAccount": "すでにアカウントをお持ちですか？",
+      "errors": {
+        "reserved": "このユーザー名は予約されています。",
+        "usernameRules": "ユーザー名は 3〜30 文字（a-z、0-9、_、-）で指定してください",
+        "passwordTooShort": "パスワードは 8 文字以上にしてください。",
+        "failed": "登録に失敗しました。"
+      }
+    }
+  },
   "editor": {
     "toolbar": {
       "languageMode": "言語モード",
