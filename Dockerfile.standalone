@@ -191,10 +191,17 @@ ENV IDF_CCACHE_ENABLE=1
 # ccache hit across compiles even though some flags (-I, -fmacro-prefix-map)
 # embed absolute paths into the command line.
 ENV CCACHE_BASEDIR=/var/lib/velxio-build
-RUN mkdir -p /var/cache/ccache \
-    && ccache --max-size=8G \
-    && ccache --set-config=compression=true \
-    && ccache --set-config=compression_level=6
+# Cache cap, compression. These are set as env vars (rather than written
+# to /var/cache/ccache/ccache.conf via `ccache --set-config` at image-build
+# time) because $CCACHE_DIR is a named volume — anything we write into it
+# during build is masked at runtime by the volume mount, so config in the
+# image gets shadowed by whatever's already in the volume. ccache reads
+# CCACHE_MAXSIZE / CCACHE_COMPRESS / CCACHE_COMPRESSLEVEL at runtime,
+# overriding any conf-file value.
+ENV CCACHE_MAXSIZE=8G
+ENV CCACHE_COMPRESS=1
+ENV CCACHE_COMPRESSLEVEL=6
+RUN mkdir -p /var/cache/ccache
 
 # Install ESP-IDF Python dependencies using the final image's Python
 # The requirements.txt has version constraints required by ESP-IDF 4.4.x
