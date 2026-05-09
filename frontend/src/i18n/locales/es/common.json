@@ -29,7 +29,7 @@
     "hero": {
       "titleLine1": "Arduino, ESP32 y Raspberry Pi.",
       "titleAccent": "Directamente en tu navegador.",
-      "subtitle": "Escribe código, conecta componentes, pulsa ejecutar. 19 placas, más de 48 componentes, emulación real de CPU — sin hardware, sin instalación, sin nube.",
+      "subtitle": "Escribe código, conecta componentes, pulsa ejecutar. 19 placas, más de 48 componentes, emulación real de CPU: sin hardware, sin instalación, sin nube.",
       "ctaPrimary": "Probar el simulador gratis →",
       "ctaGithub": "Ver en GitHub",
       "trustLine": "No requiere registro · Funciona 100% en tu navegador · Gratuito y de código abierto",
@@ -38,15 +38,15 @@
     "boards": {
       "label": "Hardware compatible",
       "titleLine1": "Cada arquitectura.",
-      "titleLine2": "Una sola herramienta.",
-      "subtitle": "19 placas en 5 arquitecturas de CPU: AVR8, ARM Cortex-M0+, RISC-V, Xtensa y Linux. Todo se ejecuta localmente, sin necesidad de nube."
+      "titleLine2": "Una herramienta.",
+      "subtitle": "19 placas en 5 arquitecturas de CPU: AVR8, ARM Cortex-M0+, RISC-V, Xtensa y Linux. Todo funciona localmente, sin necesidad de nube."
     },
     "features": {
       "label": "Características",
       "title": "Todo lo que necesitas.",
-      "subtitle": "Un IDE completo, compilador y simulador multiarquitectura — que funciona localmente sin servicios externos.",
+      "subtitle": "Un IDE completo, compilador y simulador multiarquitectura, que funciona localmente sin necesidad de servicios externos.",
       "spice": {
-        "title": "Analógico SPICE en tiempo real",
+        "title": "SPICE analógico en tiempo real",
         "desc": "Motor ngspice-WASM: análisis nodal modificado completo a ~60 Hz. Resistencias, condensadores, amplificadores operacionales, BJT, MOSFET, reguladores se comportan como silicio real, no como modelos idealizados."
       },
       "engines": {
@@ -55,11 +55,11 @@
       },
       "customChips": {
         "title": "Chips personalizados",
-        "desc": "Crea tus propios circuitos integrados en C, Rust o AssemblyScript usando la API de Chips Personalizados de Wokwi. Compila a WebAssembly y reutilízalos en varios proyectos."
+        "desc": "Crea tus propios circuitos integrados en C, Rust o AssemblyScript usando la API de Wokwi Custom Chips. Compila a WebAssembly y reutiliza entre proyectos."
       },
       "components": {
         "title": "Más de 100 componentes",
-        "desc": "Componentes analógicos precisos con SPICE y más de 48 componentes visuales de wokwi: LED, LCD, pantalla TFT ILI9341, servos, zumbadores, sensores ultrasónicos, teclados, tiras de NeoPixel."
+        "desc": "Componentes analógicos precisos con SPICE y más de 48 componentes visuales de wokwi: LEDs, LCD, pantalla TFT ILI9341, servos, zumbadores, sensores ultrasónicos, teclados, tiras de NeoPixel."
       },
       "instruments": {
         "title": "Instrumentos en vivo",
@@ -67,14 +67,14 @@
       },
       "monaco": {
         "title": "Editor Monaco + arduino-cli",
-        "desc": "Editor C++ de nivel VS Code con espacio de trabajo de varios archivos. arduino-cli local compila a archivos .hex / .uf2 / .bin reales — sin ida y vuelta a la nube."
+        "desc": "Editor C++ de nivel VS Code con espacio de trabajo de varios archivos. arduino-cli local compila a archivos .hex / .uf2 / .bin reales, sin ida y vuelta a la nube."
       }
     },
     "support": {
       "title": "Apoya el proyecto",
       "subtitle": "Velxio es gratuito y de código abierto. Si te ahorra tiempo, considera apoyar su desarrollo.",
       "ctaSponsors": "GitHub Sponsors",
-      "ctaPaypal": "Donar vía PayPal"
+      "ctaPaypal": "Donar con PayPal"
     }
   },
   "profile": {
@@ -196,8 +196,8 @@
         "activityOverTime": "Actividad a lo largo del tiempo",
         "noActivity": "Aún no hay actividad en este rango.",
         "compilesByFamily": "Compilaciones por familia de placa ({{days}}d)",
-        "diversityTitle": "Cuántas familias de placas por usuario",
-        "diversitySubtitle": "Indicador de precios: los usuarios con varias placas probablemente justifiquen niveles de pago.",
+        "diversityTitle": "Cuántas familias de placa por usuario",
+        "diversitySubtitle": "Señal de precios: los usuarios con varias placas probablemente justifican niveles de pago.",
         "boardCount_one": "{{count}} placa",
         "boardCount_other": "{{count}} placas",
         "noDataYet": "Aún no hay datos.",
@@ -287,14 +287,14 @@
     "empty": "No se encontraron ejemplos con los filtros seleccionados",
     "emptyForQuery": "No se encontraron ejemplos para \"{{query}}\" con los filtros seleccionados",
     "resetFilters": "Restablecer filtros",
-    "installing": "Instalando librerías ({{done}}/{{total}})",
+    "installing": "Instalando bibliotecas ({{done}}/{{total}})",
     "loadingExample": "Cargando ejemplo...",
     "notFound": "Ejemplo \"{{id}}\" no encontrado.",
     "browseAll": "Ver todos los ejemplos"
   },
   "starBanner": {
     "ariaLabel": "Marcar Velxio con estrella en GitHub",
-    "title": "¿Te gusta Velxio?",
+    "title": "¿Disfrutando de Velxio?",
     "body": "¡Una ⭐ en GitHub ayuda a que más desarrolladores descubran el proyecto, solo toma 2 segundos!",
     "cta": "Marcar con estrella en GitHub",
     "dismiss": "Descartar"
@@ -338,7 +338,7 @@
       "signingIn": "Iniciando sesión…",
       "or": "o",
       "continueGoogle": "Continuar con Google",
-      "noAccount": "¿No tienes una cuenta?",
+      "noAccount": "¿No tienes cuenta?",
       "failed": "Error al iniciar sesión."
     },
     "register": {
@@ -349,12 +349,12 @@
       "passwordPlaceholder": "Al menos 8 caracteres",
       "create": "Crear cuenta",
       "creating": "Creando cuenta…",
-      "haveAccount": "¿Ya tienes una cuenta?",
+      "haveAccount": "¿Ya tienes cuenta?",
       "errors": {
         "reserved": "Ese nombre de usuario está reservado.",
         "usernameRules": "El nombre de usuario debe tener entre 3 y 30 caracteres (a-z, 0-9, _, -)",
         "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
-        "failed": "Error en el registro."
+        "failed": "Error al registrarse."
       }
     }
   },
@@ -377,16 +377,16 @@
       "compileAll": "Compilar todas las placas",
       "runAll": "Ejecutar todas las placas",
       "libraries": {
-        "title": "Buscar e instalar librerías de Arduino",
-        "label": "Librerías"
+        "title": "Buscar e instalar bibliotecas de Arduino",
+        "label": "Bibliotecas"
       },
       "import": "Importar un proyecto desde un archivo .zip",
       "export": "Exportar el proyecto actual como un archivo .zip",
       "uploadFirmware": "Subir firmware (.hex, .bin, .elf, .ihex) para omitir la compilación",
       "toggleConsole": "Alternar consola de salida",
       "libHint": {
-        "message": "¿Falta una librería? Instálala desde el",
-        "cta": "Administrador de librerías",
+        "message": "¿Falta una biblioteca? Instálala desde el",
+        "cta": "Administrador de bibliotecas",
         "dismiss": "Descartar"
       }
     },
@@ -438,9 +438,9 @@
       "cancel": "Cancelar",
       "visibility": {
         "public": "Público",
-        "publicHint": "Cualquiera con el enlace puede verlo",
+        "publicHint": "Cualquier persona con el enlace puede verlo",
         "private": "Privado",
-        "privateHint": "Solo tú puedes ver esto"
+        "privateHint": "Solo tú puedes verlo"
       },
       "errors": {
         "nameRequired": "El nombre del proyecto es obligatorio.",
@@ -453,7 +453,7 @@
       "title": "Compartir proyecto",
       "public": "Público",
       "private": "Privado",
-      "publicHint": "Cualquiera con el enlace puede ver este proyecto",
+      "publicHint": "Cualquier persona con el enlace puede ver este proyecto",
       "privateHint": "Solo tú puedes ver este proyecto",
       "makePrivate": "Hacer privado",
       "makePublic": "Hacer público",
@@ -468,7 +468,7 @@
       },
       "activeBoard": "Placa activa",
       "noBoard": "Sin placa",
-      "noBoardHint": "No hay ninguna placa en el lienzo: añade una con el botón Añadir para compilar y ejecutar código",
+      "noBoardHint": "No hay placa en el lienzo: añade una con el botón Añadir para compilar y ejecutar código",
       "undo": {
         "label": "Deshacer",
         "title": "Deshacer: {{description}} (Ctrl+Z)",
@@ -516,30 +516,30 @@
       "clearFilters": "Limpiar filtros"
     },
     "libraryManager": {
-      "title": "ADMINISTRADOR DE LIBRERÍAS",
+      "title": "ADMINISTRADOR DE BIBLIOTECAS",
       "searchTab": "Buscar",
       "installedTab": "Instaladas",
       "filterPlaceholder": "Filtrar tu búsqueda...",
       "searchingFor": "Buscando \"{{query}}\"…",
-      "loadingLibraries": "Cargando librerías…",
-      "noResults": "No hay librerías disponibles",
-      "noResultsFor": "No se encontraron librerías para \"{{query}}\"",
+      "loadingLibraries": "Cargando bibliotecas…",
+      "noResults": "No hay bibliotecas disponibles",
+      "noResultsFor": "No se encontraron bibliotecas para \"{{query}}\"",
       "byAuthor": "por {{author}}",
       "install": "INSTALAR",
       "installing": "Instalando...",
       "uninstall": "DESINSTALAR",
       "uninstalling": "Desinstalando...",
-      "loadingInstalled": "Cargando librerías instaladas...",
-      "noneInstalled": "Aún no hay librerías instaladas.",
-      "useSearchTab": "Usa la pestaña Buscar para instalar librerías."
+      "loadingInstalled": "Cargando bibliotecas instaladas...",
+      "noneInstalled": "Aún no hay bibliotecas instaladas.",
+      "useSearchTab": "Usa la pestaña Buscar para instalar bibliotecas."
     },
     "installLibs": {
-      "title": "LIBRERÍAS REQUERIDAS",
+      "title": "BIBLIOTECAS REQUERIDAS",
       "installingProgress": "Instalando {{done}} de {{total}}…",
-      "allDone": "Todas las librerías se instalaron correctamente",
-      "required_one": "Este proyecto requiere {{count}} librería. Instálala para compilar correctamente.",
-      "required_other": "Este proyecto requiere {{count}} librerías. Instálalas para compilar correctamente.",
-      "wokwiHosted": "Librería alojada por Wokwi",
+      "allDone": "Todas las bibliotecas se instalaron correctamente",
+      "required_one": "Este proyecto requiere {{count}} biblioteca. Instálala para compilar correctamente.",
+      "required_other": "Este proyecto requiere {{count}} bibliotecas. Instálalas para compilar correctamente.",
+      "wokwiHosted": "Biblioteca alojada por Wokwi",
       "pending": "pendiente",
       "installing": "instalando…",
       "installed": "instalada",
@@ -565,12 +565,12 @@
       "timeDiv": "Tiempo/div:",
       "pauseTitle": "Pausar captura",
       "resumeTitle": "Reanudar captura",
-      "pause": "Pausa",
+      "pause": "Pausar",
       "run": "Ejecutar",
       "clearTitle": "Borrar todas las muestras capturadas",
       "clear": "Borrar",
       "noChannels": "No se añadieron canales.",
-      "noChannelsHint": "Haz clic en \"+ Añadir canal\" para monitorizar un pin.",
+      "noChannelsHint": "Haz clic en \"+ Añadir canal\" para monitorear un pin.",
       "removeChannel": "Eliminar {{label}}"
     },
     "componentProps": {
@@ -653,7 +653,7 @@
       "compiling": "Compilando…",
       "compile": "Compilar",
       "compiledOk": "✓ Compilado — {{kb}} KB",
-      "compileFailed": "Error de compilación",
+      "compileFailed": "Error al compilar",
       "cancel": "Cancelar",
       "savePlace": "Guardar y colocar",
       "compileFirst": "Compila primero"

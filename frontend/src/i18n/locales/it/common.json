@@ -23,13 +23,13 @@
     "search": "Cerca"
   },
   "footer": {
-    "about": "Velxio è un simulatore di circuiti e microcontrollori gratuito e open-source che funziona interamente nel tuo browser. Arduino, ESP32, RP2040 e ATtiny85, con co-simulazione analogica SPICE-accurata. Creato per maker, studenti e ingegneri embedded che imparano facendo. AGPLv3."
+    "about": "Velxio è un simulatore gratuito e open-source di circuiti e microcontrollori che funziona interamente nel browser. Arduino, ESP32, RP2040 e ATtiny85, con co-simulazione analogica SPICE accurata. Creato per maker, studenti e ingegneri embedded che imparano facendo. AGPLv3."
   },
   "landing": {
     "hero": {
       "titleLine1": "Arduino, ESP32 e Raspberry Pi.",
       "titleAccent": "Direttamente nel tuo browser.",
-      "subtitle": "Scrivi codice, collega componenti, premi esegui. 19 schede, 48+ parti, emulazione CPU reale — niente hardware, niente installazione, niente cloud.",
+      "subtitle": "Scrivi codice, collega componenti, premi esegui. 19 schede, 48+ parti, emulazione CPU reale — nessun hardware, nessuna installazione, nessun cloud.",
       "ctaPrimary": "Prova il Simulatore Gratis →",
       "ctaGithub": "Vedi su GitHub",
       "trustLine": "Nessuna registrazione richiesta · Funziona al 100% nel browser · Gratuito e open-source",
@@ -39,12 +39,12 @@
       "label": "Hardware Supportato",
       "titleLine1": "Ogni architettura.",
       "titleLine2": "Un solo strumento.",
-      "subtitle": "19 schede su 5 architetture CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tutto in esecuzione localmente, senza cloud."
+      "subtitle": "19 schede su 5 architetture CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tutte eseguite localmente, senza cloud."
     },
     "features": {
       "label": "Funzionalità",
-      "title": "Tutto ciò che ti serve.",
-      "subtitle": "Un IDE completo, compilatore e simulatore multi-architettura — in esecuzione localmente senza servizi esterni.",
+      "title": "Tutto ciò di cui hai bisogno.",
+      "subtitle": "Un IDE completo, compilatore e simulatore multi-architettura — eseguito localmente senza servizi esterni.",
       "spice": {
         "title": "Analogico SPICE in Tempo Reale",
         "desc": "Motore ngspice-WASM — Analisi Nodale Modificata completa a ~60 Hz. Resistenze, condensatori, amplificatori operazionali, BJT, MOSFET, regolatori si comportano come silicio reale, non modelli idealizzati."
@@ -55,11 +55,11 @@
       },
       "customChips": {
         "title": "Chip Personalizzati",
-        "desc": "Crea i tuoi circuiti integrati in C, Rust o AssemblyScript usando l'API Custom Chips di Wokwi. Compila in WebAssembly e riutilizzali tra i progetti."
+        "desc": "Crea i tuoi circuiti integrati in C, Rust o AssemblyScript usando l'API Custom Chips di Wokwi. Compila in WebAssembly e riutilizzali tra progetti."
       },
       "components": {
         "title": "100+ Componenti",
-        "desc": "Parti analogiche SPICE-accurate più 48+ componenti visivi wokwi — LED, LCD, TFT ILI9341, servo, buzzer, sensori a ultrasuoni, tastierini, strisce NeoPixel."
+        "desc": "Parti analogiche SPICE accurate più 48+ componenti visivi wokwi — LED, LCD, TFT ILI9341, servo, buzzer, sensori a ultrasuoni, tastierini, strisce NeoPixel."
       },
       "instruments": {
         "title": "Strumenti Live",
@@ -67,12 +67,12 @@
       },
       "monaco": {
         "title": "Editor Monaco + arduino-cli",
-        "desc": "Editor C++ di livello VS Code con area di lavoro multi-file. arduino-cli locale compila in file .hex / .uf2 / .bin reali — nessun round-trip sul cloud."
+        "desc": "Editor C++ di livello VS Code con workspace multi-file. arduino-cli locale compila in file .hex / .uf2 / .bin reali — nessun round-trip cloud."
       }
     },
     "support": {
       "title": "Supporta il progetto",
-      "subtitle": "Velxio è gratuito e open source. Se ti fa risparmiare tempo, considera di supportarne lo sviluppo.",
+      "subtitle": "Velxio è gratuito e open-source. Se ti fa risparmiare tempo, considera di supportare il suo sviluppo.",
       "ctaSponsors": "GitHub Sponsors",
       "ctaPaypal": "Dona tramite PayPal"
     }
@@ -89,7 +89,7 @@
     "title": "Prezzi",
     "selfHosted": "Questa istanza di Velxio è auto-ospitata dall'immagine open-source — tutte le funzionalità sono gratuite per chiunque la utilizzi.",
     "hostedVersion": "La versione ospitata su <link>velxio.dev</link> offre un livello Pro opzionale che aiuta a finanziare lo sviluppo.",
-    "sourceCode": "Il codice sorgente è <link>con licenza MIT su GitHub</link>."
+    "sourceCode": "Il codice sorgente è <link>concesso in licenza MIT su GitHub</link>."
   },
   "admin": {
     "loading": "Caricamento…",
@@ -185,24 +185,24 @@
         "totalProjects": "Progetti totali",
         "compilesAllTime": "Compilazioni (totali)",
         "runsAllTime": "Esecuzioni (totali)",
-        "newIn30d": "+{{count}} in 30g",
+        "newIn30d": "+{{count}} in 30gg",
         "successPct": "{{pct}}% successo",
         "dau": "attivi nelle ultime 24h",
-        "wau": "attivi negli ultimi 7g",
-        "mau": "attivi negli ultimi 30g",
+        "wau": "attivi negli ultimi 7gg",
+        "mau": "attivi negli ultimi 30gg",
         "publicPrivate": "Pubblici / Privati"
       },
       "charts": {
         "activityOverTime": "Attività nel tempo",
         "noActivity": "Nessuna attività in questo intervallo.",
-        "compilesByFamily": "Compilazioni per famiglia di schede ({{days}}g)",
+        "compilesByFamily": "Compilazioni per famiglia di schede ({{days}}gg)",
         "diversityTitle": "Quante famiglie di schede per utente",
         "diversitySubtitle": "Segnale di prezzo — gli utenti multi-scheda probabilmente giustificano livelli a pagamento.",
         "boardCount_one": "{{count}} scheda",
         "boardCount_other": "{{count}} schede",
         "noDataYet": "Nessun dato ancora.",
-        "topFqbn": "Schede principali per FQBN ({{days}}g)",
-        "topCountries": "Paesi principali ({{days}}g)",
+        "topFqbn": "Schede più usate per FQBN ({{days}}gg)",
+        "topCountries": "Paesi principali ({{days}}gg)",
         "countriesSubtitle": "Dall'intestazione CF-IPCountry di Cloudflare. \"Utenti\" = paese di residenza attuale, \"Registrazioni\" = dove si sono registrati, \"Attivi\" = utenti distinti con attività in questo intervallo.",
         "noCountryData": "Nessun dato paese ancora (probabilmente in esecuzione al di fuori di Cloudflare).",
         "topUsers": "Utenti principali per compilazioni",
@@ -212,14 +212,14 @@
         "country": "Paese",
         "users": "Utenti",
         "signups": "Registrazioni",
-        "activeRange": "Attivi ({{days}}g)",
+        "activeRange": "Attivi ({{days}}gg)",
         "user": "Utente"
       }
     },
     "activity": {
       "loadFailed": "Caricamento attività fallito.",
       "title": "Attività giornaliera — {{username}}",
-      "subtitle": "Conteggi di compilazione ed esecuzione per giorno e per progetto per questo utente.",
+      "subtitle": "Conteggi di compilazioni ed esecuzioni per giorno e per progetto per questo utente.",
       "noActivity": "Nessuna attività nell'intervallo selezionato.",
       "projectCount_one": "{{count}} progetto",
       "projectCount_other": "{{count}} progetti",
@@ -267,7 +267,7 @@
       "categoryLabel": "Categoria:",
       "difficultyLabel": "Difficoltà:",
       "category": {
-        "all": "Tutti",
+        "all": "Tutte",
         "basics": "Base",
         "sensors": "Sensori",
         "displays": "Display",
@@ -324,7 +324,7 @@
     },
     "cta": {
       "title": "Pronto a provare Velxio?",
-      "subtitle": "Nessuna registrazione richiesta. Funziona al 100% nel tuo browser. Gratuito e open source.",
+      "subtitle": "Nessuna registrazione richiesta. Funziona al 100% nel browser. Gratuito e open source.",
       "openEditor": "Apri Editor"
     }
   },
@@ -373,14 +373,14 @@
         "run": "Esegui (auto-compila se necessario)"
       },
       "stop": "Ferma",
-      "reset": "Reimposta",
+      "reset": "Ripristina",
       "compileAll": "Compila tutte le schede",
       "runAll": "Esegui tutte le schede",
       "libraries": {
         "title": "Cerca e installa librerie Arduino",
         "label": "Librerie"
       },
-      "import": "Importa un progetto da un file .zip",
+      "import": "Importa un progetto da file .zip",
       "export": "Esporta il progetto corrente come file .zip",
       "uploadFirmware": "Carica firmware (.hex, .bin, .elf, .ihex) per saltare la compilazione",
       "toggleConsole": "Attiva/Disattiva Console di Output",
@@ -391,8 +391,8 @@
       }
     },
     "fileExplorer": {
-      "workspace": "AREA DI LAVORO",
-      "newWorkspace": "Nuova area di lavoro (cancella schede, componenti, cavi e file)",
+      "workspace": "WORKSPACE",
+      "newWorkspace": "Nuovo workspace (cancella schede, componenti, cavi e file)",
       "saveProject": "Salva progetto (Ctrl+S)",
       "clickToEdit": "clicca per modificare",
       "collapse": "Comprimi",
@@ -400,7 +400,7 @@
       "newFileInBoard": "Nuovo file in questa scheda",
       "unsavedChanges": "Modifiche non salvate",
       "unsavedSuffix": "non salvato",
-      "emptyState": "Aggiungi una scheda all'area di disegno per iniziare a modificare il codice.",
+      "emptyState": "Aggiungi una scheda al canvas per iniziare a modificare il codice.",
       "confirmDelete": "Eliminare questo file?",
       "status": {
         "running": "In esecuzione",
@@ -420,7 +420,7 @@
       "cancel": "Annulla"
     },
     "loginPrompt": {
-      "title": "Accedi per salvare il tuo progetto",
+      "title": "Accedi per salvare il progetto",
       "body": "Crea un account gratuito per salvare e condividere i tuoi progetti.",
       "createAccount": "Crea account",
       "cancel": "Annulla"
@@ -468,7 +468,7 @@
       },
       "activeBoard": "Scheda attiva",
       "noBoard": "Nessuna scheda",
-      "noBoardHint": "Nessuna scheda nell'area di disegno — aggiungine una con il pulsante Aggiungi per compilare ed eseguire codice",
+      "noBoardHint": "Nessuna scheda sul canvas — aggiungine una con il pulsante Aggiungi per compilare ed eseguire codice",
       "undo": {
         "label": "Annulla",
         "title": "Annulla: {{description}} (Ctrl+Z)",
@@ -497,9 +497,9 @@
       "removeConfirm": {
         "boardFallback": "Scheda",
         "title": "Rimuovere {{label}}?",
-        "body": "Questo rimuoverà la scheda dall'area di lavoro. Questa operazione non può essere annullata.",
-        "bodyWithWires_one": "Questo rimuoverà la scheda dall'area di lavoro e {{count}} cavo collegato. Questa operazione non può essere annullata.",
-        "bodyWithWires_other": "Questo rimuoverà la scheda dall'area di lavoro e {{count}} cavi collegati. Questa operazione non può essere annullata.",
+        "body": "Questo rimuoverà la scheda dal workspace. Questa operazione non può essere annullata.",
+        "bodyWithWires_one": "Questo rimuoverà la scheda dal workspace e {{count}} cavo collegato. Questa operazione non può essere annullata.",
+        "bodyWithWires_other": "Questo rimuoverà la scheda dal workspace e {{count}} cavi collegati. Questa operazione non può essere annullata.",
         "cancel": "Annulla",
         "remove": "Rimuovi"
       }
@@ -520,7 +520,7 @@
       "searchTab": "Cerca",
       "installedTab": "Installate",
       "filterPlaceholder": "Filtra la tua ricerca...",
-      "searchingFor": "Ricerca di \"{{query}}\"…",
+      "searchingFor": "Ricerca \"{{query}}\"…",
       "loadingLibraries": "Caricamento librerie…",
       "noResults": "Nessuna libreria disponibile",
       "noResultsFor": "Nessuna libreria trovata per \"{{query}}\"",
@@ -555,7 +555,7 @@
       "circuit": "Circuito",
       "showExplorer": "Mostra esplora file",
       "hideExplorer": "Nascondi esplora file",
-      "viewMode": "Modalità visualizzazione",
+      "viewMode": "Modalità vista",
       "dragResize": "Trascina per ridimensionare"
     },
     "oscilloscope": {
@@ -563,11 +563,11 @@
       "addChannelTitle": "Aggiungi un canale pin",
       "addChannel": "Aggiungi Canale",
       "timeDiv": "Tempo/div:",
-      "pauseTitle": "Metti in pausa la cattura",
-      "resumeTitle": "Riprendi la cattura",
+      "pauseTitle": "Metti in pausa acquisizione",
+      "resumeTitle": "Riprendi acquisizione",
       "pause": "Pausa",
       "run": "Esegui",
-      "clearTitle": "Cancella tutti i campioni catturati",
+      "clearTitle": "Cancella tutti i campioni acquisiti",
       "clear": "Cancella",
       "noChannels": "Nessun canale aggiunto.",
       "noChannelsHint": "Clicca \"+ Aggiungi Canale\" per monitorare un pin.",
@@ -669,7 +669,7 @@
       "openIotGateway": "Apri IoT Gateway",
       "waitingData": "In attesa di dati seriali...",
       "startSim": "Avvia la simulazione per vedere l'output seriale.",
-      "placeholderText": "Scrivi il messaggio da inviare...",
+      "placeholderText": "Scrivi messaggio da inviare...",
       "placeholderPython": "Scrivi espressione Python... (Ctrl+C per interrompere)",
       "lineEnd": {
         "none": "Nessun terminatore",

@@ -23,27 +23,27 @@
     "search": "Pesquisar"
   },
   "footer": {
-    "about": "Velxio é um simulador gratuito e de código aberto de circuitos e microcontroladores que funciona inteiramente no seu navegador. Arduino, ESP32, RP2040 e ATtiny85, com co-simulação analógica precisa em SPICE. Criado para makers, estudantes e engenheiros embarcados que aprendem na prática. AGPLv3."
+    "about": "Velxio é um simulador gratuito e de código aberto de circuitos e microcontroladores que roda inteiramente no seu navegador. Arduino, ESP32, RP2040 e ATtiny85, com co-simulação analógica precisa com SPICE. Construído para makers, estudantes e engenheiros embarcados que aprendem na prática. AGPLv3."
   },
   "landing": {
     "hero": {
       "titleLine1": "Arduino, ESP32 e Raspberry Pi.",
       "titleAccent": "Direto no seu navegador.",
-      "subtitle": "Escreva código, monte componentes, aperte o play. 19 placas, 48+ componentes, emulação real de CPU — sem hardware, sem instalação, sem nuvem.",
+      "subtitle": "Escreva código, conecte componentes, execute. 19 placas, 48+ componentes, emulação real de CPU — sem hardware, sem instalação, sem nuvem.",
       "ctaPrimary": "Experimente o Simulador Grátis →",
       "ctaGithub": "Ver no GitHub",
-      "trustLine": "Sem cadastro · Funciona 100% no navegador · Gratuito e de código aberto",
-      "imageAlt": "Editor Velxio com circuito de semáforo no Arduino Uno"
+      "trustLine": "Sem cadastro · Roda 100% no navegador · Gratuito e de código aberto",
+      "imageAlt": "Editor Velxio com circuito de semáforo Arduino Uno"
     },
     "boards": {
       "label": "Hardware Suportado",
-      "titleLine1": "Todas as arquiteturas.",
+      "titleLine1": "Toda arquitetura.",
       "titleLine2": "Uma ferramenta.",
       "subtitle": "19 placas em 5 arquiteturas de CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tudo rodando localmente, sem necessidade de nuvem."
     },
     "features": {
       "label": "Recursos",
-      "title": "Tudo o que você precisa.",
+      "title": "Tudo que você precisa.",
       "subtitle": "Um IDE completo, compilador e simulador multi-arquitetura — rodando localmente sem serviços externos.",
       "spice": {
         "title": "SPICE Analógico em Tempo Real",
@@ -55,11 +55,11 @@
       },
       "customChips": {
         "title": "Chips Personalizados",
-        "desc": "Crie seus próprios circuitos integrados em C, Rust ou AssemblyScript usando a API de Chips Personalizados do Wokwi. Compile para WebAssembly e reutilize em vários projetos."
+        "desc": "Crie seus próprios circuitos integrados em C, Rust ou AssemblyScript usando a API Custom Chips do Wokwi. Compile para WebAssembly e reutilize em vários projetos."
       },
       "components": {
         "title": "Mais de 100 Componentes",
-        "desc": "Peças analógicas precisas em SPICE e mais de 48 componentes visuais wokwi — LEDs, LCDs, TFT ILI9341, servos, buzzers, sensores ultrassônicos, teclados, tiras NeoPixel."
+        "desc": "Componentes analógicos precisos com SPICE, além de mais de 48 componentes visuais wokwi — LEDs, LCDs, TFT ILI9341, servos, buzzers, sensores ultrassônicos, teclados, tiras NeoPixel."
       },
       "instruments": {
         "title": "Instrumentos ao Vivo",
@@ -107,10 +107,10 @@
     "editUser": {
       "title": "Editar usuário",
       "username": "Nome de usuário",
-      "email": "E-mail",
+      "email": "Email",
       "newPassword": "Nova senha (deixe em branco para manter)",
       "passwordPlaceholder": "Mín. 8 caracteres",
-      "admin": "Administrador",
+      "admin": "Admin",
       "active": "Ativo",
       "cancel": "Cancelar",
       "save": "Salvar",
@@ -129,19 +129,19 @@
     "notAdmin": {
       "title": "Acesso de administrador necessário",
       "body": "Você precisa estar logado como administrador para acessar este painel.",
-      "goLogin": "Ir para o login"
+      "goLogin": "Ir para login"
     },
     "users": {
       "loadFailed": "Falha ao carregar usuários.",
       "deleteFailed": "Falha ao excluir usuário.",
       "confirmDelete": "Excluir usuário \"{{username}}\" e todos os seus projetos? Esta ação não pode ser desfeita.",
-      "searchPlaceholder": "Pesquisar por nome de usuário ou e-mail…",
+      "searchPlaceholder": "Pesquisar por nome de usuário ou email…",
       "count_one": "{{count}} usuário",
       "count_other": "{{count}} usuários",
       "noResults": "Nenhum usuário encontrado.",
       "col": {
-        "username": "Usuário",
-        "email": "E-mail",
+        "username": "Nome de usuário",
+        "email": "Email",
         "role": "Função",
         "status": "Status",
         "projects": "Projetos",
@@ -150,7 +150,7 @@
         "boards": "Placas",
         "country": "País",
         "lastActive": "Última atividade",
-        "joined": "Ingressou em",
+        "joined": "Ingressou",
         "actions": "Ações"
       },
       "actions": {
@@ -203,7 +203,7 @@
         "noDataYet": "Ainda sem dados.",
         "topFqbn": "Principais placas por FQBN ({{days}}d)",
         "topCountries": "Principais países ({{days}}d)",
-        "countriesSubtitle": "Do cabeçalho CF-IPCountry da Cloudflare. \"Usuários\" = país de residência atual, \"Cadastros\" = onde se registraram, \"Ativos\" = usuários distintos com atividade neste intervalo.",
+        "countriesSubtitle": "Do cabeçalho CF-IPCountry da Cloudflare. \"Usuários\" = país atual, \"Inscrições\" = onde se registraram, \"Ativos\" = usuários distintos com atividade neste intervalo.",
         "noCountryData": "Ainda sem dados de país (provavelmente rodando fora da Cloudflare).",
         "topUsers": "Principais usuários por compilações",
         "topProjects": "Principais projetos por compilações"
@@ -211,7 +211,7 @@
       "col": {
         "country": "País",
         "users": "Usuários",
-        "signups": "Cadastros",
+        "signups": "Inscrições",
         "activeRange": "Ativos ({{days}}d)",
         "user": "Usuário"
       }
@@ -240,7 +240,7 @@
       "noResults": "Nenhum projeto encontrado.",
       "private": "privado",
       "public": "público",
-      "privateTitle": "Projeto privado (visão do administrador)",
+      "privateTitle": "Projeto privado (visão do admin)",
       "col": {
         "name": "Nome",
         "owner": "Proprietário",
@@ -250,7 +250,7 @@
         "runs": "Execuções",
         "updates": "Atualizações",
         "lastCompile": "Última compilação",
-        "updated": "Atualizado em"
+        "updated": "Atualizado"
       }
     }
   },
@@ -268,7 +268,7 @@
       "difficultyLabel": "Dificuldade:",
       "category": {
         "all": "Todas",
-        "basics": "Básicos",
+        "basics": "Básico",
         "sensors": "Sensores",
         "displays": "Displays",
         "communication": "Comunicação",
@@ -293,16 +293,16 @@
     "browseAll": "Ver todos os exemplos"
   },
   "starBanner": {
-    "ariaLabel": "Favoritar Velxio no GitHub",
+    "ariaLabel": "Dar estrela ao Velxio no GitHub",
     "title": "Gostando do Velxio?",
     "body": "Uma ⭐ no GitHub ajuda mais desenvolvedores a descobrirem o projeto — leva apenas 2 segundos!",
-    "cta": "Favoritar no GitHub",
+    "cta": "Dar estrela no GitHub",
     "dismiss": "Dispensar"
   },
   "about": {
     "hero": {
       "title": "Sobre o Velxio",
-      "subtitle": "Um emulador de sistemas embarcados gratuito e de código aberto — criado por um único desenvolvedor apaixonado por hardware e código aberto."
+      "subtitle": "Um emulador de sistemas embarcados gratuito e de código aberto — construído por um único desenvolvedor com paixão por hardware e código aberto."
     },
     "story": {
       "heading": "A História"
@@ -324,7 +324,7 @@
     },
     "cta": {
       "title": "Pronto para experimentar o Velxio?",
-      "subtitle": "Sem cadastro. Funciona 100% no seu navegador. Gratuito e de código aberto.",
+      "subtitle": "Sem cadastro. Roda 100% no navegador. Gratuito e de código aberto.",
       "openEditor": "Abrir Editor"
     }
   },
@@ -332,7 +332,7 @@
     "login": {
       "title": "Entrar",
       "subtitle": "para continuar no Velxio",
-      "email": "E-mail",
+      "email": "Email",
       "password": "Senha",
       "signIn": "Entrar",
       "signingIn": "Entrando…",
@@ -343,7 +343,7 @@
     },
     "register": {
       "title": "Criar conta",
-      "subtitle": "Comece a criar gratuitamente",
+      "subtitle": "Comece a construir gratuitamente",
       "username": "Nome de usuário",
       "usernamePlaceholder": "ex.: alice",
       "passwordPlaceholder": "Pelo menos 8 caracteres",
@@ -352,7 +352,7 @@
       "haveAccount": "Já tem uma conta?",
       "errors": {
         "reserved": "Este nome de usuário está reservado.",
-        "usernameRules": "O nome de usuário deve ter de 3 a 30 caracteres (a-z, 0-9, _, -)",
+        "usernameRules": "O nome de usuário deve ter 3-30 caracteres (a-z, 0-9, _, -)",
         "passwordTooShort": "A senha deve ter pelo menos 8 caracteres.",
         "failed": "Falha no registro."
       }
@@ -382,7 +382,7 @@
       },
       "import": "Importar um projeto de um arquivo .zip",
       "export": "Exportar o projeto atual como um arquivo .zip",
-      "uploadFirmware": "Carregar firmware (.hex, .bin, .elf, .ihex) para pular a compilação",
+      "uploadFirmware": "Carregar firmware (.hex, .bin, .elf, .ihex) para bypassar a compilação",
       "toggleConsole": "Alternar Console de Saída",
       "libHint": {
         "message": "Faltando biblioteca? Instale-a pelo",
@@ -420,7 +420,7 @@
       "cancel": "Cancelar"
     },
     "loginPrompt": {
-      "title": "Faça login para salvar seu projeto",
+      "title": "Entre para salvar seu projeto",
       "body": "Crie uma conta gratuita para salvar e compartilhar seus projetos.",
       "createAccount": "Criar conta",
       "cancel": "Cancelar"
@@ -483,8 +483,8 @@
       "serial": "Serial",
       "toggleScope": "Alternar Osciloscópio / Analisador Lógico",
       "scope": "Escopo",
-      "zoomIn": "Aumentar zoom",
-      "zoomOut": "Reduzir zoom",
+      "zoomIn": "Ampliar",
+      "zoomOut": "Reduzir",
       "resetView": "Redefinir visualização (clique para redefinir)",
       "componentCount_one": "{{count}} componente",
       "componentCount_other": "{{count}} componentes",
@@ -576,7 +576,7 @@
     "componentProps": {
       "close": "Fechar",
       "tapToConnect": "Toque em um pino para conectar:",
-      "tapToWire": "Toque em um pino para conectar fio:",
+      "tapToWire": "Toque em um pino para conectar:",
       "pinRoles": "Funções dos Pinos:",
       "arduinoPin": "Pino Arduino:",
       "confirmDelete": "Excluir {{name}}?",
@@ -655,7 +655,7 @@
       "compiledOk": "✓ Compilado — {{kb}} KB",
       "compileFailed": "Falha na compilação",
       "cancel": "Cancelar",
-      "savePlace": "Salvar e Posicionar",
+      "savePlace": "Salvar e Colocar",
       "compileFirst": "Compile primeiro"
     },
     "serial": {
@@ -670,7 +670,7 @@
       "waitingData": "Aguardando dados seriais...",
       "startSim": "Inicie a simulação para ver a saída serial.",
       "placeholderText": "Digite a mensagem para enviar...",
-      "placeholderPython": "Digite a expressão Python... (Ctrl+C para interromper)",
+      "placeholderPython": "Digite expressão Python... (Ctrl+C para interromper)",
       "lineEnd": {
         "none": "Sem final de linha",
         "nl": "Nova linha",

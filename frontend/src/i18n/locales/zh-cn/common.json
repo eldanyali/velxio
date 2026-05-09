@@ -17,19 +17,19 @@
       "signIn": "登录",
       "signUp": "注册",
       "myProjects": "我的项目",
-      "signOut": "退出登录"
+      "signOut": "退出"
     },
     "language": "语言",
     "search": "搜索"
   },
   "footer": {
-    "about": "Velxio 是一款免费、开源的电路和微控制器模拟器，完全在浏览器中运行。支持 Arduino、ESP32、RP2040 和 ATtiny85，并具有 SPICE 精度的模拟协同仿真。专为创客、学生和嵌入式工程师打造，边做边学。采用 AGPLv3 许可。"
+    "about": "Velxio 是一款免费、开源的电路和微控制器模拟器，完全在浏览器中运行。支持 Arduino、ESP32、RP2040 和 ATtiny85，并具有 SPICE 精度的模拟协同仿真。专为动手学习的创客、学生和嵌入式工程师打造。采用 AGPLv3 许可。"
   },
   "landing": {
     "hero": {
       "titleLine1": "Arduino、ESP32 和 Raspberry Pi。",
       "titleAccent": "就在你的浏览器中。",
-      "subtitle": "编写代码，连接元件，点击运行。19 种开发板、48 多个部件、真实的 CPU 仿真——无需硬件，无需安装，无需云端。",
+      "subtitle": "编写代码，连接元件，点击运行。19 种开发板、48 多个部件、真实的 CPU 仿真——无需硬件，无需安装，无需云。",
       "ctaPrimary": "免费试用模拟器 →",
       "ctaGithub": "在 GitHub 上查看",
       "trustLine": "无需注册 · 100% 在浏览器中运行 · 免费且开源",
@@ -37,17 +37,17 @@
     },
     "boards": {
       "label": "支持的硬件",
-      "titleLine1": "每一种架构。",
+      "titleLine1": "每种架构。",
       "titleLine2": "一个工具。",
-      "subtitle": "涵盖 5 种 CPU 架构的 19 种开发板——AVR8、ARM Cortex-M0+、RISC-V、Xtensa 和 Linux。全部本地运行，无需云端。"
+      "subtitle": "19 种开发板，涵盖 5 种 CPU 架构——AVR8、ARM Cortex-M0+、RISC-V、Xtensa 和 Linux。全部本地运行，无需云。"
     },
     "features": {
-      "label": "功能特性",
+      "label": "功能",
       "title": "你需要的一切。",
       "subtitle": "一个完整的 IDE、编译器和多架构模拟器——本地运行，无需外部服务。",
       "spice": {
         "title": "实时 SPICE 模拟",
-        "desc": "ngspice-WASM 引擎——完整的改进节点分析，约 60 Hz。电阻、电容、运放、BJT、MOSFET、稳压器表现如同真实硅片，而非理想化模型。"
+        "desc": "ngspice-WASM 引擎——完整的改进节点分析，约 60 Hz。电阻、电容、运放、BJT、MOSFET、稳压器行为如同真实硅器件，而非理想模型。"
       },
       "engines": {
         "title": "5 种仿真引擎",
@@ -55,7 +55,7 @@
       },
       "customChips": {
         "title": "自定义芯片",
-        "desc": "使用 Wokwi 自定义芯片 API，用 C、Rust 或 AssemblyScript 编写你自己的集成电路。编译为 WebAssembly 并在项目间复用。"
+        "desc": "使用 Wokwi Custom Chips API 用 C、Rust 或 AssemblyScript 编写你自己的集成电路。编译为 WebAssembly 并在项目间复用。"
       },
       "components": {
         "title": "100 多个元件",
@@ -63,11 +63,11 @@
       },
       "instruments": {
         "title": "实时仪器",
-        "desc": "多通道示波器、电压表、电流表、信号发生器。拖放到任意节点，在仿真运行时实时观察波形更新。"
+        "desc": "多通道示波器、电压表、电流表、信号发生器。放置在任何节点上，观察波形随仿真实时更新。"
       },
       "monaco": {
         "title": "Monaco 编辑器 + arduino-cli",
-        "desc": "VS Code 级别的 C++ 编辑器，支持多文件工作区。本地 arduino-cli 编译生成真实的 .hex / .uf2 / .bin 文件——无需云端往返。"
+        "desc": "VS Code 级别的 C++ 编辑器，支持多文件工作区。本地 arduino-cli 编译为真实的 .hex / .uf2 / .bin 文件——无需云端往返。"
       }
     },
     "support": {
@@ -87,14 +87,14 @@
   },
   "pricing": {
     "title": "定价",
-    "selfHosted": "此 Velxio 实例基于开源镜像自托管——所有功能对每位使用者免费。",
-    "hostedVersion": "托管版本 <link>velxio.dev</link> 提供可选的 Pro 层级，用于资助开发。",
-    "sourceCode": "源代码在 <link>GitHub 上采用 MIT 许可</link>。"
+    "selfHosted": "此 Velxio 实例是从开源镜像自托管的——所有功能对使用它的每个人免费。",
+    "hostedVersion": "托管版本 <link>velxio.dev</link> 提供可选的 Pro 层级，有助于资助开发。",
+    "sourceCode": "源代码在 GitHub 上采用 <link>MIT 许可</link>。"
   },
   "admin": {
     "loading": "加载中…",
     "panel": "管理面板",
-    "logout": "退出登录",
+    "logout": "退出",
     "tabs": {
       "dashboard": "仪表盘",
       "users": "用户",
@@ -118,7 +118,7 @@
     },
     "setup": {
       "title": "管理员设置",
-      "body": "尚未存在管理员账户。请创建第一个管理员用户以继续。",
+      "body": "尚无管理员账户。创建第一个管理员用户以继续。",
       "password": "密码",
       "confirmPassword": "确认密码",
       "passwordMismatch": "密码不匹配。",
@@ -147,7 +147,7 @@
         "projects": "项目数",
         "compiles": "编译次数",
         "runs": "运行次数",
-        "boards": "开发板",
+        "boards": "开发板数",
         "country": "国家",
         "lastActive": "最后活跃",
         "joined": "注册时间",
@@ -194,17 +194,17 @@
       },
       "charts": {
         "activityOverTime": "随时间变化的活动",
-        "noActivity": "此范围内暂无活动。",
+        "noActivity": "此范围内尚无活动。",
         "compilesByFamily": "按开发板系列的编译次数（{{days}} 天）",
         "diversityTitle": "每位用户使用的开发板系列数",
-        "diversitySubtitle": "定价信号——使用多块开发板的用户可能适合付费层级。",
+        "diversitySubtitle": "定价信号——多板用户可能适合付费层级。",
         "boardCount_one": "{{count}} 块开发板",
         "boardCount_other": "{{count}} 块开发板",
         "noDataYet": "暂无数据。",
         "topFqbn": "按 FQBN 排名靠前的开发板（{{days}} 天）",
         "topCountries": "排名靠前的国家（{{days}} 天）",
         "countriesSubtitle": "来自 Cloudflare 的 CF-IPCountry 标头。“用户”=当前所在国家，“注册”=注册时所在国家，“活跃”=此范围内有活动的独立用户。",
-        "noCountryData": "暂无国家数据（可能未在 Cloudflare 环境下运行）。",
+        "noCountryData": "暂无国家数据（可能未在 Cloudflare 后运行）。",
         "topUsers": "按编译次数排名靠前的用户",
         "topProjects": "按编译次数排名靠前的项目"
       },
@@ -223,7 +223,7 @@
       "noActivity": "所选范围内无活动。",
       "projectCount_one": "{{count}} 个项目",
       "projectCount_other": "{{count}} 个项目",
-      "deletedProject": "（已删除的项目）",
+      "deletedProject": "（已删除项目）",
       "noProject": "（无项目）",
       "col": {
         "date": "日期",
@@ -278,14 +278,14 @@
       },
       "difficulty": {
         "all": "全部",
-        "beginner": "入门",
+        "beginner": "初级",
         "intermediate": "中级",
         "advanced": "高级"
       }
     },
     "copyLink": "复制可分享链接",
-    "empty": "所选筛选条件下未找到示例",
-    "emptyForQuery": "未找到 \"{{query}}\" 的示例（当前筛选条件下）",
+    "empty": "未找到符合所选筛选条件的示例",
+    "emptyForQuery": "未找到 \"{{query}}\" 且符合所选筛选条件的示例",
     "resetFilters": "重置筛选条件",
     "installing": "正在安装库（{{done}}/{{total}}）",
     "loadingExample": "正在加载示例...",
@@ -294,15 +294,15 @@
   },
   "starBanner": {
     "ariaLabel": "在 GitHub 上为 Velxio 加星",
-    "title": "喜欢 Velxio 吗？",
+    "title": "喜欢 Velxio？",
     "body": "在 GitHub 上点个 ⭐ 可以帮助更多开发者发现这个项目——只需 2 秒钟！",
     "cta": "在 GitHub 上加星",
-    "dismiss": "忽略"
+    "dismiss": "关闭"
   },
   "about": {
     "hero": {
       "title": "关于 Velxio",
-      "subtitle": "一款免费、开源的嵌入式系统模拟器——由一位热爱硬件和开源的开发者独立打造。"
+      "subtitle": "一款免费、开源的嵌入式系统仿真器——由一位热爱硬件和开源的开发者独立构建。"
     },
     "story": {
       "heading": "故事"
@@ -314,10 +314,10 @@
       "heading": "开源理念"
     },
     "creator": {
-      "heading": "创造者"
+      "heading": "创建者"
     },
     "releases": {
-      "heading": "近期发布"
+      "heading": "最近发布"
     },
     "community": {
       "heading": "社区与媒体报道"
@@ -337,19 +337,19 @@
       "signIn": "登录",
       "signingIn": "登录中…",
       "or": "或",
-      "continueGoogle": "使用 Google 账号继续",
-      "noAccount": "没有账号？",
+      "continueGoogle": "使用 Google 继续",
+      "noAccount": "没有账户？",
       "failed": "登录失败。"
     },
     "register": {
-      "title": "创建账号",
+      "title": "创建账户",
       "subtitle": "免费开始构建",
       "username": "用户名",
       "usernamePlaceholder": "例如 alice",
       "passwordPlaceholder": "至少 8 个字符",
-      "create": "创建账号",
-      "creating": "创建账号中…",
-      "haveAccount": "已有账号？",
+      "create": "创建账户",
+      "creating": "创建账户中…",
+      "haveAccount": "已有账户？",
       "errors": {
         "reserved": "该用户名已被保留。",
         "usernameRules": "用户名必须为 3-30 个字符（a-z、0-9、_、-）",
@@ -385,9 +385,9 @@
       "uploadFirmware": "上传固件（.hex、.bin、.elf、.ihex）以跳过编译",
       "toggleConsole": "切换输出控制台",
       "libHint": {
-        "message": "缺少库？请从",
+        "message": "缺少库？从",
         "cta": "库管理器",
-        "dismiss": "忽略"
+        "dismiss": "关闭"
       }
     },
     "fileExplorer": {
@@ -421,15 +421,15 @@
     },
     "loginPrompt": {
       "title": "登录以保存项目",
-      "body": "创建免费账号以保存和分享您的项目。",
-      "createAccount": "创建账号",
+      "body": "创建免费账户以保存和分享项目。",
+      "createAccount": "创建账户",
       "cancel": "取消"
     },
     "saveProject": {
       "titleSave": "保存项目",
       "titleUpdate": "更新项目",
       "nameLabel": "项目名称 *",
-      "namePlaceholder": "我的超棒项目",
+      "namePlaceholder": "我的精彩项目",
       "descriptionLabel": "描述",
       "descriptionPlaceholder": "可选",
       "save": "保存",
@@ -440,11 +440,11 @@
         "public": "公开",
         "publicHint": "拥有链接的任何人都可以查看",
         "private": "私有",
-        "privateHint": "只有您能看到"
+        "privateHint": "只有你能看到"
       },
       "errors": {
         "nameRequired": "项目名称是必填项。",
-        "unreachable": "服务器无法访问。请检查您的连接后重试。",
+        "unreachable": "服务器不可达。请检查连接后重试。",
         "notAuth": "未认证。请登录后重试。",
         "failedStatus": "保存失败（{{status}}）。"
       }
@@ -454,7 +454,7 @@
       "public": "公开",
       "private": "私有",
       "publicHint": "拥有链接的任何人都可以查看此项目",
-      "privateHint": "只有您能看到此项目",
+      "privateHint": "只有你能看到此项目",
       "makePrivate": "设为私有",
       "makePublic": "设为公开",
       "copy": "复制",
@@ -468,7 +468,7 @@
       },
       "activeBoard": "当前开发板",
       "noBoard": "无开发板",
-      "noBoardHint": "画布上无开发板——使用“添加”按钮添加开发板以编译和运行代码",
+      "noBoardHint": "画布上没有开发板——使用“添加”按钮添加一个以编译和运行代码",
       "undo": {
         "label": "撤销",
         "title": "撤销：{{description}}（Ctrl+Z）",
@@ -511,7 +511,7 @@
       "clearSearch": "清除搜索",
       "allComponents": "所有元件",
       "boards": "开发板",
-      "loading": "正在加载元件...",
+      "loading": "加载元件中...",
       "noResults": "未找到元件",
       "clearFilters": "清除筛选条件"
     },
@@ -519,26 +519,26 @@
       "title": "库管理器",
       "searchTab": "搜索",
       "installedTab": "已安装",
-      "filterPlaceholder": "筛选您的搜索...",
+      "filterPlaceholder": "筛选搜索...",
       "searchingFor": "正在搜索 \"{{query}}\"…",
-      "loadingLibraries": "正在加载库…",
+      "loadingLibraries": "加载库中…",
       "noResults": "没有可用的库",
       "noResultsFor": "未找到 \"{{query}}\" 的库",
-      "byAuthor": "作者：{{author}}",
+      "byAuthor": "作者 {{author}}",
       "install": "安装",
       "installing": "安装中...",
       "uninstall": "卸载",
       "uninstalling": "卸载中...",
-      "loadingInstalled": "正在加载已安装的库...",
+      "loadingInstalled": "加载已安装的库...",
       "noneInstalled": "尚未安装任何库。",
       "useSearchTab": "使用“搜索”选项卡安装库。"
     },
     "installLibs": {
       "title": "所需库",
       "installingProgress": "正在安装 {{done}}/{{total}}…",
-      "allDone": "所有库已成功安装",
-      "required_one": "此项目需要 {{count}} 个库。请安装它以正确编译。",
-      "required_other": "此项目需要 {{count}} 个库。请安装它们以正确编译。",
+      "allDone": "所有库安装成功",
+      "required_one": "此项目需要 {{count}} 个库。安装它以正确编译。",
+      "required_other": "此项目需要 {{count}} 个库。安装它们以正确编译。",
       "wokwiHosted": "Wokwi 托管的库",
       "pending": "待处理",
       "installing": "安装中…",
@@ -556,7 +556,7 @@
       "showExplorer": "显示文件浏览器",
       "hideExplorer": "隐藏文件浏览器",
       "viewMode": "视图模式",
-      "dragResize": "拖拽调整大小"
+      "dragResize": "拖动调整大小"
     },
     "oscilloscope": {
       "title": "示波器",
@@ -567,10 +567,10 @@
       "resumeTitle": "恢复捕获",
       "pause": "暂停",
       "run": "运行",
-      "clearTitle": "清除所有已捕获的样本",
+      "clearTitle": "清除所有捕获的样本",
       "clear": "清除",
       "noChannels": "未添加通道。",
-      "noChannelsHint": "点击“+ 添加通道”以监控引脚。",
+      "noChannelsHint": "点击“+ 添加通道”以监视引脚。",
       "removeChannel": "移除 {{label}}"
     },
     "componentProps": {
@@ -619,7 +619,7 @@
     "pinPicker": {
       "close": "关闭",
       "filterPins": "筛选引脚…",
-      "noMatch": "无匹配的引脚。",
+      "noMatch": "没有匹配的引脚。",
       "rotate": "旋转",
       "delete": "删除"
     },
@@ -627,20 +627,20 @@
       "connected": "已连接",
       "starting": "启动中…",
       "offline": "离线",
-      "powerOnTitle": "启动 Raspberry Pi",
+      "powerOnTitle": "开启 Raspberry Pi 电源",
       "startPi": "启动 Pi",
       "connectTitle": "连接终端到 Pi",
       "connect": "连接",
-      "disconnectTitle": "断开终端连接",
+      "disconnectTitle": "断开终端",
       "disconnect": "断开",
       "terminal": "终端",
       "close": "关闭",
       "offlineTitle": "Raspberry Pi 3B 已关机",
       "offlineSubtitle": "启动 Pi 以打开终端并与 Linux 系统交互。",
-      "offlineNote1": "注意：文件浏览器显示的是暂存区域。",
+      "offlineNote1": "注意：文件浏览器显示一个暂存区。",
       "offlineNote2": "启动后使用“上传到 Pi”将文件传输到正在运行的 Pi。",
-      "loadingTerminal": "正在加载终端…",
-      "selectFile": "从浏览器中选择一个文件进行编辑。"
+      "loadingTerminal": "加载终端中…",
+      "selectFile": "从浏览器中选择文件进行编辑。"
     },
     "sensorPanel": {
       "close": "关闭"
@@ -652,7 +652,7 @@
       "attributes": "属性",
       "compiling": "编译中…",
       "compile": "编译",
-      "compiledOk": "✓ 编译完成——{{kb}} KB",
+      "compiledOk": "✓ 编译成功——{{kb}} KB",
       "compileFailed": "编译失败",
       "cancel": "取消",
       "savePlace": "保存并放置",
@@ -672,7 +672,7 @@
       "placeholderText": "输入要发送的消息...",
       "placeholderPython": "输入 Python 表达式...（Ctrl+C 中断）",
       "lineEnd": {
-        "none": "无行尾符",
+        "none": "无行尾",
         "nl": "换行",
         "cr": "回车",
         "both": "换行和回车"

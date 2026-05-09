@@ -29,7 +29,7 @@
     "hero": {
       "titleLine1": "Arduino, ESP32 & Raspberry Pi.",
       "titleAccent": "Directement dans votre navigateur.",
-      "subtitle": "Écrivez du code, câblez des composants, lancez l'exécution. 19 cartes, 48+ pièces, émulation CPU réelle — sans matériel, sans installation, sans cloud.",
+      "subtitle": "Écrivez du code, câblez des composants, lancez l'exécution. 19 cartes, 48+ composants, émulation CPU réelle — sans matériel, sans installation, sans cloud.",
       "ctaPrimary": "Essayer le simulateur gratuitement →",
       "ctaGithub": "Voir sur GitHub",
       "trustLine": "Aucune inscription requise · Fonctionne à 100% dans votre navigateur · Gratuit et open-source",
@@ -44,7 +44,7 @@
     "features": {
       "label": "Fonctionnalités",
       "title": "Tout ce dont vous avez besoin.",
-      "subtitle": "Un IDE complet, compilateur et simulateur multi-architecture — fonctionnant localement sans services externes requis.",
+      "subtitle": "Un IDE complet, compilateur et simulateur multi-architecture — fonctionnant localement sans services externes.",
       "spice": {
         "title": "Analogique SPICE en temps réel",
         "desc": "Moteur ngspice-WASM — analyse nodale modifiée complète à ~60 Hz. Résistances, condensateurs, amplificateurs opérationnels, BJT, MOSFET, régulateurs se comportent comme du vrai silicium, pas des modèles idéalisés."
@@ -55,11 +55,11 @@
       },
       "customChips": {
         "title": "Puces personnalisées",
-        "desc": "Créez vos propres circuits intégrés en C, Rust ou AssemblyScript avec l'API Custom Chips de Wokwi. Compilez en WebAssembly et réutilisez entre projets."
+        "desc": "Créez vos propres circuits intégrés en C, Rust ou AssemblyScript avec l'API Wokwi Custom Chips. Compilez en WebAssembly et réutilisez dans plusieurs projets."
       },
       "components": {
         "title": "100+ composants",
-        "desc": "Pièces analogiques précises SPICE plus 48+ composants visuels wokwi — LED, LCD, écran TFT ILI9341, servos, buzzers, capteurs ultrasoniques, claviers, bandeaux NeoPixel."
+        "desc": "Pièces analogiques précises SPICE plus 48+ composants visuels wokwi — LED, LCD, TFT ILI9341, servos, buzzers, capteurs ultrasoniques, claviers, bandes NeoPixel."
       },
       "instruments": {
         "title": "Instruments en direct",
@@ -67,7 +67,7 @@
       },
       "monaco": {
         "title": "Éditeur Monaco + arduino-cli",
-        "desc": "Éditeur C++ de qualité VS Code avec espace de travail multi-fichiers. arduino-cli local compile en fichiers .hex / .uf2 / .bin réels — pas d'aller-retour cloud."
+        "desc": "Éditeur C++ de qualité VS Code avec espace de travail multi-fichiers. arduino-cli local compile en vrais fichiers .hex / .uf2 / .bin — pas d'aller-retour cloud."
       }
     },
     "support": {
@@ -194,7 +194,7 @@
       },
       "charts": {
         "activityOverTime": "Activité dans le temps",
-        "noActivity": "Aucune activité dans cette plage pour l'instant.",
+        "noActivity": "Aucune activité dans cette plage.",
         "compilesByFamily": "Compilations par famille de cartes ({{days}}j)",
         "diversityTitle": "Combien de familles de cartes par utilisateur",
         "diversitySubtitle": "Signal de tarification — les utilisateurs multi-cartes justifient probablement des niveaux payants.",
@@ -219,7 +219,7 @@
     "activity": {
       "loadFailed": "Échec du chargement de l'activité.",
       "title": "Activité quotidienne — {{username}}",
-      "subtitle": "Comptes de compilations et d'exécutions par jour et par projet pour cet utilisateur.",
+      "subtitle": "Nombre de compilations et d'exécutions par jour et par projet pour cet utilisateur.",
       "noActivity": "Aucune activité dans la plage sélectionnée.",
       "projectCount_one": "{{count}} projet",
       "projectCount_other": "{{count}} projets",
@@ -317,7 +317,7 @@
       "heading": "Le créateur"
     },
     "releases": {
-      "heading": "Versions récentes"
+      "heading": "Dernières versions"
     },
     "community": {
       "heading": "Communauté et presse"
@@ -343,16 +343,16 @@
     },
     "register": {
       "title": "Créer un compte",
-      "subtitle": "Commencez à créer gratuitement",
+      "subtitle": "Commencez à construire gratuitement",
       "username": "Nom d'utilisateur",
       "usernamePlaceholder": "ex. alice",
       "passwordPlaceholder": "Au moins 8 caractères",
       "create": "Créer un compte",
       "creating": "Création du compte…",
-      "haveAccount": "Vous avez déjà un compte ?",
+      "haveAccount": "Déjà un compte ?",
       "errors": {
         "reserved": "Ce nom d'utilisateur est réservé.",
-        "usernameRules": "Le nom d'utilisateur doit faire 3 à 30 caractères (a-z, 0-9, _, -)",
+        "usernameRules": "Le nom d'utilisateur doit comporter 3 à 30 caractères (a-z, 0-9, _, -)",
         "passwordTooShort": "Le mot de passe doit comporter au moins 8 caractères.",
         "failed": "Échec de l'inscription."
       }
@@ -362,13 +362,13 @@
     "toolbar": {
       "languageMode": "Mode de langage",
       "compile": {
-        "addBoard": "Ajouter une carte pour compiler",
+        "addBoard": "Ajouter une carte à compiler",
         "loading": "Chargement…",
         "loadMicropython": "Charger MicroPython",
         "compile": "Compiler (Ctrl+B)"
       },
       "run": {
-        "addBoard": "Ajouter une carte pour exécuter",
+        "addBoard": "Ajouter une carte à exécuter",
         "runMicropython": "Exécuter MicroPython",
         "run": "Exécuter (compile automatiquement si nécessaire)"
       },
@@ -392,7 +392,7 @@
     },
     "fileExplorer": {
       "workspace": "ESPACE DE TRAVAIL",
-      "newWorkspace": "Nouvel espace de travail (efface cartes, composants, fils et fichiers)",
+      "newWorkspace": "Nouvel espace de travail (efface les cartes, composants, fils et fichiers)",
       "saveProject": "Enregistrer le projet (Ctrl+S)",
       "clickToEdit": "cliquer pour éditer",
       "collapse": "Réduire",
@@ -491,17 +491,17 @@
       "addComponentTitle": "Ajouter un composant",
       "add": "Ajouter",
       "dismiss": "Ignorer",
-      "removeBoard": "Retirer la carte",
+      "removeBoard": "Supprimer la carte",
       "wireCount_one": "{{count}} fil",
       "wireCount_other": "{{count}} fils",
       "removeConfirm": {
         "boardFallback": "Carte",
-        "title": "Retirer {{label}} ?",
-        "body": "Cela retirera la carte de l'espace de travail. Cette action est irréversible.",
-        "bodyWithWires_one": "Cela retirera la carte de l'espace de travail ainsi que {{count}} fil connecté. Cette action est irréversible.",
-        "bodyWithWires_other": "Cela retirera la carte de l'espace de travail ainsi que {{count}} fils connectés. Cette action est irréversible.",
+        "title": "Supprimer {{label}} ?",
+        "body": "Cela supprimera la carte de l'espace de travail. Cette action est irréversible.",
+        "bodyWithWires_one": "Cela supprimera la carte de l'espace de travail et {{count}} fil connecté. Cette action est irréversible.",
+        "bodyWithWires_other": "Cela supprimera la carte de l'espace de travail et {{count}} fils connectés. Cette action est irréversible.",
         "cancel": "Annuler",
-        "remove": "Retirer"
+        "remove": "Supprimer"
       }
     },
     "componentPicker": {
@@ -571,7 +571,7 @@
       "clear": "Effacer",
       "noChannels": "Aucun canal ajouté.",
       "noChannelsHint": "Cliquez sur \"+ Ajouter un canal\" pour surveiller une broche.",
-      "removeChannel": "Retirer {{label}}"
+      "removeChannel": "Supprimer {{label}}"
     },
     "componentProps": {
       "close": "Fermer",
@@ -583,14 +583,14 @@
       "confirmDeleteTitle": "Confirmer la suppression",
       "deleteTitle": "Supprimer le composant",
       "rotate90": "Rotation 90°",
-      "rotate": "Pivoter",
+      "rotate": "Rotation",
       "delete": "Supprimer",
       "cancel": "Annuler"
     },
     "selectionBar": {
       "label": "Actions de sélection",
       "rotate90": "Rotation 90°",
-      "rotate": "Pivoter",
+      "rotate": "Rotation",
       "delete": "Supprimer",
       "deselect": "Désélectionner",
       "deleteKind": {
@@ -620,7 +620,7 @@
       "close": "Fermer",
       "filterPins": "Filtrer les broches…",
       "noMatch": "Aucune broche correspondante.",
-      "rotate": "Pivoter",
+      "rotate": "Rotation",
       "delete": "Supprimer"
     },
     "pi": {
@@ -628,7 +628,7 @@
       "starting": "Démarrage…",
       "offline": "Hors ligne",
       "powerOnTitle": "Allumer le Raspberry Pi",
-      "startPi": "Démarrer le Pi",
+      "startPi": "Démarrer Pi",
       "connectTitle": "Connecter le terminal au Pi",
       "connect": "Connecter",
       "disconnectTitle": "Déconnecter le terminal",
@@ -675,7 +675,7 @@
         "none": "Pas de fin de ligne",
         "nl": "Nouvelle ligne",
         "cr": "Retour chariot",
-        "both": "NL & CR"
+        "both": "NL et CR"
       }
     }
   }

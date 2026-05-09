@@ -20,6 +20,7 @@ import { initReactI18next } from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 
 import enCommon from "./locales/en/common.json";
+import enReleases from "./locales/en/releases.json";
 import { DEFAULT_LOCALE, LOCALES, isLocale, type Locale } from "./config";
 import { getLocaleFromPath } from "./path";
 import { readLocaleCookie } from "./cookie";
@@ -64,7 +65,7 @@ void i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon },
+      en: { common: { ...enCommon, ...enReleases } },
     },
     lng: pickInitialLocale(),
     fallbackLng: DEFAULT_LOCALE,
@@ -92,8 +93,15 @@ void i18n
 export async function loadLocale(locale: Locale): Promise<void> {
   if (locale === DEFAULT_LOCALE) return;
   if (i18n.hasResourceBundle(locale, "common")) return;
-  const mod = await import(`./locales/${locale}/common.json`);
-  i18n.addResourceBundle(locale, "common", mod.default ?? mod, true, true);
+  const [commonMod, releasesMod] = await Promise.all([
+    import(`./locales/${locale}/common.json`),
+    import(`./locales/${locale}/releases.json`),
+  ]);
+  const merged = {
+    ...(commonMod.default ?? commonMod),
+    ...(releasesMod.default ?? releasesMod),
+  };
+  i18n.addResourceBundle(locale, "common", merged, true, true);
 }
 
 export { i18n };

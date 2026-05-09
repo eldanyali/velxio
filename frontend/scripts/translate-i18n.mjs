@@ -68,6 +68,8 @@ async function callDeepSeek(prompt) {
         temperature: 0,
         messages: [{ role: "user", content: prompt }],
         stream: false,
+        max_tokens: 8192,
+        response_format: { type: "json_object" },
       }),
     }
   );

@@ -6,7 +6,7 @@
     "nav": {
       "home": "ホーム",
       "documentation": "ドキュメント",
-      "examples": "サンプル",
+      "examples": "例",
       "editor": "エディター",
       "about": "概要",
       "blog": "ブログ",
@@ -23,31 +23,31 @@
     "search": "検索"
   },
   "footer": {
-    "about": "Velxioは、ブラウザ上で完全に動作する無料のオープンソース回路・マイクロコントローラシミュレータです。Arduino、ESP32、RP2040、ATtiny85に対応し、SPICE精度のアナログ同時シミュレーションを提供します。作って学ぶメーカー、学生、組み込みエンジニアのために構築されました。AGPLv3。"
+    "about": "Velxioは、ブラウザ上で完全に動作する無料のオープンソース回路・マイクロコントローラシミュレータです。Arduino、ESP32、RP2040、ATtiny85に対応し、SPICE精度のアナログ同時シミュレーションを提供します。メーカー、学生、組み込みエンジニアが実践的に学ぶために作られました。AGPLv3ライセンス。"
   },
   "landing": {
     "hero": {
       "titleLine1": "Arduino、ESP32、Raspberry Pi。",
-      "titleAccent": "ブラウザ上でそのまま。",
-      "subtitle": "コードを書き、部品を配線し、実行を押す。19種類のボード、48以上の部品、リアルなCPUエミュレーション — ハードウェア不要、インストール不要、クラウド不要。",
-      "ctaPrimary": "シミュレータを無料で試す →",
+      "titleAccent": "ブラウザ上で。",
+      "subtitle": "コードを書き、部品を配線し、実行ボタンを押すだけ。19のボード、48以上の部品、リアルなCPUエミュレーション—ハードウェア不要、インストール不要、クラウド不要。",
+      "ctaPrimary": "シミュレーターを無料で試す →",
       "ctaGithub": "GitHubで見る",
-      "trustLine": "サインアップ不要 · 100%ブラウザ上で動作 · 無料＆オープンソース",
-      "imageAlt": "Arduino Uno 信号機回路を使ったVelxioエディター"
+      "trustLine": "サインアップ不要 · 100%ブラウザで動作 · 無料＆オープンソース",
+      "imageAlt": "Arduino Uno交通信号回路のVelxioエディター"
     },
     "boards": {
       "label": "対応ハードウェア",
-      "titleLine1": "あらゆるアーキテクチャ。",
-      "titleLine2": "ひとつのツール。",
-      "subtitle": "AVR8、ARM Cortex-M0+、RISC-V、Xtensa、Linuxの5つのCPUアーキテクチャにわたる19のボード。すべてローカルで動作し、クラウドは不要です。"
+      "titleLine1": "すべてのアーキテクチャ。",
+      "titleLine2": "1つのツール。",
+      "subtitle": "5つのCPUアーキテクチャ（AVR8、ARM Cortex-M0+、RISC-V、Xtensa、Linux）にわたる19のボード。すべてローカルで動作し、クラウドは不要。"
     },
     "features": {
       "label": "機能",
-      "title": "必要なものはすべて。",
-      "subtitle": "完全なIDE、コンパイラ、マルチアーキテクチャシミュレータ — 外部サービス不要でローカルに動作します。",
+      "title": "必要なすべて。",
+      "subtitle": "完全なIDE、コンパイラ、マルチアーキテクチャシミュレータ—外部サービス不要でローカル動作。",
       "spice": {
         "title": "リアルタイムSPICEアナログ",
-        "desc": "ngspice-WASMエンジン — 約60Hzで完全な修正節点解析。抵抗、コンデンサ、オペアンプ、BJT、MOSFET、レギュレータは理想モデルではなく、実際のシリコンのように動作します。"
+        "desc": "ngspice-WASMエンジン—完全な修正節点解析を約60Hzで実行。抵抗、コンデンサ、オペアンプ、BJT、MOSFET、レギュレータは理想モデルではなく、実際のシリコンのように動作します。"
       },
       "engines": {
         "title": "5つのエミュレーションエンジン",
@@ -55,25 +55,25 @@
       },
       "customChips": {
         "title": "カスタムチップ",
-        "desc": "Wokwi Custom Chips APIを使用して、C、Rust、またはAssemblyScriptで独自の集積回路を作成。WebAssemblyにコンパイルしてプロジェクト間で再利用できます。"
+        "desc": "Wokwi Custom Chips APIを使用して、C、Rust、またはAssemblyScriptで独自の集積回路を作成。WebAssemblyにコンパイルしてプロジェクト間で再利用。"
       },
       "components": {
         "title": "100以上のコンポーネント",
-        "desc": "SPICE精度のアナログ部品に加え、48以上のwokwiビジュアルコンポーネント — LED、LCD、ILI9341 TFT、サーボ、ブザー、超音波センサー、キーパッド、NeoPixelストリップ。"
+        "desc": "SPICE精度のアナログ部品に加え、48以上のwokwiビジュアルコンポーネント—LED、LCD、ILI9341 TFT、サーボ、ブザー、超音波センサー、キーパッド、NeoPixelストリップ。"
       },
       "instruments": {
         "title": "ライブ計測器",
-        "desc": "マルチチャンネルオシロスコープ、電圧計、電流計、信号発生器。任意のノードにドロップして、シミュレーション実行中に波形がリアルタイムで更新されるのを確認できます。"
+        "desc": "マルチチャンネルオシロスコープ、電圧計、電流計、信号発生器。任意のノードに配置し、シミュレーション実行中に波形がリアルタイムで更新されるのを確認。"
       },
       "monaco": {
-        "title": "Monaco Editor + arduino-cli",
-        "desc": "マルチファイルワークスペースを備えたVS CodeグレードのC++エディター。ローカルのarduino-cliが実際の.hex/.uf2/.binファイルにコンパイル — クラウド往復は不要。"
+        "title": "Monacoエディター + arduino-cli",
+        "desc": "VS CodeグレードのC++エディター、マルチファイルワークスペース対応。ローカルのarduino-cliが実際の.hex/.uf2/.binファイルにコンパイル—クラウド往復不要。"
       }
     },
     "support": {
-      "title": "プロジェクトを支援する",
-      "subtitle": "Velxioは無料でオープンソースです。時間を節約できたなら、開発への支援をご検討ください。",
-      "ctaSponsors": "GitHub Sponsors",
+      "title": "プロジェクトを支援",
+      "subtitle": "Velxioは無料でオープンソースです。時間を節約できたなら、開発支援をご検討ください。",
+      "ctaSponsors": "GitHubスポンサー",
       "ctaPaypal": "PayPalで寄付"
     }
   },
@@ -87,9 +87,9 @@
   },
   "pricing": {
     "title": "料金",
-    "selfHosted": "このVelxioインスタンスはオープンソースイメージからセルフホストされています — 使用するすべての人にすべての機能が無料です。",
-    "hostedVersion": "<link>velxio.dev</link>のホスト版では、開発資金に役立つオプションのProプランを提供しています。",
-    "sourceCode": "ソースコードは<link>GitHub上でMITライセンス</link>です。"
+    "selfHosted": "このVelxioインスタンスはオープンソースイメージからセルフホストされています—すべての機能は利用者全員に無料です。",
+    "hostedVersion": "ホスト版（<link>velxio.dev</link>）では、開発資金を支援するオプションのProプランを提供しています。",
+    "sourceCode": "ソースコードは<link>GitHubでMITライセンス</link>で公開されています。"
   },
   "admin": {
     "loading": "読み込み中…",
@@ -105,9 +105,9 @@
       "save": "保存に失敗しました。"
     },
     "editUser": {
-      "title": "ユーザーを編集",
+      "title": "ユーザー編集",
       "username": "ユーザー名",
-      "email": "メールアドレス",
+      "email": "メール",
       "newPassword": "新しいパスワード（変更しない場合は空白）",
       "passwordPlaceholder": "最低8文字",
       "admin": "管理者",
@@ -118,9 +118,9 @@
     },
     "setup": {
       "title": "管理者設定",
-      "body": "管理者アカウントがまだ存在しません。続行するには最初の管理者ユーザーを作成してください。",
+      "body": "管理者アカウントがまだ存在しません。最初の管理者ユーザーを作成してください。",
       "password": "パスワード",
-      "confirmPassword": "パスワードを確認",
+      "confirmPassword": "パスワード確認",
       "passwordMismatch": "パスワードが一致しません。",
       "creating": "作成中…",
       "createAdmin": "管理者を作成",
@@ -141,7 +141,7 @@
       "noResults": "ユーザーが見つかりません。",
       "col": {
         "username": "ユーザー名",
-        "email": "メールアドレス",
+        "email": "メール",
         "role": "ロール",
         "status": "ステータス",
         "projects": "プロジェクト",
@@ -151,7 +151,7 @@
         "country": "国",
         "lastActive": "最終アクティブ",
         "joined": "登録日",
-        "actions": "アクション"
+        "actions": "操作"
       },
       "actions": {
         "activity": "アクティビティ",
@@ -161,10 +161,10 @@
     },
     "boards": {
       "loadFailed": "ボードメトリクスの読み込みに失敗しました。",
-      "range": "範囲:",
+      "range": "範囲：",
       "byFamily": "ボードファミリー別",
       "byFqbn": "正確なFQBN別",
-      "noData": "データがありません。",
+      "noData": "データなし。",
       "col": {
         "family": "ファミリー",
         "fqbn": "FQBN",
@@ -187,9 +187,9 @@
         "runsAllTime": "実行数（全期間）",
         "newIn30d": "30日間で+{{count}}",
         "successPct": "成功率{{pct}}%",
-        "dau": "過去24時間のアクティブ",
-        "wau": "過去7日間のアクティブ",
-        "mau": "過去30日間のアクティブ",
+        "dau": "過去24時間のアクティブユーザー",
+        "wau": "過去7日間のアクティブユーザー",
+        "mau": "過去30日間のアクティブユーザー",
         "publicPrivate": "公開 / 非公開"
       },
       "charts": {
@@ -197,21 +197,21 @@
         "noActivity": "この範囲ではまだアクティビティがありません。",
         "compilesByFamily": "ボードファミリー別コンパイル数（{{days}}日）",
         "diversityTitle": "ユーザーあたりのボードファミリー数",
-        "diversitySubtitle": "価格設定のシグナル — マルチボードユーザーは有料プランの対象となる可能性が高いです。",
+        "diversitySubtitle": "価格設定のシグナル—複数ボードユーザーは有料プランが適切である可能性があります。",
         "boardCount_one": "{{count}} ボード",
         "boardCount_other": "{{count}} ボード",
         "noDataYet": "まだデータがありません。",
         "topFqbn": "FQBN別トップボード（{{days}}日）",
         "topCountries": "トップ国（{{days}}日）",
-        "countriesSubtitle": "CloudflareのCF-IPCountryヘッダーから。「ユーザー」＝現在の本国、「サインアップ」＝登録国、「アクティブ」＝この範囲でアクティビティのあるユニークユーザー。",
-        "noCountryData": "まだ国のデータがありません（Cloudflare外部で実行されている可能性があります）。",
+        "countriesSubtitle": "CloudflareのCF-IPCountryヘッダーから取得。「ユーザー」＝現在のホーム国、「サインアップ」＝登録国、「アクティブ」＝この範囲でアクティビティのあるユニークユーザー。",
+        "noCountryData": "まだ国のデータがありません（Cloudflare外で実行している可能性があります）。",
         "topUsers": "コンパイル数トップユーザー",
         "topProjects": "コンパイル数トッププロジェクト"
       },
       "col": {
         "country": "国",
-        "users": "ユーザー数",
-        "signups": "サインアップ数",
+        "users": "ユーザー",
+        "signups": "サインアップ",
         "activeRange": "アクティブ（{{days}}日）",
         "user": "ユーザー"
       }
@@ -219,7 +219,7 @@
     "activity": {
       "loadFailed": "アクティビティの読み込みに失敗しました。",
       "title": "日次アクティビティ — {{username}}",
-      "subtitle": "このユーザーの日別・プロジェクト別のコンパイル数と実行数。",
+      "subtitle": "このユーザーの日次・プロジェクト別コンパイル数と実行数。",
       "noActivity": "選択した範囲にアクティビティはありません。",
       "projectCount_one": "{{count}} プロジェクト",
       "projectCount_other": "{{count}} プロジェクト",
@@ -256,16 +256,16 @@
   },
   "examples": {
     "heading": "注目のプロジェクト",
-    "subtitle": "サンプルプロジェクトを探索して実行 — ボード別に整理",
-    "searchPlaceholder": "サンプルを検索 — 「esp32 oled」「blink」「dht」…",
+    "subtitle": "ボード別に整理されたサンプルプロジェクトを探索して実行",
+    "searchPlaceholder": "サンプルを検索 — 'esp32 oled', 'blink', 'dht'…",
     "searchLabel": "サンプルを検索",
     "clearSearch": "検索をクリア",
     "clear": "クリア",
     "matchCount_one": "{{count}} 件の一致",
     "matchCount_other": "{{count}} 件の一致",
     "filters": {
-      "categoryLabel": "カテゴリ:",
-      "difficultyLabel": "難易度:",
+      "categoryLabel": "カテゴリ：",
+      "difficultyLabel": "難易度：",
       "category": {
         "all": "すべて",
         "basics": "基本",
@@ -285,7 +285,7 @@
     },
     "copyLink": "共有リンクをコピー",
     "empty": "選択したフィルターに一致するサンプルはありません",
-    "emptyForQuery": "「{{query}}」に一致するサンプルは、選択したフィルターでは見つかりませんでした",
+    "emptyForQuery": "「{{query}}」に一致するサンプルはありません",
     "resetFilters": "フィルターをリセット",
     "installing": "ライブラリをインストール中（{{done}}/{{total}}）",
     "loadingExample": "サンプルを読み込み中...",
@@ -293,16 +293,16 @@
     "browseAll": "すべてのサンプルを見る"
   },
   "starBanner": {
-    "ariaLabel": "GitHubでVelxioにスターを付ける",
+    "ariaLabel": "GitHubでVelxioにスターを",
     "title": "Velxioを気に入っていますか？",
-    "body": "GitHubでの⭐は、より多くの開発者がプロジェクトを発見するのに役立ちます — たった2秒で完了します！",
-    "cta": "GitHubでスターを付ける",
+    "body": "GitHubで⭐を付けていただくと、より多くの開発者がこのプロジェクトを発見できます—たった2秒です！",
+    "cta": "GitHubでスターを",
     "dismiss": "閉じる"
   },
   "about": {
     "hero": {
       "title": "Velxioについて",
-      "subtitle": "無料のオープンソース組み込みシステムエミュレータ — ハードウェアとオープンソースに情熱を持つ一人の開発者によって構築されました。"
+      "subtitle": "無料のオープンソース組み込みシステムエミュレータ—ハードウェアとオープンソースに情熱を持つ一人の開発者によって作られました。"
     },
     "story": {
       "heading": "ストーリー"
@@ -324,7 +324,7 @@
     },
     "cta": {
       "title": "Velxioを試してみませんか？",
-      "subtitle": "サインアップ不要。100%ブラウザ上で動作。無料でオープンソース。",
+      "subtitle": "サインアップ不要。100%ブラウザで動作。無料でオープンソース。",
       "openEditor": "エディターを開く"
     }
   },
@@ -332,7 +332,7 @@
     "login": {
       "title": "サインイン",
       "subtitle": "Velxioに続ける",
-      "email": "メールアドレス",
+      "email": "メール",
       "password": "パスワード",
       "signIn": "サインイン",
       "signingIn": "サインイン中…",
@@ -343,16 +343,16 @@
     },
     "register": {
       "title": "アカウント作成",
-      "subtitle": "無料で作り始める",
+      "subtitle": "無料で構築を始める",
       "username": "ユーザー名",
-      "usernamePlaceholder": "例: alice",
+      "usernamePlaceholder": "例：alice",
       "passwordPlaceholder": "最低8文字",
-      "create": "アカウントを作成",
-      "creating": "アカウントを作成中…",
+      "create": "アカウント作成",
+      "creating": "アカウント作成中…",
       "haveAccount": "すでにアカウントをお持ちですか？",
       "errors": {
         "reserved": "そのユーザー名は予約されています。",
-        "usernameRules": "ユーザー名は3〜30文字（a-z、0-9、_、-）である必要があります",
+        "usernameRules": "ユーザー名は3〜30文字（a-z、0-9、_、-）である必要があります。",
         "passwordTooShort": "パスワードは最低8文字必要です。",
         "failed": "登録に失敗しました。"
       }
@@ -382,17 +382,17 @@
       },
       "import": ".zipファイルからプロジェクトをインポート",
       "export": "現在のプロジェクトを.zipファイルとしてエクスポート",
-      "uploadFirmware": "コンパイルをバイパスするためにファームウェア（.hex、.bin、.elf、.ihex）をアップロード",
+      "uploadFirmware": "ファームウェア（.hex、.bin、.elf、.ihex）をアップロードしてコンパイルをスキップ",
       "toggleConsole": "出力コンソールの表示切替",
       "libHint": {
-        "message": "ライブラリがありませんか？",
+        "message": "ライブラリが不足していますか？",
         "cta": "ライブラリマネージャー",
         "dismiss": "閉じる"
       }
     },
     "fileExplorer": {
       "workspace": "ワークスペース",
-      "newWorkspace": "新しいワークスペース（ボード、コンポーネント、配線、ファイルをクリア）",
+      "newWorkspace": "新規ワークスペース（ボード、コンポーネント、配線、ファイルをクリア）",
       "saveProject": "プロジェクトを保存（Ctrl+S）",
       "clickToEdit": "クリックして編集",
       "collapse": "折りたたむ",
@@ -438,9 +438,9 @@
       "cancel": "キャンセル",
       "visibility": {
         "public": "公開",
-        "publicHint": "リンクを知っている人は誰でも閲覧できます",
+        "publicHint": "リンクを知っている人は誰でも閲覧可能",
         "private": "非公開",
-        "privateHint": "あなただけが閲覧できます"
+        "privateHint": "自分だけが閲覧可能"
       },
       "errors": {
         "nameRequired": "プロジェクト名は必須です。",
@@ -454,7 +454,7 @@
       "public": "公開",
       "private": "非公開",
       "publicHint": "リンクを知っている人は誰でもこのプロジェクトを閲覧できます",
-      "privateHint": "あなただけがこのプロジェクトを閲覧できます",
+      "privateHint": "自分だけがこのプロジェクトを閲覧できます",
       "makePrivate": "非公開にする",
       "makePublic": "公開にする",
       "copy": "コピー",
@@ -468,15 +468,15 @@
       },
       "activeBoard": "アクティブなボード",
       "noBoard": "ボードなし",
-      "noBoardHint": "キャンバスにボードがありません — 「追加」ボタンでボードを追加してコードをコンパイル・実行してください",
+      "noBoardHint": "キャンバスにボードがありません—追加ボタンでボードを追加してコードをコンパイル・実行してください",
       "undo": {
         "label": "元に戻す",
-        "title": "元に戻す: {{description}}（Ctrl+Z）",
+        "title": "元に戻す：{{description}}（Ctrl+Z）",
         "empty": "元に戻す操作はありません"
       },
       "redo": {
-        "label": "やり直す",
-        "title": "やり直す: {{description}}（Ctrl+Y）",
+        "label": "やり直し",
+        "title": "やり直し：{{description}}（Ctrl+Y）",
         "empty": "やり直す操作はありません"
       },
       "toggleSerialMonitor": "シリアルモニターの表示切替",
@@ -497,9 +497,9 @@
       "removeConfirm": {
         "boardFallback": "ボード",
         "title": "{{label}}を削除しますか？",
-        "body": "これによりワークスペースからボードが削除されます。この操作は元に戻せません。",
-        "bodyWithWires_one": "これによりワークスペースからボードと{{count}}本の接続された配線が削除されます。この操作は元に戻せません。",
-        "bodyWithWires_other": "これによりワークスペースからボードと{{count}}本の接続された配線が削除されます。この操作は元に戻せません。",
+        "body": "ワークスペースからボードが削除されます。この操作は元に戻せません。",
+        "bodyWithWires_one": "ワークスペースからボードと{{count}}本の接続配線が削除されます。この操作は元に戻せません。",
+        "bodyWithWires_other": "ワークスペースからボードと{{count}}本の接続配線が削除されます。この操作は元に戻せません。",
         "cancel": "キャンセル",
         "remove": "削除"
       }
@@ -524,22 +524,22 @@
       "loadingLibraries": "ライブラリを読み込み中…",
       "noResults": "利用可能なライブラリがありません",
       "noResultsFor": "「{{query}}」に一致するライブラリが見つかりません",
-      "byAuthor": "作者: {{author}}",
+      "byAuthor": "作者：{{author}}",
       "install": "インストール",
       "installing": "インストール中...",
       "uninstall": "アンインストール",
       "uninstalling": "アンインストール中...",
       "loadingInstalled": "インストール済みライブラリを読み込み中...",
       "noneInstalled": "まだライブラリがインストールされていません。",
-      "useSearchTab": "「検索」タブを使用してライブラリをインストールしてください。"
+      "useSearchTab": "検索タブを使用してライブラリをインストールしてください。"
     },
     "installLibs": {
       "title": "必要なライブラリ",
-      "installingProgress": "{{done}}/{{total}} をインストール中…",
+      "installingProgress": "{{total}}中{{done}}をインストール中…",
       "allDone": "すべてのライブラリが正常にインストールされました",
       "required_one": "このプロジェクトには{{count}}個のライブラリが必要です。正しくコンパイルするためにインストールしてください。",
       "required_other": "このプロジェクトには{{count}}個のライブラリが必要です。正しくコンパイルするためにインストールしてください。",
-      "wokwiHosted": "Wokwiホスト型ライブラリ",
+      "wokwiHosted": "Wokwiホストライブラリ",
       "pending": "保留中",
       "installing": "インストール中…",
       "installed": "インストール済み",
@@ -561,24 +561,24 @@
     "oscilloscope": {
       "title": "オシロスコープ",
       "addChannelTitle": "ピンチャンネルを追加",
-      "addChannel": "チャンネルを追加",
-      "timeDiv": "時間/div:",
+      "addChannel": "チャンネル追加",
+      "timeDiv": "時間/div：",
       "pauseTitle": "キャプチャを一時停止",
       "resumeTitle": "キャプチャを再開",
       "pause": "一時停止",
       "run": "実行",
-      "clearTitle": "キャプチャしたすべてのサンプルをクリア",
+      "clearTitle": "キャプチャしたサンプルをすべてクリア",
       "clear": "クリア",
       "noChannels": "チャンネルが追加されていません。",
-      "noChannelsHint": "「+ チャンネルを追加」をクリックしてピンを監視します。",
+      "noChannelsHint": "「+ チャンネル追加」をクリックしてピンを監視します。",
       "removeChannel": "{{label}}を削除"
     },
     "componentProps": {
       "close": "閉じる",
-      "tapToConnect": "接続するピンをタップ:",
-      "tapToWire": "配線するピンをタップ:",
-      "pinRoles": "ピンの役割:",
-      "arduinoPin": "Arduinoピン:",
+      "tapToConnect": "接続するピンをタップ：",
+      "tapToWire": "配線するピンをタップ：",
+      "pinRoles": "ピンの役割：",
+      "arduinoPin": "Arduinoピン：",
       "confirmDelete": "{{name}}を削除しますか？",
       "confirmDeleteTitle": "削除の確認",
       "deleteTitle": "コンポーネントを削除",
@@ -637,7 +637,7 @@
       "close": "閉じる",
       "offlineTitle": "Raspberry Pi 3Bの電源がオフです",
       "offlineSubtitle": "Piを起動して端末を開き、Linuxシステムと対話します。",
-      "offlineNote1": "注: ファイルエクスプローラはステージングエリアを表示します。",
+      "offlineNote1": "注：ファイルエクスプローラはステージングエリアを表示します。",
       "offlineNote2": "起動後、「Piにアップロード」を使用して実行中のPiにファイルを転送します。",
       "loadingTerminal": "端末を読み込み中…",
       "selectFile": "エクスプローラからファイルを選択して編集します。"
@@ -647,7 +647,7 @@
     },
     "customChip": {
       "title": "カスタムチップ — {{chipName}}",
-      "tabExamples": "サンプル",
+      "tabExamples": "例",
       "tabEditor": "エディター",
       "attributes": "属性",
       "compiling": "コンパイル中…",
@@ -668,11 +668,11 @@
       "iotGatewayTitle": "クリックしてIoTゲートウェイ経由で開く",
       "openIotGateway": "IoTゲートウェイを開く",
       "waitingData": "シリアルデータを待機中...",
-      "startSim": "シミュレーションを開始してシリアル出力を確認してください。",
+      "startSim": "シミュレーションを開始してシリアル出力を確認します。",
       "placeholderText": "送信するメッセージを入力...",
       "placeholderPython": "Python式を入力...（Ctrl+Cで中断）",
       "lineEnd": {
-        "none": "行末なし",
+        "none": "改行なし",
         "nl": "改行",
         "cr": "キャリッジリターン",
         "both": "NL & CR 両方"
