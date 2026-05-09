@@ -24,5 +24,16 @@
   },
   "footer": {
     "about": "Velxio ist ein kostenloser, quelloffener Schaltungs- und Mikrocontroller-Simulator, der vollständig im Browser läuft. Arduino, ESP32, RP2040 und ATtiny85 mit SPICE-genauer analoger Co-Simulation. Entwickelt für Maker, Studierende und Embedded-Engineers, die durch praktisches Tun lernen. AGPLv3."
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Arduino, ESP32 und Raspberry Pi.",
+      "titleAccent": "Direkt in deinem Browser.",
+      "subtitle": "Code schreiben, Komponenten verkabeln, Run drücken. 19 Boards, 48+ Bauteile, echte CPU-Emulation — ohne Hardware, ohne Installation, ohne Cloud.",
+      "ctaPrimary": "Simulator kostenlos testen →",
+      "ctaGithub": "Auf GitHub ansehen",
+      "trustLine": "Keine Anmeldung · Läuft zu 100% im Browser · Kostenlos und Open Source",
+      "imageAlt": "Velxio-Editor mit einer Ampelschaltung auf Arduino Uno"
+    }
   }
 }

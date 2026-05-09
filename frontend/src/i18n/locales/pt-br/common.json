@@ -24,5 +24,16 @@
   },
   "footer": {
     "about": "Velxio é um simulador de circuitos e microcontroladores gratuito e de código aberto que roda inteiramente no seu navegador. Arduino, ESP32, RP2040 e ATtiny85, com co-simulação analógica precisa SPICE. Feito para makers, estudantes e engenheiros embarcados que aprendem fazendo. AGPLv3."
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Arduino, ESP32 e Raspberry Pi.",
+      "titleAccent": "Direto no seu navegador.",
+      "subtitle": "Escreva código, conecte componentes, aperte run. 19 placas, mais de 48 peças, emulação real de CPU — sem hardware, sem instalação, sem nuvem.",
+      "ctaPrimary": "Testar o simulador grátis →",
+      "ctaGithub": "Ver no GitHub",
+      "trustLine": "Sem cadastro · Roda 100% no seu navegador · Gratuito e de código aberto",
+      "imageAlt": "Editor Velxio com um circuito de semáforo em Arduino Uno"
+    }
   }
 }

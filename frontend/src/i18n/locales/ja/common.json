@@ -24,5 +24,16 @@
   },
   "footer": {
     "about": "Velxio は、ブラウザ上で完全に動作する無料のオープンソース回路・マイクロコントローラシミュレータです。Arduino、ESP32、RP2040、ATtiny85 に対応し、SPICE 精度のアナログ協調シミュレーションを備えています。実践を通じて学ぶメイカー、学生、組み込みエンジニアのために作られました。AGPLv3。"
+  },
+  "landing": {
+    "hero": {
+      "titleLine1": "Arduino、ESP32、Raspberry Pi。",
+      "titleAccent": "ブラウザでそのまま。",
+      "subtitle": "コードを書いて、部品を配線し、実行ボタンを押すだけ。19 種のボード、48 以上のパーツ、本格的な CPU エミュレーション — ハードウェア不要、インストール不要、クラウド不要。",
+      "ctaPrimary": "無料でシミュレータを試す →",
+      "ctaGithub": "GitHub で見る",
+      "trustLine": "登録不要 · ブラウザ内で 100% 動作 · 無料・オープンソース",
+      "imageAlt": "Arduino Uno の信号機回路を表示している Velxio エディタ"
+    }
   }
 }

@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../store/useAuthStore';
 import { trackVisitGitHub, trackClickCTA } from '../utils/analytics';
 import { AppHeader } from '../components/layout/AppHeader';
+import { useLocalizedHref } from '../i18n/useLocalizedNavigate';
 import { useSEO } from '../utils/useSEO';
 import { getSeoMeta } from '../seoRoutes';
 import raspberryPi3Svg from '../assets/Raspberry_Pi_3_illustration.svg';
@@ -746,6 +747,7 @@ const UserMenu: React.FC = () => {
 /* ── Component ────────────────────────────────────────── */
 export const LandingPage: React.FC = () => {
   const { t } = useTranslation();
+  const localize = useLocalizedHref();
   useSEO({
     ...getSeoMeta('/')!,
     jsonLd: {
@@ -812,23 +814,19 @@ export const LandingPage: React.FC = () => {
       <section className="landing-hero">
         <div className="hero-left">
           <h1 className="hero-title">
-            Arduino, ESP32 &amp; Raspberry Pi.
+            {t('landing.hero.titleLine1')}
             <br />
-            <span className="hero-accent">Right in your browser.</span>
+            <span className="hero-accent">{t('landing.hero.titleAccent')}</span>
           </h1>
-          <p className="hero-subtitle">
-            Write code, wire up components, hit run.
-            19 boards, 48+ parts, real CPU emulation —
-            no hardware, no installation, no cloud.
-          </p>
+          <p className="hero-subtitle">{t('landing.hero.subtitle')}</p>
           <div className="hero-ctas">
             <Link
-              to="/editor"
+              to={localize('/editor')}
               className="cta-primary"
               onClick={() => trackClickCTA('landing', '/editor')}
             >
               <IcoZap />
-              Try Simulator Free →
+              {t('landing.hero.ctaPrimary')}
             </Link>
             <a
               href={GITHUB_URL}
@@ -838,12 +836,10 @@ export const LandingPage: React.FC = () => {
               className="cta-secondary"
             >
               <IcoGitHub />
-              View on GitHub
+              {t('landing.hero.ctaGithub')}
             </a>
           </div>
-          <p className="hero-trust-line">
-            No signup required · Runs 100% in your browser · Free &amp; open-source
-          </p>
+          <p className="hero-trust-line">{t('landing.hero.trustLine')}</p>
         </div>
         <div className="hero-right">
           <picture>
@@ -851,7 +847,7 @@ export const LandingPage: React.FC = () => {
             <source srcSet="/marketing/hero-editor.png" type="image/png" />
             <img
               src="/marketing/hero-editor.png"
-              alt="Velxio editor with Arduino Uno traffic-light circuit"
+              alt={t('landing.hero.imageAlt')}
               className="hero-preview-img"
               loading="eager"
               fetchPriority="high"
@@ -1258,10 +1254,10 @@ export const LandingPage: React.FC = () => {
           <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" onClick={trackVisitGitHub}>
             GitHub
           </a>
-          <Link to="/docs">Docs</Link>
-          <Link to="/examples">Examples</Link>
-          <Link to="/editor">Editor</Link>
-          <Link to="/about">About</Link>
+          <Link to={localize('/docs')}>Docs</Link>
+          <Link to={localize('/examples')}>Examples</Link>
+          <Link to={localize('/editor')}>Editor</Link>
+          <Link to={localize('/about')}>About</Link>
         </div>
         <p className="footer-copy">{t('footer.about')}</p>
       </footer>
