@@ -77,6 +77,23 @@
       "ctaPaypal": "PayPal で寄付する"
     }
   },
+  "about": {
+    "hero": {
+      "title": "Velxio について",
+      "subtitle": "ハードウェアとオープンソースに情熱を注ぐ一人の開発者が作り上げた、無料・オープンソースの組み込みシステムエミュレータです。"
+    },
+    "story": { "heading": "ストーリー" },
+    "howItWorks": { "heading": "仕組み" },
+    "openSource": { "heading": "オープンソースの理念" },
+    "creator": { "heading": "作者" },
+    "releases": { "heading": "最新リリース" },
+    "community": { "heading": "コミュニティとメディア" },
+    "cta": {
+      "title": "Velxio を試してみませんか？",
+      "subtitle": "登録不要。ブラウザだけで 100% 動作。無料・オープンソース。",
+      "openEditor": "エディタを開く"
+    }
+  },
   "auth": {
     "login": {
       "title": "サインイン",

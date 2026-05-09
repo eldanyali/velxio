@@ -77,6 +77,23 @@
       "ctaPaypal": "通过 PayPal 捐赠"
     }
   },
+  "about": {
+    "hero": {
+      "title": "关于 Velxio",
+      "subtitle": "一款免费的开源嵌入式系统模拟器 —— 由一位对硬件与开源充满热情的开发者独立打造。"
+    },
+    "story": { "heading": "故事" },
+    "howItWorks": { "heading": "工作原理" },
+    "openSource": { "heading": "开源理念" },
+    "creator": { "heading": "作者" },
+    "releases": { "heading": "近期版本" },
+    "community": { "heading": "社区与媒体" },
+    "cta": {
+      "title": "准备好试用 Velxio 了吗？",
+      "subtitle": "无需注册。100% 在浏览器中运行。免费且开源。",
+      "openEditor": "打开编辑器"
+    }
+  },
   "auth": {
     "login": {
       "title": "登录",

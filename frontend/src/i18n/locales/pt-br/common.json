@@ -77,6 +77,23 @@
       "ctaPaypal": "Doar via PayPal"
     }
   },
+  "about": {
+    "hero": {
+      "title": "Sobre o Velxio",
+      "subtitle": "Um emulador de sistemas embarcados gratuito e de código aberto — construído por um único desenvolvedor com paixão por hardware e open source."
+    },
+    "story": { "heading": "A história" },
+    "howItWorks": { "heading": "Como funciona" },
+    "openSource": { "heading": "Filosofia open source" },
+    "creator": { "heading": "O criador" },
+    "releases": { "heading": "Lançamentos recentes" },
+    "community": { "heading": "Comunidade e imprensa" },
+    "cta": {
+      "title": "Pronto para experimentar o Velxio?",
+      "subtitle": "Sem cadastro. Roda 100% no seu navegador. Gratuito e de código aberto.",
+      "openEditor": "Abrir Editor"
+    }
+  },
   "auth": {
     "login": {
       "title": "Entrar",

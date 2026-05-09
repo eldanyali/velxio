@@ -77,6 +77,23 @@
       "ctaPaypal": "Пожертвовать через PayPal"
     }
   },
+  "about": {
+    "hero": {
+      "title": "О Velxio",
+      "subtitle": "Бесплатный эмулятор встраиваемых систем с открытым исходным кодом — создан одним разработчиком, увлечённым железом и open source."
+    },
+    "story": { "heading": "История" },
+    "howItWorks": { "heading": "Как это работает" },
+    "openSource": { "heading": "Философия open source" },
+    "creator": { "heading": "Создатель" },
+    "releases": { "heading": "Последние релизы" },
+    "community": { "heading": "Сообщество и пресса" },
+    "cta": {
+      "title": "Готовы попробовать Velxio?",
+      "subtitle": "Без регистрации. Работает на 100% в браузере. Бесплатно и с открытым кодом.",
+      "openEditor": "Открыть редактор"
+    }
+  },
   "auth": {
     "login": {
       "title": "Войти",

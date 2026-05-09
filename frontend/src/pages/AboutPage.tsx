@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AppHeader } from '../components/layout/AppHeader';
+import { useLocalizedHref } from '../i18n/useLocalizedNavigate';
 import { useSEO } from '../utils/useSEO';
 import { getSeoMeta } from '../seoRoutes';
 import './AboutPage.css';
@@ -52,6 +54,8 @@ const IcoMedium = () => (
 
 /* ── Component ──────────────────────────────────────── */
 export const AboutPage: React.FC = () => {
+  const { t } = useTranslation();
+  const localize = useLocalizedHref();
   useSEO({
     ...getSeoMeta('/about')!,
     jsonLd: {
@@ -70,11 +74,8 @@ export const AboutPage: React.FC = () => {
       {/* Hero */}
       <section className="about-hero">
         <div className="about-hero-inner">
-          <h1 className="about-hero-title">About Velxio</h1>
-          <p className="about-hero-sub">
-            A free, open-source embedded systems emulator — built by a single developer with a
-            passion for hardware and open source.
-          </p>
+          <h1 className="about-hero-title">{t('about.hero.title')}</h1>
+          <p className="about-hero-sub">{t('about.hero.subtitle')}</p>
         </div>
       </section>
 
@@ -82,7 +83,7 @@ export const AboutPage: React.FC = () => {
       <section className="about-section">
         <div className="about-container">
           <div className="about-story">
-            <h2 className="about-heading">The Story</h2>
+            <h2 className="about-heading">{t('about.story.heading')}</h2>
             <p>
               Velxio started as a personal exploration into how microcontroller emulators work
               internally — CPU instructions, memory management, peripheral timing, and low-level
@@ -120,7 +121,7 @@ export const AboutPage: React.FC = () => {
       {/* Architecture overview */}
       <section className="about-section about-section-alt">
         <div className="about-container">
-          <h2 className="about-heading">How It Works</h2>
+          <h2 className="about-heading">{t('about.howItWorks.heading')}</h2>
           <div className="about-arch-grid">
             <div className="about-arch-card">
               <div className="about-arch-icon">
@@ -182,7 +183,7 @@ export const AboutPage: React.FC = () => {
       {/* Open Source Philosophy */}
       <section className="about-section">
         <div className="about-container">
-          <h2 className="about-heading">Open Source Philosophy</h2>
+          <h2 className="about-heading">{t('about.openSource.heading')}</h2>
           <p>
             Velxio is <strong>100% open source</strong> under the AGPLv3 license. No cloud
             dependency, no student accounts, no data leaving your network. Universities and
@@ -244,7 +245,7 @@ export const AboutPage: React.FC = () => {
       {/* Creator */}
       <section className="about-section about-section-alt">
         <div className="about-container">
-          <h2 className="about-heading">The Creator</h2>
+          <h2 className="about-heading">{t('about.creator.heading')}</h2>
           <div className="about-creator">
             <div className="about-creator-photo">
               <img
@@ -344,7 +345,7 @@ export const AboutPage: React.FC = () => {
       {/* Releases */}
       <section className="about-section">
         <div className="about-container">
-          <h2 className="about-heading">Recent releases</h2>
+          <h2 className="about-heading">{t('about.releases.heading')}</h2>
           <div className="about-releases">
             <Link to="/v2-5" className="about-release-card about-release-card-latest">
               <span className="about-release-tag">Latest</span>
@@ -396,7 +397,7 @@ export const AboutPage: React.FC = () => {
       {/* Community & Press */}
       <section className="about-section about-section-alt">
         <div className="about-container">
-          <h2 className="about-heading">Community &amp; Press</h2>
+          <h2 className="about-heading">{t('about.community.heading')}</h2>
           <div className="about-stats-grid">
             <div className="about-stat">
               <span className="about-stat-number">2,000+</span>
@@ -466,11 +467,11 @@ export const AboutPage: React.FC = () => {
       {/* CTA */}
       <section className="about-cta">
         <div className="about-container">
-          <h2>Ready to try Velxio?</h2>
-          <p>No signup required. Runs 100% in your browser. Free and open source.</p>
+          <h2>{t('about.cta.title')}</h2>
+          <p>{t('about.cta.subtitle')}</p>
           <div className="about-cta-btns">
-            <Link to="/editor" className="about-btn-primary">
-              Open Editor
+            <Link to={localize('/editor')} className="about-btn-primary">
+              {t('about.cta.openEditor')}
             </Link>
             <a
               href={GITHUB_URL}
@@ -478,7 +479,7 @@ export const AboutPage: React.FC = () => {
               rel="noopener noreferrer"
               className="about-btn-secondary"
             >
-              <IcoGitHub /> View on GitHub
+              <IcoGitHub /> {t('landing.hero.ctaGithub')}
             </a>
           </div>
         </div>
@@ -492,27 +493,14 @@ export const AboutPage: React.FC = () => {
         </div>
         <div className="footer-links">
           <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-            GitHub
+            {t('header.nav.github')}
           </a>
-          <Link to="/docs">Docs</Link>
-          <Link to="/examples">Examples</Link>
-          <Link to="/editor">Editor</Link>
-          <Link to="/about">About</Link>
+          <Link to={localize('/docs')}>{t('header.nav.documentation')}</Link>
+          <Link to={localize('/examples')}>{t('header.nav.examples')}</Link>
+          <Link to={localize('/editor')}>{t('header.nav.editor')}</Link>
+          <Link to={localize('/about')}>{t('header.nav.about')}</Link>
         </div>
-        <p className="footer-copy">
-          MIT License &middot; Powered by{' '}
-          <a href="https://github.com/wokwi/avr8js" target="_blank" rel="noopener noreferrer">
-            avr8js
-          </a>{' '}
-          &amp;{' '}
-          <a
-            href="https://github.com/wokwi/wokwi-elements"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            wokwi-elements
-          </a>
-        </p>
+        <p className="footer-copy">{t('footer.about')}</p>
       </footer>
     </div>
   );

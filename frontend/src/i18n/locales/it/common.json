@@ -77,6 +77,23 @@
       "ctaPaypal": "Dona con PayPal"
     }
   },
+  "about": {
+    "hero": {
+      "title": "Informazioni su Velxio",
+      "subtitle": "Un emulatore di sistemi embedded gratuito e open-source — sviluppato da un singolo sviluppatore con la passione per l'hardware e l'open source."
+    },
+    "story": { "heading": "La storia" },
+    "howItWorks": { "heading": "Come funziona" },
+    "openSource": { "heading": "Filosofia open source" },
+    "creator": { "heading": "Il creatore" },
+    "releases": { "heading": "Versioni recenti" },
+    "community": { "heading": "Community & stampa" },
+    "cta": {
+      "title": "Pronto a provare Velxio?",
+      "subtitle": "Nessuna registrazione. Funziona al 100% nel tuo browser. Gratuito e open source.",
+      "openEditor": "Apri Editor"
+    }
+  },
   "auth": {
     "login": {
       "title": "Accedi",

@@ -77,6 +77,23 @@
       "ctaPaypal": "Über PayPal spenden"
     }
   },
+  "about": {
+    "hero": {
+      "title": "Über Velxio",
+      "subtitle": "Ein kostenloser, quelloffener Emulator für eingebettete Systeme — entwickelt von einem einzelnen Entwickler mit Leidenschaft für Hardware und Open Source."
+    },
+    "story": { "heading": "Die Geschichte" },
+    "howItWorks": { "heading": "So funktioniert es" },
+    "openSource": { "heading": "Open-Source-Philosophie" },
+    "creator": { "heading": "Der Entwickler" },
+    "releases": { "heading": "Aktuelle Releases" },
+    "community": { "heading": "Community & Presse" },
+    "cta": {
+      "title": "Bereit, Velxio auszuprobieren?",
+      "subtitle": "Keine Anmeldung. Läuft zu 100% im Browser. Kostenlos und Open Source.",
+      "openEditor": "Editor öffnen"
+    }
+  },
   "auth": {
     "login": {
       "title": "Anmelden",

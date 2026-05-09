@@ -77,6 +77,23 @@
       "ctaPaypal": "Faire un don via PayPal"
     }
   },
+  "about": {
+    "hero": {
+      "title": "À propos de Velxio",
+      "subtitle": "Un émulateur de systèmes embarqués gratuit et open-source — créé par un seul développeur passionné de hardware et d'open source."
+    },
+    "story": { "heading": "L'histoire" },
+    "howItWorks": { "heading": "Comment ça marche" },
+    "openSource": { "heading": "Philosophie open source" },
+    "creator": { "heading": "Le créateur" },
+    "releases": { "heading": "Dernières versions" },
+    "community": { "heading": "Communauté & presse" },
+    "cta": {
+      "title": "Prêt à essayer Velxio ?",
+      "subtitle": "Aucune inscription. Fonctionne 100% dans votre navigateur. Gratuit et open source.",
+      "openEditor": "Ouvrir l'Éditeur"
+    }
+  },
   "auth": {
     "login": {
       "title": "Se connecter",
