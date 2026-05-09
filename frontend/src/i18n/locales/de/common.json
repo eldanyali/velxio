@@ -8,7 +8,7 @@
       "documentation": "Dokumentation",
       "examples": "Beispiele",
       "editor": "Editor",
-      "about": "Über",
+      "about": "Über uns",
       "blog": "Blog",
       "github": "GitHub",
       "discord": "Discord"
@@ -33,13 +33,13 @@
       "ctaPrimary": "Simulator kostenlos testen →",
       "ctaGithub": "Auf GitHub ansehen",
       "trustLine": "Keine Registrierung erforderlich · Läuft zu 100 % im Browser · Kostenlos & quelloffen",
-      "imageAlt": "Velxio-Editor mit Arduino Uno-Ampelschaltung"
+      "imageAlt": "Velxio-Editor mit Arduino Uno-Ampel-Schaltung"
     },
     "boards": {
       "label": "Unterstützte Hardware",
       "titleLine1": "Jede Architektur.",
       "titleLine2": "Ein Werkzeug.",
-      "subtitle": "19 Boards mit 5 CPU-Architekturen – AVR8, ARM Cortex-M0+, RISC-V, Xtensa und Linux. Alle laufen lokal, keine Cloud erforderlich."
+      "subtitle": "19 Boards über 5 CPU-Architekturen – AVR8, ARM Cortex-M0+, RISC-V, Xtensa und Linux. Alle laufen lokal, keine Cloud erforderlich."
     },
     "features": {
       "label": "Funktionen",
@@ -55,7 +55,7 @@
       },
       "customChips": {
         "title": "Benutzerdefinierte Chips",
-        "desc": "Erstellen Sie eigene integrierte Schaltungen in C, Rust oder AssemblyScript mit der Wokwi Custom Chips API. Kompilieren Sie zu WebAssembly und verwenden Sie sie projektübergreifend."
+        "desc": "Erstellen Sie eigene integrierte Schaltungen in C, Rust oder AssemblyScript mit der Wokwi Custom Chips API. Kompilieren Sie zu WebAssembly und verwenden Sie sie projektübergreifend wieder."
       },
       "components": {
         "title": "100+ Komponenten",
@@ -63,18 +63,18 @@
       },
       "instruments": {
         "title": "Live-Instrumente",
-        "desc": "Mehrkanal-Oszilloskop, Voltmeter, Amperemeter, Signalgenerator. Auf jeden Knoten legen und Wellenformen in Echtzeit während der Simulation beobachten."
+        "desc": "Mehrkanal-Oszilloskop, Voltmeter, Amperemeter, Signalgenerator. Auf jeden Knoten legen und Wellenformen in Echtzeit während der Simulation aktualisieren sehen."
       },
       "monaco": {
         "title": "Monaco Editor + arduino-cli",
-        "desc": "C++-Editor auf VS-Code-Niveau mit Multi-File-Workspace. Lokales arduino-cli kompiliert zu echten .hex/.uf2/.bin-Dateien – kein Cloud-Roundtrip."
+        "desc": "VS Code-großartiger C++-Editor mit Multi-Datei-Arbeitsbereich. Lokales arduino-cli kompiliert zu echten .hex / .uf2 / .bin-Dateien – kein Cloud-Roundtrip."
       }
     },
     "support": {
       "title": "Unterstützen Sie das Projekt",
       "subtitle": "Velxio ist kostenlos und quelloffen. Wenn es Ihnen Zeit spart, erwägen Sie, seine Entwicklung zu unterstützen.",
       "ctaSponsors": "GitHub Sponsors",
-      "ctaPaypal": "Spenden via PayPal"
+      "ctaPaypal": "Per PayPal spenden"
     }
   },
   "profile": {
@@ -87,8 +87,8 @@
   },
   "pricing": {
     "title": "Preise",
-    "selfHosted": "Diese Velxio-Instanz wird selbst gehostet aus dem quelloffenen Image – alle Funktionen sind für alle Nutzer kostenlos.",
-    "hostedVersion": "Die gehostete Version unter <link>velxio.dev</link> bietet eine optionale Pro-Stufe, die die Entwicklung finanziert.",
+    "selfHosted": "Diese Velxio-Instanz wird aus dem quelloffenen Image selbst gehostet – alle Funktionen sind für jeden, der sie nutzt, kostenlos.",
+    "hostedVersion": "Die gehostete Version unter <link>velxio.dev</link> bietet eine optionale Pro-Stufe, die zur Finanzierung der Entwicklung beiträgt.",
     "sourceCode": "Der Quellcode ist <link>MIT-lizenziert auf GitHub</link>."
   },
   "admin": {
@@ -159,6 +159,77 @@
         "delete": "Löschen"
       }
     },
+    "boards": {
+      "loadFailed": "Board-Metriken konnten nicht geladen werden.",
+      "range": "Bereich:",
+      "byFamily": "Nach Board-Familie",
+      "byFqbn": "Nach exakter FQBN",
+      "noData": "Keine Daten.",
+      "col": {
+        "family": "Familie",
+        "fqbn": "FQBN",
+        "compiles": "Kompilierungen",
+        "errors": "Fehler",
+        "successRate": "Erfolgsrate",
+        "runs": "Ausführungen",
+        "distinctUsers": "Einzelne Benutzer",
+        "distinctProjects": "Einzelne Projekte"
+      }
+    },
+    "dashboard": {
+      "loadFailed": "Metriken konnten nicht geladen werden.",
+      "loadingMetrics": "Metriken werden geladen…",
+      "unknown": "Unbekannt",
+      "kpi": {
+        "totalUsers": "Benutzer gesamt",
+        "totalProjects": "Projekte gesamt",
+        "compilesAllTime": "Kompilierungen (gesamt)",
+        "runsAllTime": "Ausführungen (gesamt)",
+        "newIn30d": "+{{count}} in 30 Tagen",
+        "successPct": "{{pct}}% Erfolg",
+        "dau": "aktiv in den letzten 24h",
+        "wau": "aktiv in den letzten 7 Tagen",
+        "mau": "aktiv in den letzten 30 Tagen",
+        "publicPrivate": "Öffentlich / Privat"
+      },
+      "charts": {
+        "activityOverTime": "Aktivität im Zeitverlauf",
+        "noActivity": "Noch keine Aktivität in diesem Bereich.",
+        "compilesByFamily": "Kompilierungen nach Board-Familie ({{days}}d)",
+        "diversityTitle": "Wie viele Board-Familien pro Benutzer",
+        "diversitySubtitle": "Preissignal – Multi-Board-Benutzer rechtfertigen wahrscheinlich kostenpflichtige Stufen.",
+        "boardCount_one": "{{count}} Board",
+        "boardCount_other": "{{count}} Boards",
+        "noDataYet": "Noch keine Daten.",
+        "topFqbn": "Top-Boards nach FQBN ({{days}}d)",
+        "topCountries": "Top-Länder ({{days}}d)",
+        "countriesSubtitle": "Aus Cloudflares CF-IPCountry-Header. \"Benutzer\" = aktuelles Heimatland, \"Anmeldungen\" = wo sie sich registriert haben, \"Aktiv\" = einzelne Benutzer mit Aktivität in diesem Bereich.",
+        "noCountryData": "Noch keine Länderdaten (läuft wahrscheinlich außerhalb von Cloudflare).",
+        "topUsers": "Top-Benutzer nach Kompilierungen",
+        "topProjects": "Top-Projekte nach Kompilierungen"
+      },
+      "col": {
+        "country": "Land",
+        "users": "Benutzer",
+        "signups": "Anmeldungen",
+        "activeRange": "Aktiv ({{days}}d)",
+        "user": "Benutzer"
+      }
+    },
+    "activity": {
+      "loadFailed": "Aktivität konnte nicht geladen werden.",
+      "title": "Tägliche Aktivität — {{username}}",
+      "subtitle": "Pro-Tag, pro-Projekt Kompilierungs- und Ausführungszahlen für diesen Benutzer.",
+      "noActivity": "Keine Aktivität im ausgewählten Bereich.",
+      "projectCount_one": "{{count}} Projekt",
+      "projectCount_other": "{{count}} Projekte",
+      "deletedProject": "(gelöschtes Projekt)",
+      "noProject": "(kein Projekt)",
+      "col": {
+        "date": "Datum",
+        "saves": "Speicherungen"
+      }
+    },
     "projects": {
       "loadFailed": "Projekte konnten nicht geladen werden.",
       "deleteFailed": "Projekt konnte nicht gelöscht werden.",
@@ -184,7 +255,7 @@
     }
   },
   "examples": {
-    "heading": "Ausgewählte Projekte",
+    "heading": "Vorgestellte Projekte",
     "subtitle": "Beispielprojekte erkunden und ausführen – nach Board sortiert",
     "searchPlaceholder": "Beispiele durchsuchen – versuchen Sie 'esp32 oled', 'blink', 'dht'…",
     "searchLabel": "Beispiele durchsuchen",
@@ -216,7 +287,17 @@
     "empty": "Keine Beispiele mit den ausgewählten Filtern gefunden",
     "emptyForQuery": "Keine Beispiele für \"{{query}}\" mit den ausgewählten Filtern gefunden",
     "resetFilters": "Filter zurücksetzen",
-    "installing": "Installiere Bibliotheken ({{done}}/{{total}})"
+    "installing": "Installiere Bibliotheken ({{done}}/{{total}})",
+    "loadingExample": "Lade Beispiel...",
+    "notFound": "Beispiel \"{{id}}\" nicht gefunden.",
+    "browseAll": "Alle Beispiele durchsuchen"
+  },
+  "starBanner": {
+    "ariaLabel": "Velxio auf GitHub mit einem Stern markieren",
+    "title": "Gefällt Ihnen Velxio?",
+    "body": "Ein ⭐ auf GitHub hilft mehr Entwicklern, das Projekt zu entdecken – es dauert nur 2 Sekunden!",
+    "cta": "Auf GitHub mit Stern markieren",
+    "dismiss": "Schließen"
   },
   "about": {
     "hero": {
@@ -227,7 +308,7 @@
       "heading": "Die Geschichte"
     },
     "howItWorks": {
-      "heading": "Wie es funktioniert"
+      "heading": "So funktioniert es"
     },
     "openSource": {
       "heading": "Open-Source-Philosophie"
@@ -236,7 +317,7 @@
       "heading": "Der Entwickler"
     },
     "releases": {
-      "heading": "Aktuelle Veröffentlichungen"
+      "heading": "Aktuelle Versionen"
     },
     "community": {
       "heading": "Community & Presse"
@@ -281,13 +362,13 @@
     "toolbar": {
       "languageMode": "Sprachmodus",
       "compile": {
-        "addBoard": "Board zum Kompilieren hinzufügen",
+        "addBoard": "Ein Board zum Kompilieren hinzufügen",
         "loading": "Lädt…",
         "loadMicropython": "MicroPython laden",
         "compile": "Kompilieren (Strg+B)"
       },
       "run": {
-        "addBoard": "Board zum Ausführen hinzufügen",
+        "addBoard": "Ein Board zum Ausführen hinzufügen",
         "runMicropython": "MicroPython ausführen",
         "run": "Ausführen (kompiliert bei Bedarf automatisch)"
       },
@@ -299,10 +380,10 @@
         "title": "Arduino-Bibliotheken suchen und installieren",
         "label": "Bibliotheken"
       },
-      "import": "Projekt aus einer .zip-Datei importieren",
-      "export": "Aktuelles Projekt als .zip-Datei exportieren",
-      "uploadFirmware": "Firmware hochladen (.hex, .bin, .elf, .ihex) um Kompilierung zu umgehen",
-      "toggleConsole": "Ausgabekonsole ein-/ausblenden",
+      "import": "Ein Projekt aus einer .zip-Datei importieren",
+      "export": "Das aktuelle Projekt als .zip-Datei exportieren",
+      "uploadFirmware": "Firmware hochladen (.hex, .bin, .elf, .ihex), um die Kompilierung zu umgehen",
+      "toggleConsole": "Ausgabekonsole umschalten",
       "libHint": {
         "message": "Bibliothek fehlt? Installieren Sie sie über den",
         "cta": "Bibliotheksverwaltung",
@@ -311,7 +392,7 @@
     },
     "fileExplorer": {
       "workspace": "ARBEITSBEREICH",
-      "newWorkspace": "Neuer Arbeitsbereich (löscht Boards, Komponenten, Leitungen und Dateien)",
+      "newWorkspace": "Neuen Arbeitsbereich erstellen (löscht Boards, Komponenten, Leitungen und Dateien)",
       "saveProject": "Projekt speichern (Strg+S)",
       "clickToEdit": "zum Bearbeiten klicken",
       "collapse": "Einklappen",
@@ -398,13 +479,13 @@
         "title": "Wiederholen: {{description}} (Strg+Y)",
         "empty": "Nichts zu wiederholen"
       },
-      "toggleSerialMonitor": "Seriellen Monitor ein-/ausblenden",
+      "toggleSerialMonitor": "Seriellen Monitor umschalten",
       "serial": "Seriell",
-      "toggleScope": "Oszilloskop/Logikanalysator ein-/ausblenden",
+      "toggleScope": "Oszilloskop / Logikanalysator umschalten",
       "scope": "Oszilloskop",
       "zoomIn": "Vergrößern",
       "zoomOut": "Verkleinern",
-      "resetView": "Ansicht zurücksetzen (klicken zum Zurücksetzen)",
+      "resetView": "Ansicht zurücksetzen (zum Zurücksetzen klicken)",
       "componentCount_one": "{{count}} Komponente",
       "componentCount_other": "{{count}} Komponenten",
       "addComponentTitle": "Komponente hinzufügen",
@@ -416,9 +497,9 @@
       "removeConfirm": {
         "boardFallback": "Board",
         "title": "{{label}} entfernen?",
-        "body": "Dies entfernt das Board aus dem Arbeitsbereich. Diese Aktion kann nicht rückgängig gemacht werden.",
-        "bodyWithWires_one": "Dies entfernt das Board aus dem Arbeitsbereich und {{count}} verbundene Leitung. Diese Aktion kann nicht rückgängig gemacht werden.",
-        "bodyWithWires_other": "Dies entfernt das Board aus dem Arbeitsbereich und {{count}} verbundene Leitungen. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "body": "Dadurch wird das Board aus dem Arbeitsbereich entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "bodyWithWires_one": "Dadurch wird das Board aus dem Arbeitsbereich und {{count}} verbundene Leitung entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "bodyWithWires_other": "Dadurch wird das Board aus dem Arbeitsbereich und {{count}} verbundene Leitungen entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
         "cancel": "Abbrechen",
         "remove": "Entfernen"
       }
@@ -438,7 +519,7 @@
       "title": "BIBLIOTHEKSVERWALTUNG",
       "searchTab": "Suchen",
       "installedTab": "Installiert",
-      "filterPlaceholder": "Suche filtern...",
+      "filterPlaceholder": "Ihre Suche filtern...",
       "searchingFor": "Suche nach \"{{query}}\"…",
       "loadingLibraries": "Bibliotheken werden geladen…",
       "noResults": "Keine Bibliotheken verfügbar",
@@ -472,16 +553,16 @@
       "code": "Code",
       "both": "Beide",
       "circuit": "Schaltung",
-      "showExplorer": "Dateiexplorer anzeigen",
-      "hideExplorer": "Dateiexplorer ausblenden",
+      "showExplorer": "Datei-Explorer anzeigen",
+      "hideExplorer": "Datei-Explorer ausblenden",
       "viewMode": "Ansichtsmodus",
       "dragResize": "Zum Größenändern ziehen"
     },
     "oscilloscope": {
       "title": "Oszilloskop",
-      "addChannelTitle": "Pin-Kanal hinzufügen",
+      "addChannelTitle": "Einen Pin-Kanal hinzufügen",
       "addChannel": "Kanal hinzufügen",
-      "timeDiv": "Zeit/Div:",
+      "timeDiv": "Zeit/Teilung:",
       "pauseTitle": "Aufnahme pausieren",
       "resumeTitle": "Aufnahme fortsetzen",
       "pause": "Pause",
@@ -534,6 +615,32 @@
     },
     "boardPicker": {
       "title": "Board hinzufügen"
+    },
+    "pinPicker": {
+      "close": "Schließen",
+      "filterPins": "Pins filtern…",
+      "noMatch": "Keine passenden Pins.",
+      "rotate": "Drehen",
+      "delete": "Löschen"
+    },
+    "pi": {
+      "connected": "Verbunden",
+      "starting": "Starte…",
+      "offline": "Offline",
+      "powerOnTitle": "Raspberry Pi einschalten",
+      "startPi": "Pi starten",
+      "connectTitle": "Terminal mit Pi verbinden",
+      "connect": "Verbinden",
+      "disconnectTitle": "Terminal trennen",
+      "disconnect": "Trennen",
+      "terminal": "Terminal",
+      "close": "Schließen",
+      "offlineTitle": "Raspberry Pi 3B ist ausgeschaltet",
+      "offlineSubtitle": "Starten Sie den Pi, um ein Terminal zu öffnen und mit dem Linux-System zu interagieren.",
+      "offlineNote1": "Hinweis: Der Datei-Explorer zeigt einen Staging-Bereich an.",
+      "offlineNote2": "Verwenden Sie \"Auf Pi hochladen\", nach dem Start, um Dateien auf den laufenden Pi zu übertragen.",
+      "loadingTerminal": "Terminal wird geladen…",
+      "selectFile": "Wählen Sie eine Datei aus dem Explorer aus, um sie zu bearbeiten."
     },
     "sensorPanel": {
       "close": "Schließen"

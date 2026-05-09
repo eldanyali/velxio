@@ -23,7 +23,7 @@
     "search": "Cerca"
   },
   "footer": {
-    "about": "Velxio è un simulatore gratuito e open-source di circuiti e microcontrollori che funziona interamente nel tuo browser. Arduino, ESP32, RP2040 e ATtiny85, con co-simulazione analogica SPICE accurata. Creato per maker, studenti e ingegneri embedded che imparano facendo. AGPLv3."
+    "about": "Velxio è un simulatore di circuiti e microcontrollori gratuito e open-source che funziona interamente nel tuo browser. Arduino, ESP32, RP2040 e ATtiny85, con co-simulazione analogica SPICE-accurata. Creato per maker, studenti e ingegneri embedded che imparano facendo. AGPLv3."
   },
   "landing": {
     "hero": {
@@ -39,7 +39,7 @@
       "label": "Hardware Supportato",
       "titleLine1": "Ogni architettura.",
       "titleLine2": "Un solo strumento.",
-      "subtitle": "19 schede su 5 architetture CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tutto in esecuzione localmente, senza bisogno del cloud."
+      "subtitle": "19 schede su 5 architetture CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tutto in esecuzione localmente, senza cloud."
     },
     "features": {
       "label": "Funzionalità",
@@ -59,7 +59,7 @@
       },
       "components": {
         "title": "100+ Componenti",
-        "desc": "Parti analogiche SPICE accurate più 48+ componenti visivi wokwi — LED, LCD, TFT ILI9341, servo, buzzer, sensori a ultrasuoni, tastierini, strisce NeoPixel."
+        "desc": "Parti analogiche SPICE-accurate più 48+ componenti visivi wokwi — LED, LCD, TFT ILI9341, servo, buzzer, sensori a ultrasuoni, tastierini, strisce NeoPixel."
       },
       "instruments": {
         "title": "Strumenti Live",
@@ -89,7 +89,7 @@
     "title": "Prezzi",
     "selfHosted": "Questa istanza di Velxio è auto-ospitata dall'immagine open-source — tutte le funzionalità sono gratuite per chiunque la utilizzi.",
     "hostedVersion": "La versione ospitata su <link>velxio.dev</link> offre un livello Pro opzionale che aiuta a finanziare lo sviluppo.",
-    "sourceCode": "Il codice sorgente è <link>concesso in licenza MIT su GitHub</link>."
+    "sourceCode": "Il codice sorgente è <link>con licenza MIT su GitHub</link>."
   },
   "admin": {
     "loading": "Caricamento…",
@@ -159,6 +159,77 @@
         "delete": "Elimina"
       }
     },
+    "boards": {
+      "loadFailed": "Caricamento metriche schede fallito.",
+      "range": "Intervallo:",
+      "byFamily": "Per famiglia di schede",
+      "byFqbn": "Per FQBN esatto",
+      "noData": "Nessun dato.",
+      "col": {
+        "family": "Famiglia",
+        "fqbn": "FQBN",
+        "compiles": "Compilazioni",
+        "errors": "Errori",
+        "successRate": "Tasso di successo",
+        "runs": "Esecuzioni",
+        "distinctUsers": "Utenti distinti",
+        "distinctProjects": "Progetti distinti"
+      }
+    },
+    "dashboard": {
+      "loadFailed": "Caricamento metriche fallito.",
+      "loadingMetrics": "Caricamento metriche…",
+      "unknown": "Sconosciuto",
+      "kpi": {
+        "totalUsers": "Utenti totali",
+        "totalProjects": "Progetti totali",
+        "compilesAllTime": "Compilazioni (totali)",
+        "runsAllTime": "Esecuzioni (totali)",
+        "newIn30d": "+{{count}} in 30g",
+        "successPct": "{{pct}}% successo",
+        "dau": "attivi nelle ultime 24h",
+        "wau": "attivi negli ultimi 7g",
+        "mau": "attivi negli ultimi 30g",
+        "publicPrivate": "Pubblici / Privati"
+      },
+      "charts": {
+        "activityOverTime": "Attività nel tempo",
+        "noActivity": "Nessuna attività in questo intervallo.",
+        "compilesByFamily": "Compilazioni per famiglia di schede ({{days}}g)",
+        "diversityTitle": "Quante famiglie di schede per utente",
+        "diversitySubtitle": "Segnale di prezzo — gli utenti multi-scheda probabilmente giustificano livelli a pagamento.",
+        "boardCount_one": "{{count}} scheda",
+        "boardCount_other": "{{count}} schede",
+        "noDataYet": "Nessun dato ancora.",
+        "topFqbn": "Schede principali per FQBN ({{days}}g)",
+        "topCountries": "Paesi principali ({{days}}g)",
+        "countriesSubtitle": "Dall'intestazione CF-IPCountry di Cloudflare. \"Utenti\" = paese di residenza attuale, \"Registrazioni\" = dove si sono registrati, \"Attivi\" = utenti distinti con attività in questo intervallo.",
+        "noCountryData": "Nessun dato paese ancora (probabilmente in esecuzione al di fuori di Cloudflare).",
+        "topUsers": "Utenti principali per compilazioni",
+        "topProjects": "Progetti principali per compilazioni"
+      },
+      "col": {
+        "country": "Paese",
+        "users": "Utenti",
+        "signups": "Registrazioni",
+        "activeRange": "Attivi ({{days}}g)",
+        "user": "Utente"
+      }
+    },
+    "activity": {
+      "loadFailed": "Caricamento attività fallito.",
+      "title": "Attività giornaliera — {{username}}",
+      "subtitle": "Conteggi di compilazione ed esecuzione per giorno e per progetto per questo utente.",
+      "noActivity": "Nessuna attività nell'intervallo selezionato.",
+      "projectCount_one": "{{count}} progetto",
+      "projectCount_other": "{{count}} progetti",
+      "deletedProject": "(progetto eliminato)",
+      "noProject": "(nessun progetto)",
+      "col": {
+        "date": "Data",
+        "saves": "Salvataggi"
+      }
+    },
     "projects": {
       "loadFailed": "Caricamento progetti fallito.",
       "deleteFailed": "Eliminazione progetto fallita.",
@@ -196,7 +267,7 @@
       "categoryLabel": "Categoria:",
       "difficultyLabel": "Difficoltà:",
       "category": {
-        "all": "Tutte",
+        "all": "Tutti",
         "basics": "Base",
         "sensors": "Sensori",
         "displays": "Display",
@@ -216,7 +287,17 @@
     "empty": "Nessun esempio trovato con i filtri selezionati",
     "emptyForQuery": "Nessun esempio trovato per \"{{query}}\" con i filtri selezionati",
     "resetFilters": "Reimposta filtri",
-    "installing": "Installazione librerie ({{done}}/{{total}})"
+    "installing": "Installazione librerie ({{done}}/{{total}})",
+    "loadingExample": "Caricamento esempio...",
+    "notFound": "Esempio \"{{id}}\" non trovato.",
+    "browseAll": "Sfoglia tutti gli esempi"
+  },
+  "starBanner": {
+    "ariaLabel": "Metti una stella a Velxio su GitHub",
+    "title": "Ti piace Velxio?",
+    "body": "Una ⭐ su GitHub aiuta più sviluppatori a scoprire il progetto — ci vogliono solo 2 secondi!",
+    "cta": "Metti stella su GitHub",
+    "dismiss": "Ignora"
   },
   "about": {
     "hero": {
@@ -272,7 +353,7 @@
       "errors": {
         "reserved": "Questo nome utente è riservato.",
         "usernameRules": "Il nome utente deve essere di 3-30 caratteri (a-z, 0-9, _, -)",
-        "passwordTooShort": "La password deve contenere almeno 8 caratteri.",
+        "passwordTooShort": "La password deve essere di almeno 8 caratteri.",
         "failed": "Registrazione fallita."
       }
     }
@@ -302,7 +383,7 @@
       "import": "Importa un progetto da un file .zip",
       "export": "Esporta il progetto corrente come file .zip",
       "uploadFirmware": "Carica firmware (.hex, .bin, .elf, .ihex) per saltare la compilazione",
-      "toggleConsole": "Mostra/Nascondi Console di Output",
+      "toggleConsole": "Attiva/Disattiva Console di Output",
       "libHint": {
         "message": "Libreria mancante? Installala dal",
         "cta": "Gestore Librerie",
@@ -359,7 +440,7 @@
         "public": "Pubblico",
         "publicHint": "Chiunque abbia il link può visualizzare",
         "private": "Privato",
-        "privateHint": "Solo tu puoi vederlo"
+        "privateHint": "Solo tu puoi vedere questo"
       },
       "errors": {
         "nameRequired": "Il nome del progetto è obbligatorio.",
@@ -398,9 +479,9 @@
         "title": "Ripeti: {{description}} (Ctrl+Y)",
         "empty": "Niente da ripetere"
       },
-      "toggleSerialMonitor": "Mostra/Nascondi Monitor Seriale",
+      "toggleSerialMonitor": "Attiva/Disattiva Monitor Seriale",
       "serial": "Seriale",
-      "toggleScope": "Mostra/Nascondi Oscilloscopio / Analizzatore Logico",
+      "toggleScope": "Attiva/Disattiva Oscilloscopio / Analizzatore Logico",
       "scope": "Oscilloscopio",
       "zoomIn": "Ingrandisci",
       "zoomOut": "Riduci",
@@ -482,11 +563,11 @@
       "addChannelTitle": "Aggiungi un canale pin",
       "addChannel": "Aggiungi Canale",
       "timeDiv": "Tempo/div:",
-      "pauseTitle": "Metti in pausa acquisizione",
-      "resumeTitle": "Riprendi acquisizione",
+      "pauseTitle": "Metti in pausa la cattura",
+      "resumeTitle": "Riprendi la cattura",
       "pause": "Pausa",
       "run": "Esegui",
-      "clearTitle": "Cancella tutti i campioni acquisiti",
+      "clearTitle": "Cancella tutti i campioni catturati",
       "clear": "Cancella",
       "noChannels": "Nessun canale aggiunto.",
       "noChannelsHint": "Clicca \"+ Aggiungi Canale\" per monitorare un pin.",
@@ -535,6 +616,32 @@
     "boardPicker": {
       "title": "Aggiungi Scheda"
     },
+    "pinPicker": {
+      "close": "Chiudi",
+      "filterPins": "Filtra pin…",
+      "noMatch": "Nessun pin corrisponde.",
+      "rotate": "Ruota",
+      "delete": "Elimina"
+    },
+    "pi": {
+      "connected": "Connesso",
+      "starting": "Avvio…",
+      "offline": "Offline",
+      "powerOnTitle": "Accendi il Raspberry Pi",
+      "startPi": "Avvia Pi",
+      "connectTitle": "Connetti terminale al Pi",
+      "connect": "Connetti",
+      "disconnectTitle": "Disconnetti terminale",
+      "disconnect": "Disconnetti",
+      "terminal": "Terminale",
+      "close": "Chiudi",
+      "offlineTitle": "Raspberry Pi 3B è spento",
+      "offlineSubtitle": "Avvia il Pi per aprire un terminale e interagire con il sistema Linux.",
+      "offlineNote1": "Nota: L'esplora file mostra un'area di staging.",
+      "offlineNote2": "Usa \"Carica su Pi\" dopo l'avvio per trasferire file al Pi in esecuzione.",
+      "loadingTerminal": "Caricamento terminale…",
+      "selectFile": "Seleziona un file dall'esplora per modificarlo."
+    },
     "sensorPanel": {
       "close": "Chiudi"
     },
@@ -549,7 +656,7 @@
       "compileFailed": "Compilazione fallita",
       "cancel": "Annulla",
       "savePlace": "Salva e Posiziona",
-      "compileFirst": "Compila prima"
+      "compileFirst": "Prima compila"
     },
     "serial": {
       "title": "Monitor Seriale",

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   adminGetUserActivity,
   type DailyProjectActivity,
@@ -15,6 +16,7 @@ interface Props {
 const RANGE_OPTIONS = [7, 30, 90, 365];
 
 export function UserActivityModal({ userId, username, onClose }: Props) {
+  const { t } = useTranslation();
   const [data, setData] = useState<UserDailyActivityResponse | null>(null);
   const [rangeDays, setRangeDays] = useState(30);
   const [loading, setLoading] = useState(true);
@@ -25,9 +27,9 @@ export function UserActivityModal({ userId, username, onClose }: Props) {
     setError('');
     adminGetUserActivity(userId, rangeDays)
       .then(setData)
-      .catch((e: any) => setError(e?.response?.data?.detail || 'Failed to load activity.'))
+      .catch((e: any) => setError(e?.response?.data?.detail || t('admin.activity.loadFailed')))
       .finally(() => setLoading(false));
-  }, [userId, rangeDays]);
+  }, [userId, rangeDays, t]);
 
   // Group entries by date for the per-day expandable view
   const grouped = useMemo(() => {
@@ -51,10 +53,8 @@ export function UserActivityModal({ userId, username, onClose }: Props) {
       <div style={s.box} onClick={(e) => e.stopPropagation()}>
         <div style={s.header}>
           <div>
-            <h2 style={s.title}>Daily activity — {username}</h2>
-            <p style={s.subtitle}>
-              Per-day, per-project compile and run counts for this user.
-            </p>
+            <h2 style={s.title}>{t('admin.activity.title', { username })}</h2>
+            <p style={s.subtitle}>{t('admin.activity.subtitle')}</p>
           </div>
           <button style={s.closeBtn} onClick={onClose}>
             ×
@@ -62,7 +62,7 @@ export function UserActivityModal({ userId, username, onClose }: Props) {
         </div>
 
         <div style={s.controls}>
-          <span style={s.muted}>Range:</span>
+          <span style={s.muted}>{t('admin.boards.range')}</span>
           {RANGE_OPTIONS.map((d) => (
             <button
               key={d}
@@ -74,11 +74,11 @@ export function UserActivityModal({ userId, username, onClose }: Props) {
           ))}
         </div>
 
-        {loading && <p style={s.muted}>Loading…</p>}
+        {loading && <p style={s.muted}>{t('admin.loading')}</p>}
         {error && <div style={s.error}>{error}</div>}
 
         {!loading && !error && data && grouped.length === 0 && (
-          <p style={s.muted}>No activity in the selected range.</p>
+          <p style={s.muted}>{t('admin.activity.noActivity')}</p>
         )}
 
         {!loading && !error && grouped.length > 0 && (
@@ -86,12 +86,12 @@ export function UserActivityModal({ userId, username, onClose }: Props) {
             <table style={s.table}>
               <thead>
                 <tr>
-                  <th style={s.th}>Date</th>
-                  <th style={s.th}>Project</th>
-                  <th style={s.thNum}>Compiles</th>
-                  <th style={s.thNum}>Errors</th>
-                  <th style={s.thNum}>Runs</th>
-                  <th style={s.thNum}>Saves</th>
+                  <th style={s.th}>{t('admin.activity.col.date')}</th>
+                  <th style={s.th}>{t('admin.projects.col.name')}</th>
+                  <th style={s.thNum}>{t('admin.boards.col.compiles')}</th>
+                  <th style={s.thNum}>{t('admin.boards.col.errors')}</th>
+                  <th style={s.thNum}>{t('admin.boards.col.runs')}</th>
+                  <th style={s.thNum}>{t('admin.activity.col.saves')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -104,8 +104,9 @@ export function UserActivityModal({ userId, username, onClose }: Props) {
                         <td style={s.dayHeaderCell}>{date}</td>
                         <td style={s.dayHeaderCell}>
                           <span style={s.muted}>
-                            {totals?.distinct_projects ?? entries.length} project
-                            {(totals?.distinct_projects ?? entries.length) === 1 ? '' : 's'}
+                            {t('admin.activity.projectCount', {
+                              count: totals?.distinct_projects ?? entries.length,
+                            })}
                           </span>
                         </td>
                         <td style={s.dayHeaderTotal}>{totals?.compiles ?? 0}</td>
@@ -120,7 +121,9 @@ export function UserActivityModal({ userId, username, onClose }: Props) {
                           <td style={s.td}>
                             {e.project_name ?? (
                               <span style={s.mutedItalic}>
-                                {e.project_id ? '(deleted project)' : '(no project)'}
+                                {e.project_id
+                                  ? t('admin.activity.deletedProject')
+                                  : t('admin.activity.noProject')}
                               </span>
                             )}
                           </td>

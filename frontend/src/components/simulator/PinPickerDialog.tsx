@@ -15,6 +15,7 @@
  */
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface PinInfoLike {
   name: string;
@@ -50,6 +51,7 @@ export const PinPickerDialog: React.FC<PinPickerDialogProps> = ({
   onRotate,
   onDelete,
 }) => {
+  const { t } = useTranslation();
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const [filter, setFilter] = useState('');
 
@@ -139,7 +141,7 @@ export const PinPickerDialog: React.FC<PinPickerDialogProps> = ({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('editor.pinPicker.close')}
             style={{
               background: 'transparent',
               border: 'none',
@@ -165,7 +167,7 @@ export const PinPickerDialog: React.FC<PinPickerDialogProps> = ({
               type="text"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              placeholder="Filter pins…"
+              placeholder={t('editor.pinPicker.filterPins')}
               autoFocus={false}
               style={{
                 width: '100%',
@@ -192,7 +194,7 @@ export const PinPickerDialog: React.FC<PinPickerDialogProps> = ({
           }}
         >
           {filteredPins.length === 0 ? (
-            <div style={{ padding: 16, color: '#999', fontSize: 13 }}>No pins match.</div>
+            <div style={{ padding: 16, color: '#999', fontSize: 13 }}>{t('editor.pinPicker.noMatch')}</div>
           ) : (
             filteredPins.map((pin) => (
               <button
@@ -261,9 +263,9 @@ export const PinPickerDialog: React.FC<PinPickerDialogProps> = ({
                 type="button"
                 onClick={onRotate}
                 style={footerButtonStyle}
-                aria-label="Rotate"
+                aria-label={t('editor.pinPicker.rotate')}
               >
-                <RotateGlyph /> Rotate
+                <RotateGlyph /> {t('editor.pinPicker.rotate')}
               </button>
             )}
             {onDelete && (
@@ -277,9 +279,9 @@ export const PinPickerDialog: React.FC<PinPickerDialogProps> = ({
                   borderColor: '#5a2c2c',
                   color: '#e06c75',
                 }}
-                aria-label="Delete"
+                aria-label={t('editor.pinPicker.delete')}
               >
-                <TrashGlyph /> Delete
+                <TrashGlyph /> {t('editor.pinPicker.delete')}
               </button>
             )}
           </div>

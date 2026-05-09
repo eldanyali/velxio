@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { adminGetBoards, type BoardBreakdown } from '../../services/metricsService';
 
 const FAMILY_COLORS: Record<string, string> = {
@@ -17,6 +18,7 @@ function familyBadge(name: string | null) {
 }
 
 export function AdminBoardsTab() {
+  const { t } = useTranslation();
   const [families, setFamilies] = useState<BoardBreakdown[]>([]);
   const [fqbns, setFqbns] = useState<BoardBreakdown[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,17 +33,17 @@ export function AdminBoardsTab() {
         setFamilies(b.families);
         setFqbns(b.fqbns);
       })
-      .catch(() => setError('Failed to load board metrics.'))
+      .catch(() => setError(t('admin.boards.loadFailed')))
       .finally(() => setLoading(false));
-  }, [rangeDays]);
+  }, [rangeDays, t]);
 
-  if (loading) return <p style={s.muted}>Loading…</p>;
+  if (loading) return <p style={s.muted}>{t('admin.loading')}</p>;
   if (error) return <div style={s.error}>{error}</div>;
 
   return (
     <div style={s.wrap}>
       <div style={s.rangeRow}>
-        <span style={s.muted}>Range:</span>
+        <span style={s.muted}>{t('admin.boards.range')}</span>
         {[7, 30, 90, 365].map((d) => (
           <button
             key={d}
@@ -54,24 +56,24 @@ export function AdminBoardsTab() {
       </div>
 
       <div style={s.section}>
-        <h3 style={s.sectionTitle}>By board family</h3>
+        <h3 style={s.sectionTitle}>{t('admin.boards.byFamily')}</h3>
         <table style={s.table}>
           <thead>
             <tr>
-              <th style={s.th}>Family</th>
-              <th style={s.thNum}>Compiles</th>
-              <th style={s.thNum}>Errors</th>
-              <th style={s.thNum}>Success rate</th>
-              <th style={s.thNum}>Runs</th>
-              <th style={s.thNum}>Distinct users</th>
-              <th style={s.thNum}>Distinct projects</th>
+              <th style={s.th}>{t('admin.boards.col.family')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.compiles')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.errors')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.successRate')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.runs')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.distinctUsers')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.distinctProjects')}</th>
             </tr>
           </thead>
           <tbody>
             {families.length === 0 && (
               <tr>
                 <td colSpan={7} style={{ ...s.td, textAlign: 'center', color: '#666' }}>
-                  No data.
+                  {t('admin.boards.noData')}
                 </td>
               </tr>
             )}
@@ -95,24 +97,24 @@ export function AdminBoardsTab() {
       </div>
 
       <div style={s.section}>
-        <h3 style={s.sectionTitle}>By exact FQBN</h3>
+        <h3 style={s.sectionTitle}>{t('admin.boards.byFqbn')}</h3>
         <table style={s.table}>
           <thead>
             <tr>
-              <th style={s.th}>FQBN</th>
-              <th style={s.thNum}>Compiles</th>
-              <th style={s.thNum}>Errors</th>
-              <th style={s.thNum}>Success rate</th>
-              <th style={s.thNum}>Runs</th>
-              <th style={s.thNum}>Distinct users</th>
-              <th style={s.thNum}>Distinct projects</th>
+              <th style={s.th}>{t('admin.boards.col.fqbn')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.compiles')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.errors')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.successRate')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.runs')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.distinctUsers')}</th>
+              <th style={s.thNum}>{t('admin.boards.col.distinctProjects')}</th>
             </tr>
           </thead>
           <tbody>
             {fqbns.length === 0 && (
               <tr>
                 <td colSpan={7} style={{ ...s.td, textAlign: 'center', color: '#666' }}>
-                  No data.
+                  {t('admin.boards.noData')}
                 </td>
               </tr>
             )}

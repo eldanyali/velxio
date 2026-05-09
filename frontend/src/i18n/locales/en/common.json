@@ -159,6 +159,77 @@
         "delete": "Delete"
       }
     },
+    "boards": {
+      "loadFailed": "Failed to load board metrics.",
+      "range": "Range:",
+      "byFamily": "By board family",
+      "byFqbn": "By exact FQBN",
+      "noData": "No data.",
+      "col": {
+        "family": "Family",
+        "fqbn": "FQBN",
+        "compiles": "Compiles",
+        "errors": "Errors",
+        "successRate": "Success rate",
+        "runs": "Runs",
+        "distinctUsers": "Distinct users",
+        "distinctProjects": "Distinct projects"
+      }
+    },
+    "dashboard": {
+      "loadFailed": "Failed to load metrics.",
+      "loadingMetrics": "Loading metrics…",
+      "unknown": "Unknown",
+      "kpi": {
+        "totalUsers": "Total users",
+        "totalProjects": "Total projects",
+        "compilesAllTime": "Compiles (all-time)",
+        "runsAllTime": "Runs (all-time)",
+        "newIn30d": "+{{count}} in 30d",
+        "successPct": "{{pct}}% success",
+        "dau": "active in last 24h",
+        "wau": "active in last 7d",
+        "mau": "active in last 30d",
+        "publicPrivate": "Public / Private"
+      },
+      "charts": {
+        "activityOverTime": "Activity over time",
+        "noActivity": "No activity yet in this range.",
+        "compilesByFamily": "Compiles by board family ({{days}}d)",
+        "diversityTitle": "How many board families per user",
+        "diversitySubtitle": "Pricing signal — multi-board users likely warrant paid tiers.",
+        "boardCount_one": "{{count}} board",
+        "boardCount_other": "{{count}} boards",
+        "noDataYet": "No data yet.",
+        "topFqbn": "Top boards by FQBN ({{days}}d)",
+        "topCountries": "Top countries ({{days}}d)",
+        "countriesSubtitle": "From Cloudflare's CF-IPCountry header. \"Users\" = current home country, \"Signups\" = where they registered, \"Active\" = distinct users with activity in this range.",
+        "noCountryData": "No country data yet (likely running outside Cloudflare).",
+        "topUsers": "Top users by compiles",
+        "topProjects": "Top projects by compiles"
+      },
+      "col": {
+        "country": "Country",
+        "users": "Users",
+        "signups": "Signups",
+        "activeRange": "Active ({{days}}d)",
+        "user": "User"
+      }
+    },
+    "activity": {
+      "loadFailed": "Failed to load activity.",
+      "title": "Daily activity — {{username}}",
+      "subtitle": "Per-day, per-project compile and run counts for this user.",
+      "noActivity": "No activity in the selected range.",
+      "projectCount_one": "{{count}} project",
+      "projectCount_other": "{{count}} projects",
+      "deletedProject": "(deleted project)",
+      "noProject": "(no project)",
+      "col": {
+        "date": "Date",
+        "saves": "Saves"
+      }
+    },
     "projects": {
       "loadFailed": "Failed to load projects.",
       "deleteFailed": "Failed to delete project.",
@@ -216,7 +287,17 @@
     "empty": "No examples found with the selected filters",
     "emptyForQuery": "No examples found for \"{{query}}\" with the selected filters",
     "resetFilters": "Reset filters",
-    "installing": "Installing libraries ({{done}}/{{total}})"
+    "installing": "Installing libraries ({{done}}/{{total}})",
+    "loadingExample": "Loading example...",
+    "notFound": "Example \"{{id}}\" not found.",
+    "browseAll": "Browse all examples"
+  },
+  "starBanner": {
+    "ariaLabel": "Star Velxio on GitHub",
+    "title": "Enjoying Velxio?",
+    "body": "A ⭐ on GitHub helps more developers discover the project — it only takes 2 seconds!",
+    "cta": "Star on GitHub",
+    "dismiss": "Dismiss"
   },
   "about": {
     "hero": {
@@ -522,6 +603,32 @@
     },
     "boardPicker": {
       "title": "Add Board"
+    },
+    "pinPicker": {
+      "close": "Close",
+      "filterPins": "Filter pins…",
+      "noMatch": "No pins match.",
+      "rotate": "Rotate",
+      "delete": "Delete"
+    },
+    "pi": {
+      "connected": "Connected",
+      "starting": "Starting…",
+      "offline": "Offline",
+      "powerOnTitle": "Power on the Raspberry Pi",
+      "startPi": "Start Pi",
+      "connectTitle": "Connect terminal to Pi",
+      "connect": "Connect",
+      "disconnectTitle": "Disconnect terminal",
+      "disconnect": "Disconnect",
+      "terminal": "Terminal",
+      "close": "Close",
+      "offlineTitle": "Raspberry Pi 3B is powered off",
+      "offlineSubtitle": "Start the Pi to open a terminal and interact with the Linux system.",
+      "offlineNote1": "Note: The file explorer shows a staging area.",
+      "offlineNote2": "Use \"Upload to Pi\" after starting to transfer files to the running Pi.",
+      "loadingTerminal": "Loading terminal…",
+      "selectFile": "Select a file from the explorer to edit it."
     },
     "sensorPanel": {
       "close": "Close"

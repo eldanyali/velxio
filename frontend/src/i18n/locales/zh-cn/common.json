@@ -23,13 +23,13 @@
     "search": "搜索"
   },
   "footer": {
-    "about": "Velxio 是一款免费、开源的电路和微控制器模拟器，完全在浏览器中运行。支持 Arduino、ESP32、RP2040 和 ATtiny85，并具有 SPICE 精度的模拟协同仿真。专为动手实践的学习者、学生和嵌入式工程师打造。采用 AGPLv3 许可。"
+    "about": "Velxio 是一款免费、开源的电路和微控制器模拟器，完全在浏览器中运行。支持 Arduino、ESP32、RP2040 和 ATtiny85，并具有 SPICE 精度的模拟协同仿真。专为创客、学生和嵌入式工程师打造，边做边学。采用 AGPLv3 许可。"
   },
   "landing": {
     "hero": {
       "titleLine1": "Arduino、ESP32 和 Raspberry Pi。",
       "titleAccent": "就在你的浏览器中。",
-      "subtitle": "编写代码，连接元件，点击运行。19 块开发板、48 多个部件、真实的 CPU 仿真——无需硬件，无需安装，无需云端。",
+      "subtitle": "编写代码，连接元件，点击运行。19 种开发板、48 多个部件、真实的 CPU 仿真——无需硬件，无需安装，无需云端。",
       "ctaPrimary": "免费试用模拟器 →",
       "ctaGithub": "在 GitHub 上查看",
       "trustLine": "无需注册 · 100% 在浏览器中运行 · 免费且开源",
@@ -39,7 +39,7 @@
       "label": "支持的硬件",
       "titleLine1": "每一种架构。",
       "titleLine2": "一个工具。",
-      "subtitle": "涵盖 5 种 CPU 架构的 19 块开发板——AVR8、ARM Cortex-M0+、RISC-V、Xtensa 和 Linux。全部本地运行，无需云端。"
+      "subtitle": "涵盖 5 种 CPU 架构的 19 种开发板——AVR8、ARM Cortex-M0+、RISC-V、Xtensa 和 Linux。全部本地运行，无需云端。"
     },
     "features": {
       "label": "功能特性",
@@ -47,7 +47,7 @@
       "subtitle": "一个完整的 IDE、编译器和多架构模拟器——本地运行，无需外部服务。",
       "spice": {
         "title": "实时 SPICE 模拟",
-        "desc": "ngspice-WASM 引擎——完整的改进节点分析，约 60 Hz。电阻、电容、运放、BJT、MOSFET、稳压器表现如同真实硅器件，而非理想化模型。"
+        "desc": "ngspice-WASM 引擎——完整的改进节点分析，约 60 Hz。电阻、电容、运放、BJT、MOSFET、稳压器表现如同真实硅片，而非理想化模型。"
       },
       "engines": {
         "title": "5 种仿真引擎",
@@ -87,7 +87,7 @@
   },
   "pricing": {
     "title": "定价",
-    "selfHosted": "此 Velxio 实例基于开源镜像自托管——所有功能对所有用户免费。",
+    "selfHosted": "此 Velxio 实例基于开源镜像自托管——所有功能对每位使用者免费。",
     "hostedVersion": "托管版本 <link>velxio.dev</link> 提供可选的 Pro 层级，用于资助开发。",
     "sourceCode": "源代码在 <link>GitHub 上采用 MIT 许可</link>。"
   },
@@ -150,13 +150,84 @@
         "boards": "开发板",
         "country": "国家",
         "lastActive": "最后活跃",
-        "joined": "加入时间",
+        "joined": "注册时间",
         "actions": "操作"
       },
       "actions": {
         "activity": "活动",
         "edit": "编辑",
         "delete": "删除"
+      }
+    },
+    "boards": {
+      "loadFailed": "加载开发板指标失败。",
+      "range": "范围：",
+      "byFamily": "按开发板系列",
+      "byFqbn": "按精确 FQBN",
+      "noData": "无数据。",
+      "col": {
+        "family": "系列",
+        "fqbn": "FQBN",
+        "compiles": "编译次数",
+        "errors": "错误数",
+        "successRate": "成功率",
+        "runs": "运行次数",
+        "distinctUsers": "独立用户数",
+        "distinctProjects": "独立项目数"
+      }
+    },
+    "dashboard": {
+      "loadFailed": "加载指标失败。",
+      "loadingMetrics": "加载指标中…",
+      "unknown": "未知",
+      "kpi": {
+        "totalUsers": "总用户数",
+        "totalProjects": "总项目数",
+        "compilesAllTime": "编译次数（全部时间）",
+        "runsAllTime": "运行次数（全部时间）",
+        "newIn30d": "30 天内新增 {{count}}",
+        "successPct": "成功率 {{pct}}%",
+        "dau": "过去 24 小时活跃",
+        "wau": "过去 7 天活跃",
+        "mau": "过去 30 天活跃",
+        "publicPrivate": "公开 / 私有"
+      },
+      "charts": {
+        "activityOverTime": "随时间变化的活动",
+        "noActivity": "此范围内暂无活动。",
+        "compilesByFamily": "按开发板系列的编译次数（{{days}} 天）",
+        "diversityTitle": "每位用户使用的开发板系列数",
+        "diversitySubtitle": "定价信号——使用多块开发板的用户可能适合付费层级。",
+        "boardCount_one": "{{count}} 块开发板",
+        "boardCount_other": "{{count}} 块开发板",
+        "noDataYet": "暂无数据。",
+        "topFqbn": "按 FQBN 排名靠前的开发板（{{days}} 天）",
+        "topCountries": "排名靠前的国家（{{days}} 天）",
+        "countriesSubtitle": "来自 Cloudflare 的 CF-IPCountry 标头。“用户”=当前所在国家，“注册”=注册时所在国家，“活跃”=此范围内有活动的独立用户。",
+        "noCountryData": "暂无国家数据（可能未在 Cloudflare 环境下运行）。",
+        "topUsers": "按编译次数排名靠前的用户",
+        "topProjects": "按编译次数排名靠前的项目"
+      },
+      "col": {
+        "country": "国家",
+        "users": "用户数",
+        "signups": "注册数",
+        "activeRange": "活跃（{{days}} 天）",
+        "user": "用户"
+      }
+    },
+    "activity": {
+      "loadFailed": "加载活动失败。",
+      "title": "每日活动——{{username}}",
+      "subtitle": "该用户每天、每个项目的编译和运行次数。",
+      "noActivity": "所选范围内无活动。",
+      "projectCount_one": "{{count}} 个项目",
+      "projectCount_other": "{{count}} 个项目",
+      "deletedProject": "（已删除的项目）",
+      "noProject": "（无项目）",
+      "col": {
+        "date": "日期",
+        "saves": "保存次数"
       }
     },
     "projects": {
@@ -186,7 +257,7 @@
   "examples": {
     "heading": "精选项目",
     "subtitle": "浏览并运行示例项目——按开发板分类",
-    "searchPlaceholder": "搜索示例——试试 'esp32 oled'、'blink'、'dht'…",
+    "searchPlaceholder": "搜索示例——试试 'esp32 oled', 'blink', 'dht'…",
     "searchLabel": "搜索示例",
     "clearSearch": "清除搜索",
     "clear": "清除",
@@ -213,15 +284,25 @@
       }
     },
     "copyLink": "复制可分享链接",
-    "empty": "未找到符合所选筛选条件的示例",
-    "emptyForQuery": "未找到 \"{{query}}\" 且符合所选筛选条件的示例",
+    "empty": "所选筛选条件下未找到示例",
+    "emptyForQuery": "未找到 \"{{query}}\" 的示例（当前筛选条件下）",
     "resetFilters": "重置筛选条件",
-    "installing": "正在安装库 ({{done}}/{{total}})"
+    "installing": "正在安装库（{{done}}/{{total}}）",
+    "loadingExample": "正在加载示例...",
+    "notFound": "未找到示例 \"{{id}}\"。",
+    "browseAll": "浏览所有示例"
+  },
+  "starBanner": {
+    "ariaLabel": "在 GitHub 上为 Velxio 加星",
+    "title": "喜欢 Velxio 吗？",
+    "body": "在 GitHub 上点个 ⭐ 可以帮助更多开发者发现这个项目——只需 2 秒钟！",
+    "cta": "在 GitHub 上加星",
+    "dismiss": "忽略"
   },
   "about": {
     "hero": {
       "title": "关于 Velxio",
-      "subtitle": "一款免费、开源的嵌入式系统仿真器——由一位热爱硬件和开源的个人开发者打造。"
+      "subtitle": "一款免费、开源的嵌入式系统模拟器——由一位热爱硬件和开源的开发者独立打造。"
     },
     "story": {
       "heading": "故事"
@@ -233,7 +314,7 @@
       "heading": "开源理念"
     },
     "creator": {
-      "heading": "创建者"
+      "heading": "创造者"
     },
     "releases": {
       "heading": "近期发布"
@@ -242,7 +323,7 @@
       "heading": "社区与媒体报道"
     },
     "cta": {
-      "title": "准备好体验 Velxio 了吗？",
+      "title": "准备好尝试 Velxio 了吗？",
       "subtitle": "无需注册。100% 在浏览器中运行。免费且开源。",
       "openEditor": "打开编辑器"
     }
@@ -284,12 +365,12 @@
         "addBoard": "添加开发板以编译",
         "loading": "加载中…",
         "loadMicropython": "加载 MicroPython",
-        "compile": "编译 (Ctrl+B)"
+        "compile": "编译（Ctrl+B）"
       },
       "run": {
         "addBoard": "添加开发板以运行",
         "runMicropython": "运行 MicroPython",
-        "run": "运行（如需将自动编译）"
+        "run": "运行（如需则自动编译）"
       },
       "stop": "停止",
       "reset": "重置",
@@ -301,7 +382,7 @@
       },
       "import": "从 .zip 文件导入项目",
       "export": "将当前项目导出为 .zip 文件",
-      "uploadFirmware": "上传固件 (.hex、.bin、.elf、.ihex) 以跳过编译",
+      "uploadFirmware": "上传固件（.hex、.bin、.elf、.ihex）以跳过编译",
       "toggleConsole": "切换输出控制台",
       "libHint": {
         "message": "缺少库？请从",
@@ -312,7 +393,7 @@
     "fileExplorer": {
       "workspace": "工作区",
       "newWorkspace": "新建工作区（清除开发板、元件、导线和文件）",
-      "saveProject": "保存项目 (Ctrl+S)",
+      "saveProject": "保存项目（Ctrl+S）",
       "clickToEdit": "点击编辑",
       "collapse": "折叠",
       "expand": "展开",
@@ -348,7 +429,7 @@
       "titleSave": "保存项目",
       "titleUpdate": "更新项目",
       "nameLabel": "项目名称 *",
-      "namePlaceholder": "我的精彩项目",
+      "namePlaceholder": "我的超棒项目",
       "descriptionLabel": "描述",
       "descriptionPlaceholder": "可选",
       "save": "保存",
@@ -357,23 +438,23 @@
       "cancel": "取消",
       "visibility": {
         "public": "公开",
-        "publicHint": "拥有链接的任何人都可查看",
+        "publicHint": "拥有链接的任何人都可以查看",
         "private": "私有",
-        "privateHint": "仅您自己可见"
+        "privateHint": "只有您能看到"
       },
       "errors": {
-        "nameRequired": "项目名称不能为空。",
+        "nameRequired": "项目名称是必填项。",
         "unreachable": "服务器无法访问。请检查您的连接后重试。",
         "notAuth": "未认证。请登录后重试。",
-        "failedStatus": "保存失败 ({{status}})。"
+        "failedStatus": "保存失败（{{status}}）。"
       }
     },
     "share": {
       "title": "分享项目",
       "public": "公开",
       "private": "私有",
-      "publicHint": "拥有链接的任何人都可查看此项目",
-      "privateHint": "仅您自己可见此项目",
+      "publicHint": "拥有链接的任何人都可以查看此项目",
+      "privateHint": "只有您能看到此项目",
       "makePrivate": "设为私有",
       "makePublic": "设为公开",
       "copy": "复制",
@@ -390,13 +471,13 @@
       "noBoardHint": "画布上无开发板——使用“添加”按钮添加开发板以编译和运行代码",
       "undo": {
         "label": "撤销",
-        "title": "撤销：{{description}} (Ctrl+Z)",
-        "empty": "无操作可撤销"
+        "title": "撤销：{{description}}（Ctrl+Z）",
+        "empty": "没有可撤销的操作"
       },
       "redo": {
         "label": "重做",
-        "title": "重做：{{description}} (Ctrl+Y)",
-        "empty": "无操作可重做"
+        "title": "重做：{{description}}（Ctrl+Y）",
+        "empty": "没有可重做的操作"
       },
       "toggleSerialMonitor": "切换串口监视器",
       "serial": "串口",
@@ -409,7 +490,7 @@
       "componentCount_other": "{{count}} 个元件",
       "addComponentTitle": "添加元件",
       "add": "添加",
-      "dismiss": "忽略",
+      "dismiss": "关闭",
       "removeBoard": "移除开发板",
       "wireCount_one": "{{count}} 根导线",
       "wireCount_other": "{{count}} 根导线",
@@ -441,9 +522,9 @@
       "filterPlaceholder": "筛选您的搜索...",
       "searchingFor": "正在搜索 \"{{query}}\"…",
       "loadingLibraries": "正在加载库…",
-      "noResults": "无可用库",
-      "noResultsFor": "未找到 \"{{query}}\" 的相关库",
-      "byAuthor": "作者 {{author}}",
+      "noResults": "没有可用的库",
+      "noResultsFor": "未找到 \"{{query}}\" 的库",
+      "byAuthor": "作者：{{author}}",
       "install": "安装",
       "installing": "安装中...",
       "uninstall": "卸载",
@@ -458,14 +539,14 @@
       "allDone": "所有库已成功安装",
       "required_one": "此项目需要 {{count}} 个库。请安装它以正确编译。",
       "required_other": "此项目需要 {{count}} 个库。请安装它们以正确编译。",
-      "wokwiHosted": "Wokwi 托管库",
+      "wokwiHosted": "Wokwi 托管的库",
       "pending": "待处理",
       "installing": "安装中…",
       "installed": "已安装",
       "errorStatus": "错误",
       "close": "关闭",
       "skip": "跳过",
-      "installAll": "全部安装 ({{count}})",
+      "installAll": "全部安装（{{count}}）",
       "installingShort": "安装中…"
     },
     "shell": {
@@ -486,7 +567,7 @@
       "resumeTitle": "恢复捕获",
       "pause": "暂停",
       "run": "运行",
-      "clearTitle": "清除所有捕获的样本",
+      "clearTitle": "清除所有已捕获的样本",
       "clear": "清除",
       "noChannels": "未添加通道。",
       "noChannelsHint": "点击“+ 添加通道”以监控引脚。",
@@ -535,17 +616,43 @@
     "boardPicker": {
       "title": "添加开发板"
     },
+    "pinPicker": {
+      "close": "关闭",
+      "filterPins": "筛选引脚…",
+      "noMatch": "无匹配的引脚。",
+      "rotate": "旋转",
+      "delete": "删除"
+    },
+    "pi": {
+      "connected": "已连接",
+      "starting": "启动中…",
+      "offline": "离线",
+      "powerOnTitle": "启动 Raspberry Pi",
+      "startPi": "启动 Pi",
+      "connectTitle": "连接终端到 Pi",
+      "connect": "连接",
+      "disconnectTitle": "断开终端连接",
+      "disconnect": "断开",
+      "terminal": "终端",
+      "close": "关闭",
+      "offlineTitle": "Raspberry Pi 3B 已关机",
+      "offlineSubtitle": "启动 Pi 以打开终端并与 Linux 系统交互。",
+      "offlineNote1": "注意：文件浏览器显示的是暂存区域。",
+      "offlineNote2": "启动后使用“上传到 Pi”将文件传输到正在运行的 Pi。",
+      "loadingTerminal": "正在加载终端…",
+      "selectFile": "从浏览器中选择一个文件进行编辑。"
+    },
     "sensorPanel": {
       "close": "关闭"
     },
     "customChip": {
-      "title": "自定义芯片 — {{chipName}}",
+      "title": "自定义芯片——{{chipName}}",
       "tabExamples": "示例",
       "tabEditor": "编辑器",
       "attributes": "属性",
       "compiling": "编译中…",
       "compile": "编译",
-      "compiledOk": "✓ 编译完成 — {{kb}} KB",
+      "compiledOk": "✓ 编译完成——{{kb}} KB",
       "compileFailed": "编译失败",
       "cancel": "取消",
       "savePlace": "保存并放置",
@@ -563,7 +670,7 @@
       "waitingData": "等待串口数据...",
       "startSim": "启动仿真以查看串口输出。",
       "placeholderText": "输入要发送的消息...",
-      "placeholderPython": "输入 Python 表达式... (Ctrl+C 中断)",
+      "placeholderPython": "输入 Python 表达式...（Ctrl+C 中断）",
       "lineEnd": {
         "none": "无行尾符",
         "nl": "换行",

@@ -32,7 +32,7 @@
       "subtitle": "Écrivez du code, câblez des composants, lancez l'exécution. 19 cartes, 48+ pièces, émulation CPU réelle — sans matériel, sans installation, sans cloud.",
       "ctaPrimary": "Essayer le simulateur gratuitement →",
       "ctaGithub": "Voir sur GitHub",
-      "trustLine": "Aucune inscription requise · Fonctionne à 100 % dans votre navigateur · Gratuit et open-source",
+      "trustLine": "Aucune inscription requise · Fonctionne à 100% dans votre navigateur · Gratuit et open-source",
       "imageAlt": "Éditeur Velxio avec circuit de feux de circulation Arduino Uno"
     },
     "boards": {
@@ -47,7 +47,7 @@
       "subtitle": "Un IDE complet, compilateur et simulateur multi-architecture — fonctionnant localement sans services externes requis.",
       "spice": {
         "title": "Analogique SPICE en temps réel",
-        "desc": "Moteur ngspice-WASM — analyse nodale modifiée complète à ~60 Hz. Résistances, condensateurs, amplificateurs opérationnels, BJT, MOSFET, régulateurs se comportent comme du silicium réel, pas des modèles idéalisés."
+        "desc": "Moteur ngspice-WASM — analyse nodale modifiée complète à ~60 Hz. Résistances, condensateurs, amplificateurs opérationnels, BJT, MOSFET, régulateurs se comportent comme du vrai silicium, pas des modèles idéalisés."
       },
       "engines": {
         "title": "5 moteurs d'émulation",
@@ -55,11 +55,11 @@
       },
       "customChips": {
         "title": "Puces personnalisées",
-        "desc": "Créez vos propres circuits intégrés en C, Rust ou AssemblyScript avec l'API Custom Chips de Wokwi. Compilez en WebAssembly et réutilisez dans plusieurs projets."
+        "desc": "Créez vos propres circuits intégrés en C, Rust ou AssemblyScript avec l'API Custom Chips de Wokwi. Compilez en WebAssembly et réutilisez entre projets."
       },
       "components": {
         "title": "100+ composants",
-        "desc": "Pièces analogiques précises SPICE plus 48+ composants visuels wokwi — LED, écrans LCD, TFT ILI9341, servos, buzzers, capteurs ultrasoniques, claviers, bandes NeoPixel."
+        "desc": "Pièces analogiques précises SPICE plus 48+ composants visuels wokwi — LED, LCD, écran TFT ILI9341, servos, buzzers, capteurs ultrasoniques, claviers, bandeaux NeoPixel."
       },
       "instruments": {
         "title": "Instruments en direct",
@@ -67,7 +67,7 @@
       },
       "monaco": {
         "title": "Éditeur Monaco + arduino-cli",
-        "desc": "Éditeur C++ de qualité VS Code avec espace de travail multi-fichiers. arduino-cli local compile en fichiers .hex / .uf2 / .bin réels — pas d'aller-retour vers le cloud."
+        "desc": "Éditeur C++ de qualité VS Code avec espace de travail multi-fichiers. arduino-cli local compile en fichiers .hex / .uf2 / .bin réels — pas d'aller-retour cloud."
       }
     },
     "support": {
@@ -80,9 +80,9 @@
   "profile": {
     "newProject": "Nouveau projet",
     "loading": "Chargement…",
-    "empty": "Aucun projet public pour le moment.",
+    "empty": "Aucun projet public pour l'instant.",
     "private": "Privé",
-    "copyLink": "Copier le lien de partage",
+    "copyLink": "Copier le lien partageable",
     "notFound": "Utilisateur introuvable."
   },
   "pricing": {
@@ -159,6 +159,77 @@
         "delete": "Supprimer"
       }
     },
+    "boards": {
+      "loadFailed": "Échec du chargement des métriques des cartes.",
+      "range": "Plage :",
+      "byFamily": "Par famille de cartes",
+      "byFqbn": "Par FQBN exact",
+      "noData": "Aucune donnée.",
+      "col": {
+        "family": "Famille",
+        "fqbn": "FQBN",
+        "compiles": "Compilations",
+        "errors": "Erreurs",
+        "successRate": "Taux de succès",
+        "runs": "Exécutions",
+        "distinctUsers": "Utilisateurs distincts",
+        "distinctProjects": "Projets distincts"
+      }
+    },
+    "dashboard": {
+      "loadFailed": "Échec du chargement des métriques.",
+      "loadingMetrics": "Chargement des métriques…",
+      "unknown": "Inconnu",
+      "kpi": {
+        "totalUsers": "Utilisateurs totaux",
+        "totalProjects": "Projets totaux",
+        "compilesAllTime": "Compilations (total)",
+        "runsAllTime": "Exécutions (total)",
+        "newIn30d": "+{{count}} en 30j",
+        "successPct": "{{pct}}% de succès",
+        "dau": "actifs dans les dernières 24h",
+        "wau": "actifs dans les 7 derniers jours",
+        "mau": "actifs dans les 30 derniers jours",
+        "publicPrivate": "Public / Privé"
+      },
+      "charts": {
+        "activityOverTime": "Activité dans le temps",
+        "noActivity": "Aucune activité dans cette plage pour l'instant.",
+        "compilesByFamily": "Compilations par famille de cartes ({{days}}j)",
+        "diversityTitle": "Combien de familles de cartes par utilisateur",
+        "diversitySubtitle": "Signal de tarification — les utilisateurs multi-cartes justifient probablement des niveaux payants.",
+        "boardCount_one": "{{count}} carte",
+        "boardCount_other": "{{count}} cartes",
+        "noDataYet": "Pas encore de données.",
+        "topFqbn": "Meilleures cartes par FQBN ({{days}}j)",
+        "topCountries": "Meilleurs pays ({{days}}j)",
+        "countriesSubtitle": "D'après l'en-tête CF-IPCountry de Cloudflare. \"Utilisateurs\" = pays d'origine actuel, \"Inscriptions\" = lieu d'inscription, \"Actifs\" = utilisateurs distincts avec activité dans cette plage.",
+        "noCountryData": "Pas encore de données pays (probablement exécuté en dehors de Cloudflare).",
+        "topUsers": "Meilleurs utilisateurs par compilations",
+        "topProjects": "Meilleurs projets par compilations"
+      },
+      "col": {
+        "country": "Pays",
+        "users": "Utilisateurs",
+        "signups": "Inscriptions",
+        "activeRange": "Actifs ({{days}}j)",
+        "user": "Utilisateur"
+      }
+    },
+    "activity": {
+      "loadFailed": "Échec du chargement de l'activité.",
+      "title": "Activité quotidienne — {{username}}",
+      "subtitle": "Comptes de compilations et d'exécutions par jour et par projet pour cet utilisateur.",
+      "noActivity": "Aucune activité dans la plage sélectionnée.",
+      "projectCount_one": "{{count}} projet",
+      "projectCount_other": "{{count}} projets",
+      "deletedProject": "(projet supprimé)",
+      "noProject": "(aucun projet)",
+      "col": {
+        "date": "Date",
+        "saves": "Sauvegardes"
+      }
+    },
     "projects": {
       "loadFailed": "Échec du chargement des projets.",
       "deleteFailed": "Échec de la suppression du projet.",
@@ -196,7 +267,7 @@
       "categoryLabel": "Catégorie :",
       "difficultyLabel": "Difficulté :",
       "category": {
-        "all": "Toutes",
+        "all": "Tout",
         "basics": "Bases",
         "sensors": "Capteurs",
         "displays": "Afficheurs",
@@ -206,22 +277,32 @@
         "circuits": "Circuits"
       },
       "difficulty": {
-        "all": "Toutes",
+        "all": "Tout",
         "beginner": "Débutant",
         "intermediate": "Intermédiaire",
         "advanced": "Avancé"
       }
     },
-    "copyLink": "Copier le lien de partage",
+    "copyLink": "Copier le lien partageable",
     "empty": "Aucun exemple trouvé avec les filtres sélectionnés",
     "emptyForQuery": "Aucun exemple trouvé pour \"{{query}}\" avec les filtres sélectionnés",
     "resetFilters": "Réinitialiser les filtres",
-    "installing": "Installation des bibliothèques ({{done}}/{{total}})"
+    "installing": "Installation des bibliothèques ({{done}}/{{total}})",
+    "loadingExample": "Chargement de l'exemple...",
+    "notFound": "Exemple \"{{id}}\" introuvable.",
+    "browseAll": "Parcourir tous les exemples"
+  },
+  "starBanner": {
+    "ariaLabel": "Mettre une étoile à Velxio sur GitHub",
+    "title": "Vous appréciez Velxio ?",
+    "body": "Une ⭐ sur GitHub aide plus de développeurs à découvrir le projet — cela ne prend que 2 secondes !",
+    "cta": "Mettre une étoile sur GitHub",
+    "dismiss": "Ignorer"
   },
   "about": {
     "hero": {
       "title": "À propos de Velxio",
-      "subtitle": "Un émulateur de systèmes embarqués gratuit et open-source — créé par un développeur passionné de matériel et d'open-source."
+      "subtitle": "Un émulateur de systèmes embarqués gratuit et open-source — créé par un seul développeur passionné de matériel et d'open source."
     },
     "story": {
       "heading": "L'histoire"
@@ -230,20 +311,20 @@
       "heading": "Comment ça marche"
     },
     "openSource": {
-      "heading": "Philosophie open-source"
+      "heading": "Philosophie open source"
     },
     "creator": {
       "heading": "Le créateur"
     },
     "releases": {
-      "heading": "Dernières versions"
+      "heading": "Versions récentes"
     },
     "community": {
       "heading": "Communauté et presse"
     },
     "cta": {
       "title": "Prêt à essayer Velxio ?",
-      "subtitle": "Aucune inscription requise. Fonctionne à 100 % dans votre navigateur. Gratuit et open-source.",
+      "subtitle": "Aucune inscription requise. Fonctionne à 100% dans votre navigateur. Gratuit et open source.",
       "openEditor": "Ouvrir l'éditeur"
     }
   },
@@ -262,7 +343,7 @@
     },
     "register": {
       "title": "Créer un compte",
-      "subtitle": "Commencez à construire gratuitement",
+      "subtitle": "Commencez à créer gratuitement",
       "username": "Nom d'utilisateur",
       "usernamePlaceholder": "ex. alice",
       "passwordPlaceholder": "Au moins 8 caractères",
@@ -311,9 +392,9 @@
     },
     "fileExplorer": {
       "workspace": "ESPACE DE TRAVAIL",
-      "newWorkspace": "Nouvel espace de travail (efface les cartes, composants, fils et fichiers)",
+      "newWorkspace": "Nouvel espace de travail (efface cartes, composants, fils et fichiers)",
       "saveProject": "Enregistrer le projet (Ctrl+S)",
-      "clickToEdit": "cliquer pour modifier",
+      "clickToEdit": "cliquer pour éditer",
       "collapse": "Réduire",
       "expand": "Développer",
       "newFileInBoard": "Nouveau fichier dans cette carte",
@@ -400,7 +481,7 @@
       },
       "toggleSerialMonitor": "Afficher/Masquer le moniteur série",
       "serial": "Série",
-      "toggleScope": "Afficher/Masquer l'oscilloscope / l'analyseur logique",
+      "toggleScope": "Afficher/Masquer l'oscilloscope / analyseur logique",
       "scope": "Scope",
       "zoomIn": "Zoom avant",
       "zoomOut": "Zoom arrière",
@@ -418,7 +499,7 @@
         "title": "Retirer {{label}} ?",
         "body": "Cela retirera la carte de l'espace de travail. Cette action est irréversible.",
         "bodyWithWires_one": "Cela retirera la carte de l'espace de travail ainsi que {{count}} fil connecté. Cette action est irréversible.",
-        "bodyWithWires_other": "Cela retirera la carte de l'espace de travail ainsi que les {{count}} fils connectés. Cette action est irréversible.",
+        "bodyWithWires_other": "Cela retirera la carte de l'espace de travail ainsi que {{count}} fils connectés. Cette action est irréversible.",
         "cancel": "Annuler",
         "remove": "Retirer"
       }
@@ -449,13 +530,13 @@
       "uninstall": "DÉSINSTALLER",
       "uninstalling": "Désinstallation...",
       "loadingInstalled": "Chargement des bibliothèques installées...",
-      "noneInstalled": "Aucune bibliothèque installée pour le moment.",
+      "noneInstalled": "Aucune bibliothèque installée pour l'instant.",
       "useSearchTab": "Utilisez l'onglet Rechercher pour installer des bibliothèques."
     },
     "installLibs": {
       "title": "BIBLIOTHÈQUES REQUISES",
       "installingProgress": "Installation de {{done}} sur {{total}}…",
-      "allDone": "Toutes les bibliothèques ont été installées avec succès",
+      "allDone": "Toutes les bibliothèques installées avec succès",
       "required_one": "Ce projet nécessite {{count}} bibliothèque. Installez-la pour compiler correctement.",
       "required_other": "Ce projet nécessite {{count}} bibliothèques. Installez-les pour compiler correctement.",
       "wokwiHosted": "Bibliothèque hébergée par Wokwi",
@@ -475,7 +556,7 @@
       "showExplorer": "Afficher l'explorateur de fichiers",
       "hideExplorer": "Masquer l'explorateur de fichiers",
       "viewMode": "Mode d'affichage",
-      "dragResize": "Faire glisser pour redimensionner"
+      "dragResize": "Glisser pour redimensionner"
     },
     "oscilloscope": {
       "title": "Oscilloscope",
@@ -502,14 +583,14 @@
       "confirmDeleteTitle": "Confirmer la suppression",
       "deleteTitle": "Supprimer le composant",
       "rotate90": "Rotation 90°",
-      "rotate": "Rotation",
+      "rotate": "Pivoter",
       "delete": "Supprimer",
       "cancel": "Annuler"
     },
     "selectionBar": {
       "label": "Actions de sélection",
       "rotate90": "Rotation 90°",
-      "rotate": "Rotation",
+      "rotate": "Pivoter",
       "delete": "Supprimer",
       "deselect": "Désélectionner",
       "deleteKind": {
@@ -530,10 +611,36 @@
       "auto": "Auto",
       "clear": "Effacer la sortie",
       "close": "Fermer",
-      "empty": "Aucune sortie de compilation pour le moment. Cliquez sur Compiler pour commencer."
+      "empty": "Aucune sortie de compilation pour l'instant. Cliquez sur Compiler pour commencer."
     },
     "boardPicker": {
       "title": "Ajouter une carte"
+    },
+    "pinPicker": {
+      "close": "Fermer",
+      "filterPins": "Filtrer les broches…",
+      "noMatch": "Aucune broche correspondante.",
+      "rotate": "Pivoter",
+      "delete": "Supprimer"
+    },
+    "pi": {
+      "connected": "Connecté",
+      "starting": "Démarrage…",
+      "offline": "Hors ligne",
+      "powerOnTitle": "Allumer le Raspberry Pi",
+      "startPi": "Démarrer le Pi",
+      "connectTitle": "Connecter le terminal au Pi",
+      "connect": "Connecter",
+      "disconnectTitle": "Déconnecter le terminal",
+      "disconnect": "Déconnecter",
+      "terminal": "Terminal",
+      "close": "Fermer",
+      "offlineTitle": "Raspberry Pi 3B est éteint",
+      "offlineSubtitle": "Démarrez le Pi pour ouvrir un terminal et interagir avec le système Linux.",
+      "offlineNote1": "Remarque : L'explorateur de fichiers affiche une zone de préparation.",
+      "offlineNote2": "Utilisez \"Téléverser vers Pi\" après le démarrage pour transférer des fichiers vers le Pi en cours d'exécution.",
+      "loadingTerminal": "Chargement du terminal…",
+      "selectFile": "Sélectionnez un fichier dans l'explorateur pour l'éditer."
     },
     "sensorPanel": {
       "close": "Fermer"
@@ -548,7 +655,7 @@
       "compiledOk": "✓ Compilé — {{kb}} Ko",
       "compileFailed": "Échec de la compilation",
       "cancel": "Annuler",
-      "savePlace": "Enregistrer et placer",
+      "savePlace": "Enregistrer & Placer",
       "compileFirst": "Compiler d'abord"
     },
     "serial": {
@@ -560,15 +667,15 @@
       "send": "Envoyer",
       "iotGatewayTitle": "Cliquez pour ouvrir via la passerelle IoT",
       "openIotGateway": "Ouvrir la passerelle IoT",
-      "waitingData": "En attente de données série...",
+      "waitingData": "Attente de données série...",
       "startSim": "Démarrez la simulation pour voir la sortie série.",
-      "placeholderText": "Tapez un message à envoyer...",
+      "placeholderText": "Tapez le message à envoyer...",
       "placeholderPython": "Tapez une expression Python... (Ctrl+C pour interrompre)",
       "lineEnd": {
         "none": "Pas de fin de ligne",
         "nl": "Nouvelle ligne",
         "cr": "Retour chariot",
-        "both": "NL et CR"
+        "both": "NL & CR"
       }
     }
   }

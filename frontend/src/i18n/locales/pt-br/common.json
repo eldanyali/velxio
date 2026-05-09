@@ -23,28 +23,28 @@
     "search": "Pesquisar"
   },
   "footer": {
-    "about": "Velxio é um simulador gratuito e de código aberto de circuitos e microcontroladores que roda inteiramente no seu navegador. Arduino, ESP32, RP2040 e ATtiny85, com co-simulação analógica precisa em SPICE. Criado para makers, estudantes e engenheiros embarcados que aprendem na prática. AGPLv3."
+    "about": "Velxio é um simulador gratuito e de código aberto de circuitos e microcontroladores que funciona inteiramente no seu navegador. Arduino, ESP32, RP2040 e ATtiny85, com co-simulação analógica precisa em SPICE. Criado para makers, estudantes e engenheiros embarcados que aprendem na prática. AGPLv3."
   },
   "landing": {
     "hero": {
       "titleLine1": "Arduino, ESP32 e Raspberry Pi.",
       "titleAccent": "Direto no seu navegador.",
-      "subtitle": "Escreva código, monte componentes, aperte executar. 19 placas, 48+ componentes, emulação real de CPU — sem hardware, sem instalação, sem nuvem.",
+      "subtitle": "Escreva código, monte componentes, aperte o play. 19 placas, 48+ componentes, emulação real de CPU — sem hardware, sem instalação, sem nuvem.",
       "ctaPrimary": "Experimente o Simulador Grátis →",
       "ctaGithub": "Ver no GitHub",
-      "trustLine": "Sem cadastro · Roda 100% no navegador · Gratuito e de código aberto",
+      "trustLine": "Sem cadastro · Funciona 100% no navegador · Gratuito e de código aberto",
       "imageAlt": "Editor Velxio com circuito de semáforo no Arduino Uno"
     },
     "boards": {
       "label": "Hardware Suportado",
-      "titleLine1": "Toda arquitetura.",
+      "titleLine1": "Todas as arquiteturas.",
       "titleLine2": "Uma ferramenta.",
-      "subtitle": "19 placas em 5 arquiteturas de CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tudo rodando localmente, sem nuvem."
+      "subtitle": "19 placas em 5 arquiteturas de CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tudo rodando localmente, sem necessidade de nuvem."
     },
     "features": {
       "label": "Recursos",
       "title": "Tudo o que você precisa.",
-      "subtitle": "Um IDE, compilador e simulador multiarquitetura completo — rodando localmente sem serviços externos.",
+      "subtitle": "Um IDE completo, compilador e simulador multi-arquitetura — rodando localmente sem serviços externos.",
       "spice": {
         "title": "SPICE Analógico em Tempo Real",
         "desc": "Mecanismo ngspice-WASM — Análise Nodal Modificada completa a ~60 Hz. Resistores, capacitores, amplificadores operacionais, BJTs, MOSFETs, reguladores se comportam como silício real, não modelos idealizados."
@@ -129,7 +129,7 @@
     "notAdmin": {
       "title": "Acesso de administrador necessário",
       "body": "Você precisa estar logado como administrador para acessar este painel.",
-      "goLogin": "Ir para login"
+      "goLogin": "Ir para o login"
     },
     "users": {
       "loadFailed": "Falha ao carregar usuários.",
@@ -140,7 +140,7 @@
       "count_other": "{{count}} usuários",
       "noResults": "Nenhum usuário encontrado.",
       "col": {
-        "username": "Nome de usuário",
+        "username": "Usuário",
         "email": "E-mail",
         "role": "Função",
         "status": "Status",
@@ -157,6 +157,77 @@
         "activity": "Atividade",
         "edit": "Editar",
         "delete": "Excluir"
+      }
+    },
+    "boards": {
+      "loadFailed": "Falha ao carregar métricas de placas.",
+      "range": "Intervalo:",
+      "byFamily": "Por família de placa",
+      "byFqbn": "Por FQBN exato",
+      "noData": "Sem dados.",
+      "col": {
+        "family": "Família",
+        "fqbn": "FQBN",
+        "compiles": "Compilações",
+        "errors": "Erros",
+        "successRate": "Taxa de sucesso",
+        "runs": "Execuções",
+        "distinctUsers": "Usuários distintos",
+        "distinctProjects": "Projetos distintos"
+      }
+    },
+    "dashboard": {
+      "loadFailed": "Falha ao carregar métricas.",
+      "loadingMetrics": "Carregando métricas…",
+      "unknown": "Desconhecido",
+      "kpi": {
+        "totalUsers": "Total de usuários",
+        "totalProjects": "Total de projetos",
+        "compilesAllTime": "Compilações (total)",
+        "runsAllTime": "Execuções (total)",
+        "newIn30d": "+{{count}} em 30d",
+        "successPct": "{{pct}}% sucesso",
+        "dau": "ativos nas últimas 24h",
+        "wau": "ativos nos últimos 7d",
+        "mau": "ativos nos últimos 30d",
+        "publicPrivate": "Público / Privado"
+      },
+      "charts": {
+        "activityOverTime": "Atividade ao longo do tempo",
+        "noActivity": "Nenhuma atividade ainda neste intervalo.",
+        "compilesByFamily": "Compilações por família de placa ({{days}}d)",
+        "diversityTitle": "Quantas famílias de placa por usuário",
+        "diversitySubtitle": "Sinal de precificação — usuários com múltiplas placas provavelmente justificam níveis pagos.",
+        "boardCount_one": "{{count}} placa",
+        "boardCount_other": "{{count}} placas",
+        "noDataYet": "Ainda sem dados.",
+        "topFqbn": "Principais placas por FQBN ({{days}}d)",
+        "topCountries": "Principais países ({{days}}d)",
+        "countriesSubtitle": "Do cabeçalho CF-IPCountry da Cloudflare. \"Usuários\" = país de residência atual, \"Cadastros\" = onde se registraram, \"Ativos\" = usuários distintos com atividade neste intervalo.",
+        "noCountryData": "Ainda sem dados de país (provavelmente rodando fora da Cloudflare).",
+        "topUsers": "Principais usuários por compilações",
+        "topProjects": "Principais projetos por compilações"
+      },
+      "col": {
+        "country": "País",
+        "users": "Usuários",
+        "signups": "Cadastros",
+        "activeRange": "Ativos ({{days}}d)",
+        "user": "Usuário"
+      }
+    },
+    "activity": {
+      "loadFailed": "Falha ao carregar atividade.",
+      "title": "Atividade diária — {{username}}",
+      "subtitle": "Contagens de compilação e execução por dia e por projeto para este usuário.",
+      "noActivity": "Nenhuma atividade no intervalo selecionado.",
+      "projectCount_one": "{{count}} projeto",
+      "projectCount_other": "{{count}} projetos",
+      "deletedProject": "(projeto excluído)",
+      "noProject": "(sem projeto)",
+      "col": {
+        "date": "Data",
+        "saves": "Salvamentos"
       }
     },
     "projects": {
@@ -216,12 +287,22 @@
     "empty": "Nenhum exemplo encontrado com os filtros selecionados",
     "emptyForQuery": "Nenhum exemplo encontrado para \"{{query}}\" com os filtros selecionados",
     "resetFilters": "Redefinir filtros",
-    "installing": "Instalando bibliotecas ({{done}}/{{total}})"
+    "installing": "Instalando bibliotecas ({{done}}/{{total}})",
+    "loadingExample": "Carregando exemplo...",
+    "notFound": "Exemplo \"{{id}}\" não encontrado.",
+    "browseAll": "Ver todos os exemplos"
+  },
+  "starBanner": {
+    "ariaLabel": "Favoritar Velxio no GitHub",
+    "title": "Gostando do Velxio?",
+    "body": "Uma ⭐ no GitHub ajuda mais desenvolvedores a descobrirem o projeto — leva apenas 2 segundos!",
+    "cta": "Favoritar no GitHub",
+    "dismiss": "Dispensar"
   },
   "about": {
     "hero": {
       "title": "Sobre o Velxio",
-      "subtitle": "Um emulador de sistemas embarcados gratuito e de código aberto — criado por um único desenvolvedor com paixão por hardware e código aberto."
+      "subtitle": "Um emulador de sistemas embarcados gratuito e de código aberto — criado por um único desenvolvedor apaixonado por hardware e código aberto."
     },
     "story": {
       "heading": "A História"
@@ -243,7 +324,7 @@
     },
     "cta": {
       "title": "Pronto para experimentar o Velxio?",
-      "subtitle": "Sem cadastro. Roda 100% no seu navegador. Gratuito e de código aberto.",
+      "subtitle": "Sem cadastro. Funciona 100% no seu navegador. Gratuito e de código aberto.",
       "openEditor": "Abrir Editor"
     }
   },
@@ -301,7 +382,7 @@
       },
       "import": "Importar um projeto de um arquivo .zip",
       "export": "Exportar o projeto atual como um arquivo .zip",
-      "uploadFirmware": "Carregar firmware (.hex, .bin, .elf, .ihex) para ignorar a compilação",
+      "uploadFirmware": "Carregar firmware (.hex, .bin, .elf, .ihex) para pular a compilação",
       "toggleConsole": "Alternar Console de Saída",
       "libHint": {
         "message": "Faltando biblioteca? Instale-a pelo",
@@ -339,7 +420,7 @@
       "cancel": "Cancelar"
     },
     "loginPrompt": {
-      "title": "Entre para salvar seu projeto",
+      "title": "Faça login para salvar seu projeto",
       "body": "Crie uma conta gratuita para salvar e compartilhar seus projetos.",
       "createAccount": "Criar conta",
       "cancel": "Cancelar"
@@ -357,7 +438,7 @@
       "cancel": "Cancelar",
       "visibility": {
         "public": "Público",
-        "publicHint": "Qualquer um com o link pode ver",
+        "publicHint": "Qualquer pessoa com o link pode ver",
         "private": "Privado",
         "privateHint": "Só você pode ver isso"
       },
@@ -372,7 +453,7 @@
       "title": "Compartilhar projeto",
       "public": "Público",
       "private": "Privado",
-      "publicHint": "Qualquer um com o link pode ver este projeto",
+      "publicHint": "Qualquer pessoa com o link pode ver este projeto",
       "privateHint": "Só você pode ver este projeto",
       "makePrivate": "Tornar privado",
       "makePublic": "Tornar público",
@@ -403,7 +484,7 @@
       "toggleScope": "Alternar Osciloscópio / Analisador Lógico",
       "scope": "Escopo",
       "zoomIn": "Aumentar zoom",
-      "zoomOut": "Diminuir zoom",
+      "zoomOut": "Reduzir zoom",
       "resetView": "Redefinir visualização (clique para redefinir)",
       "componentCount_one": "{{count}} componente",
       "componentCount_other": "{{count}} componentes",
@@ -535,6 +616,32 @@
     "boardPicker": {
       "title": "Adicionar Placa"
     },
+    "pinPicker": {
+      "close": "Fechar",
+      "filterPins": "Filtrar pinos…",
+      "noMatch": "Nenhum pino corresponde.",
+      "rotate": "Girar",
+      "delete": "Excluir"
+    },
+    "pi": {
+      "connected": "Conectado",
+      "starting": "Iniciando…",
+      "offline": "Offline",
+      "powerOnTitle": "Ligar o Raspberry Pi",
+      "startPi": "Iniciar Pi",
+      "connectTitle": "Conectar terminal ao Pi",
+      "connect": "Conectar",
+      "disconnectTitle": "Desconectar terminal",
+      "disconnect": "Desconectar",
+      "terminal": "Terminal",
+      "close": "Fechar",
+      "offlineTitle": "Raspberry Pi 3B está desligado",
+      "offlineSubtitle": "Inicie o Pi para abrir um terminal e interagir com o sistema Linux.",
+      "offlineNote1": "Nota: O explorador de arquivos mostra uma área de preparação.",
+      "offlineNote2": "Use \"Enviar para Pi\" após iniciar para transferir arquivos para o Pi em execução.",
+      "loadingTerminal": "Carregando terminal…",
+      "selectFile": "Selecione um arquivo no explorador para editá-lo."
+    },
     "sensorPanel": {
       "close": "Fechar"
     },
@@ -548,7 +655,7 @@
       "compiledOk": "✓ Compilado — {{kb}} KB",
       "compileFailed": "Falha na compilação",
       "cancel": "Cancelar",
-      "savePlace": "Salvar e Colocar",
+      "savePlace": "Salvar e Posicionar",
       "compileFirst": "Compile primeiro"
     },
     "serial": {

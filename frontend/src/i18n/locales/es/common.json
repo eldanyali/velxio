@@ -32,19 +32,19 @@
       "subtitle": "Escribe código, conecta componentes, pulsa ejecutar. 19 placas, más de 48 componentes, emulación real de CPU — sin hardware, sin instalación, sin nube.",
       "ctaPrimary": "Probar el simulador gratis →",
       "ctaGithub": "Ver en GitHub",
-      "trustLine": "Sin registro necesario · Funciona al 100% en tu navegador · Gratuito y de código abierto",
+      "trustLine": "No requiere registro · Funciona 100% en tu navegador · Gratuito y de código abierto",
       "imageAlt": "Editor de Velxio con circuito de semáforo en Arduino Uno"
     },
     "boards": {
       "label": "Hardware compatible",
       "titleLine1": "Cada arquitectura.",
       "titleLine2": "Una sola herramienta.",
-      "subtitle": "19 placas en 5 arquitecturas de CPU: AVR8, ARM Cortex-M0+, RISC-V, Xtensa y Linux. Todo funciona localmente, sin necesidad de nube."
+      "subtitle": "19 placas en 5 arquitecturas de CPU: AVR8, ARM Cortex-M0+, RISC-V, Xtensa y Linux. Todo se ejecuta localmente, sin necesidad de nube."
     },
     "features": {
       "label": "Características",
       "title": "Todo lo que necesitas.",
-      "subtitle": "Un IDE completo, compilador y simulador multiarquitectura — que funciona localmente sin necesidad de servicios externos.",
+      "subtitle": "Un IDE completo, compilador y simulador multiarquitectura — que funciona localmente sin servicios externos.",
       "spice": {
         "title": "Analógico SPICE en tiempo real",
         "desc": "Motor ngspice-WASM: análisis nodal modificado completo a ~60 Hz. Resistencias, condensadores, amplificadores operacionales, BJT, MOSFET, reguladores se comportan como silicio real, no como modelos idealizados."
@@ -67,14 +67,14 @@
       },
       "monaco": {
         "title": "Editor Monaco + arduino-cli",
-        "desc": "Editor de C++ de nivel VS Code con espacio de trabajo de varios archivos. arduino-cli local compila a archivos .hex / .uf2 / .bin reales — sin viaje de ida y vuelta a la nube."
+        "desc": "Editor C++ de nivel VS Code con espacio de trabajo de varios archivos. arduino-cli local compila a archivos .hex / .uf2 / .bin reales — sin ida y vuelta a la nube."
       }
     },
     "support": {
       "title": "Apoya el proyecto",
       "subtitle": "Velxio es gratuito y de código abierto. Si te ahorra tiempo, considera apoyar su desarrollo.",
       "ctaSponsors": "GitHub Sponsors",
-      "ctaPaypal": "Donar mediante PayPal"
+      "ctaPaypal": "Donar vía PayPal"
     }
   },
   "profile": {
@@ -128,7 +128,7 @@
     },
     "notAdmin": {
       "title": "Se requiere acceso de administrador",
-      "body": "Debes haber iniciado sesión como administrador para acceder a este panel.",
+      "body": "Debes iniciar sesión como administrador para acceder a este panel.",
       "goLogin": "Ir a iniciar sesión"
     },
     "users": {
@@ -159,6 +159,77 @@
         "delete": "Eliminar"
       }
     },
+    "boards": {
+      "loadFailed": "Error al cargar las métricas de placas.",
+      "range": "Rango:",
+      "byFamily": "Por familia de placa",
+      "byFqbn": "Por FQBN exacto",
+      "noData": "Sin datos.",
+      "col": {
+        "family": "Familia",
+        "fqbn": "FQBN",
+        "compiles": "Compilaciones",
+        "errors": "Errores",
+        "successRate": "Tasa de éxito",
+        "runs": "Ejecuciones",
+        "distinctUsers": "Usuarios distintos",
+        "distinctProjects": "Proyectos distintos"
+      }
+    },
+    "dashboard": {
+      "loadFailed": "Error al cargar las métricas.",
+      "loadingMetrics": "Cargando métricas…",
+      "unknown": "Desconocido",
+      "kpi": {
+        "totalUsers": "Usuarios totales",
+        "totalProjects": "Proyectos totales",
+        "compilesAllTime": "Compilaciones (totales)",
+        "runsAllTime": "Ejecuciones (totales)",
+        "newIn30d": "+{{count}} en 30d",
+        "successPct": "{{pct}}% de éxito",
+        "dau": "activos en las últimas 24h",
+        "wau": "activos en los últimos 7d",
+        "mau": "activos en los últimos 30d",
+        "publicPrivate": "Público / Privado"
+      },
+      "charts": {
+        "activityOverTime": "Actividad a lo largo del tiempo",
+        "noActivity": "Aún no hay actividad en este rango.",
+        "compilesByFamily": "Compilaciones por familia de placa ({{days}}d)",
+        "diversityTitle": "Cuántas familias de placas por usuario",
+        "diversitySubtitle": "Indicador de precios: los usuarios con varias placas probablemente justifiquen niveles de pago.",
+        "boardCount_one": "{{count}} placa",
+        "boardCount_other": "{{count}} placas",
+        "noDataYet": "Aún no hay datos.",
+        "topFqbn": "Placas principales por FQBN ({{days}}d)",
+        "topCountries": "Países principales ({{days}}d)",
+        "countriesSubtitle": "Del encabezado CF-IPCountry de Cloudflare. \"Usuarios\" = país de origen actual, \"Registros\" = dónde se registraron, \"Activos\" = usuarios distintos con actividad en este rango.",
+        "noCountryData": "Aún no hay datos de país (probablemente se ejecuta fuera de Cloudflare).",
+        "topUsers": "Usuarios principales por compilaciones",
+        "topProjects": "Proyectos principales por compilaciones"
+      },
+      "col": {
+        "country": "País",
+        "users": "Usuarios",
+        "signups": "Registros",
+        "activeRange": "Activos ({{days}}d)",
+        "user": "Usuario"
+      }
+    },
+    "activity": {
+      "loadFailed": "Error al cargar la actividad.",
+      "title": "Actividad diaria — {{username}}",
+      "subtitle": "Recuentos de compilaciones y ejecuciones por día y por proyecto para este usuario.",
+      "noActivity": "Sin actividad en el rango seleccionado.",
+      "projectCount_one": "{{count}} proyecto",
+      "projectCount_other": "{{count}} proyectos",
+      "deletedProject": "(proyecto eliminado)",
+      "noProject": "(sin proyecto)",
+      "col": {
+        "date": "Fecha",
+        "saves": "Guardados"
+      }
+    },
     "projects": {
       "loadFailed": "Error al cargar los proyectos.",
       "deleteFailed": "Error al eliminar el proyecto.",
@@ -185,7 +256,7 @@
   },
   "examples": {
     "heading": "Proyectos destacados",
-    "subtitle": "Explora y ejecuta proyectos de ejemplo — organizados por placa",
+    "subtitle": "Explora y ejecuta proyectos de ejemplo, organizados por placa",
     "searchPlaceholder": "Buscar ejemplos — prueba 'esp32 oled', 'blink', 'dht'…",
     "searchLabel": "Buscar ejemplos",
     "clearSearch": "Limpiar búsqueda",
@@ -216,12 +287,22 @@
     "empty": "No se encontraron ejemplos con los filtros seleccionados",
     "emptyForQuery": "No se encontraron ejemplos para \"{{query}}\" con los filtros seleccionados",
     "resetFilters": "Restablecer filtros",
-    "installing": "Instalando bibliotecas ({{done}}/{{total}})"
+    "installing": "Instalando librerías ({{done}}/{{total}})",
+    "loadingExample": "Cargando ejemplo...",
+    "notFound": "Ejemplo \"{{id}}\" no encontrado.",
+    "browseAll": "Ver todos los ejemplos"
+  },
+  "starBanner": {
+    "ariaLabel": "Marcar Velxio con estrella en GitHub",
+    "title": "¿Te gusta Velxio?",
+    "body": "¡Una ⭐ en GitHub ayuda a que más desarrolladores descubran el proyecto, solo toma 2 segundos!",
+    "cta": "Marcar con estrella en GitHub",
+    "dismiss": "Descartar"
   },
   "about": {
     "hero": {
       "title": "Acerca de Velxio",
-      "subtitle": "Un emulador de sistemas embebidos gratuito y de código abierto — creado por un solo desarrollador apasionado por el hardware y el código abierto."
+      "subtitle": "Un emulador de sistemas embebidos gratuito y de código abierto, creado por un solo desarrollador apasionado por el hardware y el código abierto."
     },
     "story": {
       "heading": "La historia"
@@ -236,14 +317,14 @@
       "heading": "El creador"
     },
     "releases": {
-      "heading": "Versiones recientes"
+      "heading": "Lanzamientos recientes"
     },
     "community": {
       "heading": "Comunidad y prensa"
     },
     "cta": {
       "title": "¿Listo para probar Velxio?",
-      "subtitle": "Sin necesidad de registro. Funciona al 100% en tu navegador. Gratuito y de código abierto.",
+      "subtitle": "No requiere registro. Funciona 100% en tu navegador. Gratuito y de código abierto.",
       "openEditor": "Abrir editor"
     }
   },
@@ -273,7 +354,7 @@
         "reserved": "Ese nombre de usuario está reservado.",
         "usernameRules": "El nombre de usuario debe tener entre 3 y 30 caracteres (a-z, 0-9, _, -)",
         "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
-        "failed": "Error al registrarse."
+        "failed": "Error en el registro."
       }
     }
   },
@@ -296,16 +377,16 @@
       "compileAll": "Compilar todas las placas",
       "runAll": "Ejecutar todas las placas",
       "libraries": {
-        "title": "Buscar e instalar bibliotecas de Arduino",
-        "label": "Bibliotecas"
+        "title": "Buscar e instalar librerías de Arduino",
+        "label": "Librerías"
       },
       "import": "Importar un proyecto desde un archivo .zip",
       "export": "Exportar el proyecto actual como un archivo .zip",
       "uploadFirmware": "Subir firmware (.hex, .bin, .elf, .ihex) para omitir la compilación",
       "toggleConsole": "Alternar consola de salida",
       "libHint": {
-        "message": "¿Falta una biblioteca? Instálala desde el",
-        "cta": "Administrador de bibliotecas",
+        "message": "¿Falta una librería? Instálala desde el",
+        "cta": "Administrador de librerías",
         "dismiss": "Descartar"
       }
     },
@@ -357,7 +438,7 @@
       "cancel": "Cancelar",
       "visibility": {
         "public": "Público",
-        "publicHint": "Cualquier persona con el enlace puede verlo",
+        "publicHint": "Cualquiera con el enlace puede verlo",
         "private": "Privado",
         "privateHint": "Solo tú puedes ver esto"
       },
@@ -372,7 +453,7 @@
       "title": "Compartir proyecto",
       "public": "Público",
       "private": "Privado",
-      "publicHint": "Cualquier persona con el enlace puede ver este proyecto",
+      "publicHint": "Cualquiera con el enlace puede ver este proyecto",
       "privateHint": "Solo tú puedes ver este proyecto",
       "makePrivate": "Hacer privado",
       "makePublic": "Hacer público",
@@ -435,30 +516,30 @@
       "clearFilters": "Limpiar filtros"
     },
     "libraryManager": {
-      "title": "ADMINISTRADOR DE BIBLIOTECAS",
+      "title": "ADMINISTRADOR DE LIBRERÍAS",
       "searchTab": "Buscar",
       "installedTab": "Instaladas",
       "filterPlaceholder": "Filtrar tu búsqueda...",
       "searchingFor": "Buscando \"{{query}}\"…",
-      "loadingLibraries": "Cargando bibliotecas…",
-      "noResults": "No hay bibliotecas disponibles",
-      "noResultsFor": "No se encontraron bibliotecas para \"{{query}}\"",
+      "loadingLibraries": "Cargando librerías…",
+      "noResults": "No hay librerías disponibles",
+      "noResultsFor": "No se encontraron librerías para \"{{query}}\"",
       "byAuthor": "por {{author}}",
       "install": "INSTALAR",
       "installing": "Instalando...",
       "uninstall": "DESINSTALAR",
       "uninstalling": "Desinstalando...",
-      "loadingInstalled": "Cargando bibliotecas instaladas...",
-      "noneInstalled": "Aún no hay bibliotecas instaladas.",
-      "useSearchTab": "Usa la pestaña Buscar para instalar bibliotecas."
+      "loadingInstalled": "Cargando librerías instaladas...",
+      "noneInstalled": "Aún no hay librerías instaladas.",
+      "useSearchTab": "Usa la pestaña Buscar para instalar librerías."
     },
     "installLibs": {
-      "title": "BIBLIOTECAS REQUERIDAS",
+      "title": "LIBRERÍAS REQUERIDAS",
       "installingProgress": "Instalando {{done}} de {{total}}…",
-      "allDone": "Todas las bibliotecas se instalaron correctamente",
-      "required_one": "Este proyecto requiere {{count}} biblioteca. Instálala para compilar correctamente.",
-      "required_other": "Este proyecto requiere {{count}} bibliotecas. Instálalas para compilar correctamente.",
-      "wokwiHosted": "Biblioteca alojada por Wokwi",
+      "allDone": "Todas las librerías se instalaron correctamente",
+      "required_one": "Este proyecto requiere {{count}} librería. Instálala para compilar correctamente.",
+      "required_other": "Este proyecto requiere {{count}} librerías. Instálalas para compilar correctamente.",
+      "wokwiHosted": "Librería alojada por Wokwi",
       "pending": "pendiente",
       "installing": "instalando…",
       "installed": "instalada",
@@ -489,15 +570,15 @@
       "clearTitle": "Borrar todas las muestras capturadas",
       "clear": "Borrar",
       "noChannels": "No se añadieron canales.",
-      "noChannelsHint": "Haz clic en \"+ Añadir canal\" para monitorear un pin.",
+      "noChannelsHint": "Haz clic en \"+ Añadir canal\" para monitorizar un pin.",
       "removeChannel": "Eliminar {{label}}"
     },
     "componentProps": {
       "close": "Cerrar",
       "tapToConnect": "Toca un pin para conectar:",
       "tapToWire": "Toca un pin para cablear:",
-      "pinRoles": "Funciones de los pines:",
-      "arduinoPin": "Pin de Arduino:",
+      "pinRoles": "Roles de pin:",
+      "arduinoPin": "Pin Arduino:",
       "confirmDelete": "¿Eliminar {{name}}?",
       "confirmDeleteTitle": "Confirmar eliminación",
       "deleteTitle": "Eliminar componente",
@@ -535,6 +616,32 @@
     "boardPicker": {
       "title": "Añadir placa"
     },
+    "pinPicker": {
+      "close": "Cerrar",
+      "filterPins": "Filtrar pines…",
+      "noMatch": "No hay pines que coincidan.",
+      "rotate": "Rotar",
+      "delete": "Eliminar"
+    },
+    "pi": {
+      "connected": "Conectado",
+      "starting": "Iniciando…",
+      "offline": "Desconectado",
+      "powerOnTitle": "Encender la Raspberry Pi",
+      "startPi": "Iniciar Pi",
+      "connectTitle": "Conectar terminal a la Pi",
+      "connect": "Conectar",
+      "disconnectTitle": "Desconectar terminal",
+      "disconnect": "Desconectar",
+      "terminal": "Terminal",
+      "close": "Cerrar",
+      "offlineTitle": "Raspberry Pi 3B está apagada",
+      "offlineSubtitle": "Inicia la Pi para abrir un terminal e interactuar con el sistema Linux.",
+      "offlineNote1": "Nota: El explorador de archivos muestra un área de preparación.",
+      "offlineNote2": "Usa \"Subir a Pi\" después de iniciar para transferir archivos a la Pi en ejecución.",
+      "loadingTerminal": "Cargando terminal…",
+      "selectFile": "Selecciona un archivo del explorador para editarlo."
+    },
     "sensorPanel": {
       "close": "Cerrar"
     },
@@ -546,7 +653,7 @@
       "compiling": "Compilando…",
       "compile": "Compilar",
       "compiledOk": "✓ Compilado — {{kb}} KB",
-      "compileFailed": "Error al compilar",
+      "compileFailed": "Error de compilación",
       "cancel": "Cancelar",
       "savePlace": "Guardar y colocar",
       "compileFirst": "Compila primero"
@@ -558,7 +665,7 @@
       "clearTitle": "Limpiar salida de esta placa",
       "clear": "Limpiar",
       "send": "Enviar",
-      "iotGatewayTitle": "Haz clic para abrir mediante IoT Gateway",
+      "iotGatewayTitle": "Haz clic para abrir a través de IoT Gateway",
       "openIotGateway": "Abrir IoT Gateway",
       "waitingData": "Esperando datos serie...",
       "startSim": "Inicia la simulación para ver la salida serie.",

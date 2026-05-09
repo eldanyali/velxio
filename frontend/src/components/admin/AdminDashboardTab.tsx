@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Bar,
   BarChart,
@@ -80,6 +81,7 @@ const chartTooltipStyle: React.CSSProperties = {
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 export function AdminDashboardTab() {
+  const { t } = useTranslation();
   const [overview, setOverview] = useState<OverviewResponse | null>(null);
   const [compileSeries, setCompileSeries] = useState<TimeseriesResponse | null>(null);
   const [runSeries, setRunSeries] = useState<TimeseriesResponse | null>(null);
@@ -117,9 +119,9 @@ export function AdminDashboardTab() {
         setTopProjects(tp);
         setCountries(ct.entries);
       })
-      .catch(() => setError('Failed to load metrics.'))
+      .catch(() => setError(t('admin.dashboard.loadFailed')))
       .finally(() => setLoading(false));
-  }, [rangeDays]);
+  }, [rangeDays, t]);
 
   // Merge compile + run series by bucket for the line chart
   const mergedSeries = useMemo(() => {
@@ -136,7 +138,7 @@ export function AdminDashboardTab() {
     return Array.from(map.values()).sort((a, b) => a.bucket.localeCompare(b.bucket));
   }, [compileSeries, runSeries]);
 
-  if (loading) return <p style={s.muted}>Loading metrics…</p>;
+  if (loading) return <p style={s.muted}>{t('admin.dashboard.loadingMetrics')}</p>;
   if (error) return <div style={s.error}>{error}</div>;
   if (!overview) return null;
 
@@ -146,7 +148,7 @@ export function AdminDashboardTab() {
     <div style={s.wrap}>
       {/* Range selector */}
       <div style={s.rangeRow}>
-        <span style={s.muted}>Range:</span>
+        <span style={s.muted}>{t('admin.boards.range')}</span>
         {[7, 30, 90, 365].map((d) => (
           <button
             key={d}
@@ -160,24 +162,36 @@ export function AdminDashboardTab() {
 
       {/* KPIs */}
       <div style={s.kpiGrid}>
-        <KpiCard label="Total users" value={overview.total_users} hint={`+${overview.new_users_30d} in 30d`} />
-        <KpiCard label="Total projects" value={overview.total_projects} hint={`+${overview.new_projects_30d} in 30d`} />
-        <KpiCard label="Compiles (all-time)" value={overview.total_compiles} hint={`${successPct}% success`} />
-        <KpiCard label="Runs (all-time)" value={overview.total_runs} />
-        <KpiCard label="DAU" value={overview.dau} hint="active in last 24h" />
-        <KpiCard label="WAU" value={overview.wau} hint="active in last 7d" />
-        <KpiCard label="MAU" value={overview.mau} hint="active in last 30d" />
         <KpiCard
-          label="Public / Private"
+          label={t('admin.dashboard.kpi.totalUsers')}
+          value={overview.total_users}
+          hint={t('admin.dashboard.kpi.newIn30d', { count: overview.new_users_30d })}
+        />
+        <KpiCard
+          label={t('admin.dashboard.kpi.totalProjects')}
+          value={overview.total_projects}
+          hint={t('admin.dashboard.kpi.newIn30d', { count: overview.new_projects_30d })}
+        />
+        <KpiCard
+          label={t('admin.dashboard.kpi.compilesAllTime')}
+          value={overview.total_compiles}
+          hint={t('admin.dashboard.kpi.successPct', { pct: successPct })}
+        />
+        <KpiCard label={t('admin.dashboard.kpi.runsAllTime')} value={overview.total_runs} />
+        <KpiCard label="DAU" value={overview.dau} hint={t('admin.dashboard.kpi.dau')} />
+        <KpiCard label="WAU" value={overview.wau} hint={t('admin.dashboard.kpi.wau')} />
+        <KpiCard label="MAU" value={overview.mau} hint={t('admin.dashboard.kpi.mau')} />
+        <KpiCard
+          label={t('admin.dashboard.kpi.publicPrivate')}
           value={`${overview.public_projects} / ${overview.private_projects}`}
         />
       </div>
 
       {/* Activity over time */}
       <div style={s.chartCard}>
-        <h3 style={s.chartTitle}>Activity over time</h3>
+        <h3 style={s.chartTitle}>{t('admin.dashboard.charts.activityOverTime')}</h3>
         {mergedSeries.length === 0 ? (
-          <p style={s.muted}>No activity yet in this range.</p>
+          <p style={s.muted}>{t('admin.dashboard.charts.noActivity')}</p>
         ) : (
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={mergedSeries} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
@@ -186,8 +200,8 @@ export function AdminDashboardTab() {
               <YAxis stroke="#888" tick={{ fontSize: 11 }} />
               <Tooltip contentStyle={chartTooltipStyle} />
               <Legend wrapperStyle={{ color: '#ccc', fontSize: 12 }} />
-              <Line type="monotone" dataKey="compiles" stroke="#4fc3f7" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="runs" stroke="#a5d6a7" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="compiles" name={t('admin.boards.col.compiles')} stroke="#4fc3f7" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="runs" name={t('admin.boards.col.runs')} stroke="#a5d6a7" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         )}
@@ -196,9 +210,9 @@ export function AdminDashboardTab() {
       <div style={s.twoCol}>
         {/* Board family distribution */}
         <div style={s.chartCard}>
-          <h3 style={s.chartTitle}>Compiles by board family ({rangeDays}d)</h3>
+          <h3 style={s.chartTitle}>{t('admin.dashboard.charts.compilesByFamily', { days: rangeDays })}</h3>
           {boards.length === 0 ? (
-            <p style={s.muted}>No data.</p>
+            <p style={s.muted}>{t('admin.boards.noData')}</p>
           ) : (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={boards} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
@@ -206,7 +220,7 @@ export function AdminDashboardTab() {
                 <XAxis dataKey="board_family" stroke="#888" tick={{ fontSize: 11 }} />
                 <YAxis stroke="#888" tick={{ fontSize: 11 }} />
                 <Tooltip contentStyle={chartTooltipStyle} />
-                <Bar dataKey="compile_count" name="Compiles">
+                <Bar dataKey="compile_count" name={t('admin.boards.col.compiles')}>
                   {boards.map((b, i) => (
                     <Cell key={i} fill={familyColor(b.board_family)} />
                   ))}
@@ -218,13 +232,16 @@ export function AdminDashboardTab() {
 
         {/* Board diversity (pricing signal) */}
         <div style={s.chartCard}>
-          <h3 style={s.chartTitle}>How many board families per user</h3>
-          <p style={s.chartSubtitle}>Pricing signal — multi-board users likely warrant paid tiers.</p>
+          <h3 style={s.chartTitle}>{t('admin.dashboard.charts.diversityTitle')}</h3>
+          <p style={s.chartSubtitle}>{t('admin.dashboard.charts.diversitySubtitle')}</p>
           {diversity && diversity.total_users_with_compiles > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie
-                  data={diversity.buckets.map((b) => ({ name: `${b.bucket} board(s)`, value: b.user_count }))}
+                  data={diversity.buckets.map((b) => ({
+                    name: t('admin.dashboard.charts.boardCount', { count: b.bucket }),
+                    value: b.user_count,
+                  }))}
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
@@ -239,16 +256,16 @@ export function AdminDashboardTab() {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <p style={s.muted}>No data yet.</p>
+            <p style={s.muted}>{t('admin.dashboard.charts.noDataYet')}</p>
           )}
         </div>
       </div>
 
       {/* Top FQBNs */}
       <div style={s.chartCard}>
-        <h3 style={s.chartTitle}>Top boards by FQBN ({rangeDays}d)</h3>
+        <h3 style={s.chartTitle}>{t('admin.dashboard.charts.topFqbn', { days: rangeDays })}</h3>
         {fqbns.length === 0 ? (
-          <p style={s.muted}>No data.</p>
+          <p style={s.muted}>{t('admin.boards.noData')}</p>
         ) : (
           <ResponsiveContainer width="100%" height={Math.max(220, fqbns.slice(0, 10).length * 32)}>
             <BarChart
@@ -260,7 +277,7 @@ export function AdminDashboardTab() {
               <XAxis type="number" stroke="#888" tick={{ fontSize: 11 }} />
               <YAxis type="category" dataKey="board_fqbn" stroke="#888" tick={{ fontSize: 11 }} width={140} />
               <Tooltip contentStyle={chartTooltipStyle} />
-              <Bar dataKey="compile_count" name="Compiles">
+              <Bar dataKey="compile_count" name={t('admin.boards.col.compiles')}>
                 {fqbns.slice(0, 10).map((b, i) => (
                   <Cell key={i} fill={familyColor(b.board_family)} />
                 ))}
@@ -272,23 +289,22 @@ export function AdminDashboardTab() {
 
       {/* Top countries */}
       <div style={s.chartCard}>
-        <h3 style={s.chartTitle}>Top countries ({rangeDays}d)</h3>
-        <p style={s.chartSubtitle}>
-          From Cloudflare's CF-IPCountry header. "Users" = current home country, "Signups" = where
-          they registered, "Active" = distinct users with activity in this range.
-        </p>
+        <h3 style={s.chartTitle}>{t('admin.dashboard.charts.topCountries', { days: rangeDays })}</h3>
+        <p style={s.chartSubtitle}>{t('admin.dashboard.charts.countriesSubtitle')}</p>
         {countries.length === 0 ? (
-          <p style={s.muted}>No country data yet (likely running outside Cloudflare).</p>
+          <p style={s.muted}>{t('admin.dashboard.charts.noCountryData')}</p>
         ) : (
           <table style={s.table}>
             <thead>
               <tr>
-                <th style={s.th}>Country</th>
-                <th style={{ ...s.th, textAlign: 'right' }}>Users</th>
-                <th style={{ ...s.th, textAlign: 'right' }}>Signups</th>
-                <th style={{ ...s.th, textAlign: 'right' }}>Active ({rangeDays}d)</th>
-                <th style={{ ...s.th, textAlign: 'right' }}>Compiles</th>
-                <th style={{ ...s.th, textAlign: 'right' }}>Runs</th>
+                <th style={s.th}>{t('admin.dashboard.col.country')}</th>
+                <th style={{ ...s.th, textAlign: 'right' }}>{t('admin.dashboard.col.users')}</th>
+                <th style={{ ...s.th, textAlign: 'right' }}>{t('admin.dashboard.col.signups')}</th>
+                <th style={{ ...s.th, textAlign: 'right' }}>
+                  {t('admin.dashboard.col.activeRange', { days: rangeDays })}
+                </th>
+                <th style={{ ...s.th, textAlign: 'right' }}>{t('admin.boards.col.compiles')}</th>
+                <th style={{ ...s.th, textAlign: 'right' }}>{t('admin.boards.col.runs')}</th>
               </tr>
             </thead>
             <tbody>
@@ -296,7 +312,7 @@ export function AdminDashboardTab() {
                 <tr key={c.country ?? `unknown-${i}`} style={s.tr}>
                   <td style={s.td}>
                     <span style={{ fontSize: 16, marginRight: 6 }}>{countryFlag(c.country)}</span>
-                    {c.country ?? <span style={{ color: '#666' }}>Unknown</span>}
+                    {c.country ?? <span style={{ color: '#666' }}>{t('admin.dashboard.unknown')}</span>}
                   </td>
                   <td style={{ ...s.td, textAlign: 'right' }}>{c.user_count}</td>
                   <td style={{ ...s.td, textAlign: 'right' }}>{c.signup_count}</td>
@@ -313,16 +329,16 @@ export function AdminDashboardTab() {
       {/* Top users / projects */}
       <div style={s.twoCol}>
         <div style={s.chartCard}>
-          <h3 style={s.chartTitle}>Top users by compiles</h3>
+          <h3 style={s.chartTitle}>{t('admin.dashboard.charts.topUsers')}</h3>
           {topUsers.length === 0 ? (
-            <p style={s.muted}>No data.</p>
+            <p style={s.muted}>{t('admin.boards.noData')}</p>
           ) : (
             <table style={s.table}>
               <thead>
                 <tr>
                   <th style={s.th}>#</th>
-                  <th style={s.th}>User</th>
-                  <th style={{ ...s.th, textAlign: 'right' }}>Compiles</th>
+                  <th style={s.th}>{t('admin.dashboard.col.user')}</th>
+                  <th style={{ ...s.th, textAlign: 'right' }}>{t('admin.boards.col.compiles')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -339,17 +355,17 @@ export function AdminDashboardTab() {
         </div>
 
         <div style={s.chartCard}>
-          <h3 style={s.chartTitle}>Top projects by compiles</h3>
+          <h3 style={s.chartTitle}>{t('admin.dashboard.charts.topProjects')}</h3>
           {topProjects.length === 0 ? (
-            <p style={s.muted}>No data.</p>
+            <p style={s.muted}>{t('admin.boards.noData')}</p>
           ) : (
             <table style={s.table}>
               <thead>
                 <tr>
                   <th style={s.th}>#</th>
-                  <th style={s.th}>Project</th>
-                  <th style={s.th}>Owner</th>
-                  <th style={{ ...s.th, textAlign: 'right' }}>Compiles</th>
+                  <th style={s.th}>{t('admin.projects.col.name')}</th>
+                  <th style={s.th}>{t('admin.projects.col.owner')}</th>
+                  <th style={{ ...s.th, textAlign: 'right' }}>{t('admin.boards.col.compiles')}</th>
                 </tr>
               </thead>
               <tbody>
