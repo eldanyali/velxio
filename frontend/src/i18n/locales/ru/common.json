@@ -76,5 +76,38 @@
       "ctaSponsors": "GitHub Sponsors",
       "ctaPaypal": "Пожертвовать через PayPal"
     }
+  },
+  "editor": {
+    "toolbar": {
+      "languageMode": "Режим языка",
+      "compile": {
+        "addBoard": "Добавьте плату, чтобы скомпилировать",
+        "loading": "Загрузка…",
+        "loadMicropython": "Загрузить MicroPython",
+        "compile": "Компилировать (Ctrl+B)"
+      },
+      "run": {
+        "addBoard": "Добавьте плату, чтобы запустить",
+        "runMicropython": "Запустить MicroPython",
+        "run": "Запустить (при необходимости компилируется автоматически)"
+      },
+      "stop": "Остановить",
+      "reset": "Сбросить",
+      "compileAll": "Скомпилировать все платы",
+      "runAll": "Запустить все платы",
+      "libraries": {
+        "title": "Поиск и установка библиотек Arduino",
+        "label": "Библиотеки"
+      },
+      "import": "Импорт проекта из .zip",
+      "export": "Экспорт текущего проекта в .zip",
+      "uploadFirmware": "Загрузить прошивку (.hex, .bin, .elf, .ihex) и пропустить компиляцию",
+      "toggleConsole": "Показать/скрыть консоль вывода",
+      "libHint": {
+        "message": "Не хватает библиотеки? Установите её через",
+        "cta": "Менеджер библиотек",
+        "dismiss": "Закрыть"
+      }
+    }
   }
 }

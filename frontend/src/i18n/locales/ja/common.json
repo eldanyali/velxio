@@ -76,5 +76,38 @@
       "ctaSponsors": "GitHub Sponsors",
       "ctaPaypal": "PayPal で寄付する"
     }
+  },
+  "editor": {
+    "toolbar": {
+      "languageMode": "言語モード",
+      "compile": {
+        "addBoard": "コンパイルするにはボードを追加してください",
+        "loading": "読み込み中…",
+        "loadMicropython": "MicroPython を読み込む",
+        "compile": "コンパイル (Ctrl+B)"
+      },
+      "run": {
+        "addBoard": "実行するにはボードを追加してください",
+        "runMicropython": "MicroPython を実行",
+        "run": "実行（必要に応じて自動コンパイル）"
+      },
+      "stop": "停止",
+      "reset": "リセット",
+      "compileAll": "すべてのボードをコンパイル",
+      "runAll": "すべてのボードを実行",
+      "libraries": {
+        "title": "Arduino ライブラリを検索・インストール",
+        "label": "ライブラリ"
+      },
+      "import": ".zip ファイルからプロジェクトをインポート",
+      "export": "現在のプロジェクトを .zip としてエクスポート",
+      "uploadFirmware": "ファームウェア (.hex, .bin, .elf, .ihex) をアップロードしてコンパイルをスキップ",
+      "toggleConsole": "出力コンソールの表示切り替え",
+      "libHint": {
+        "message": "ライブラリが足りませんか？こちらからインストール：",
+        "cta": "ライブラリマネージャー",
+        "dismiss": "閉じる"
+      }
+    }
   }
 }

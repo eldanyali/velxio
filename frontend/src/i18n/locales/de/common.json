@@ -76,5 +76,38 @@
       "ctaSponsors": "GitHub Sponsors",
       "ctaPaypal": "Über PayPal spenden"
     }
+  },
+  "editor": {
+    "toolbar": {
+      "languageMode": "Sprachmodus",
+      "compile": {
+        "addBoard": "Board hinzufügen, um zu kompilieren",
+        "loading": "Wird geladen…",
+        "loadMicropython": "MicroPython laden",
+        "compile": "Kompilieren (Strg+B)"
+      },
+      "run": {
+        "addBoard": "Board hinzufügen, um auszuführen",
+        "runMicropython": "MicroPython ausführen",
+        "run": "Ausführen (kompiliert bei Bedarf automatisch)"
+      },
+      "stop": "Stoppen",
+      "reset": "Zurücksetzen",
+      "compileAll": "Alle Boards kompilieren",
+      "runAll": "Alle Boards ausführen",
+      "libraries": {
+        "title": "Arduino-Bibliotheken suchen und installieren",
+        "label": "Bibliotheken"
+      },
+      "import": "Projekt aus einer .zip-Datei importieren",
+      "export": "Aktuelles Projekt als .zip exportieren",
+      "uploadFirmware": "Firmware (.hex, .bin, .elf, .ihex) hochladen und Kompilierung überspringen",
+      "toggleConsole": "Ausgabekonsole umschalten",
+      "libHint": {
+        "message": "Bibliothek fehlt? Installiere sie über den",
+        "cta": "Bibliotheksmanager",
+        "dismiss": "Schließen"
+      }
+    }
   }
 }

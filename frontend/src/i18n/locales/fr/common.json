@@ -76,5 +76,38 @@
       "ctaSponsors": "GitHub Sponsors",
       "ctaPaypal": "Faire un don via PayPal"
     }
+  },
+  "editor": {
+    "toolbar": {
+      "languageMode": "Mode de langage",
+      "compile": {
+        "addBoard": "Ajoutez une carte pour compiler",
+        "loading": "Chargement…",
+        "loadMicropython": "Charger MicroPython",
+        "compile": "Compiler (Ctrl+B)"
+      },
+      "run": {
+        "addBoard": "Ajoutez une carte pour exécuter",
+        "runMicropython": "Exécuter MicroPython",
+        "run": "Exécuter (compile automatiquement si besoin)"
+      },
+      "stop": "Arrêter",
+      "reset": "Réinitialiser",
+      "compileAll": "Compiler toutes les cartes",
+      "runAll": "Exécuter toutes les cartes",
+      "libraries": {
+        "title": "Rechercher et installer des bibliothèques Arduino",
+        "label": "Bibliothèques"
+      },
+      "import": "Importer un projet depuis un fichier .zip",
+      "export": "Exporter le projet courant en .zip",
+      "uploadFirmware": "Téléverser un firmware (.hex, .bin, .elf, .ihex) pour contourner la compilation",
+      "toggleConsole": "Afficher/masquer la console de sortie",
+      "libHint": {
+        "message": "Bibliothèque manquante ? Installez-la depuis le",
+        "cta": "Gestionnaire de bibliothèques",
+        "dismiss": "Fermer"
+      }
+    }
   }
 }

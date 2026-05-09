@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEditorStore } from '../../store/useEditorStore';
 import { useSimulatorStore } from '../../store/useSimulatorStore';
 import type { BoardKind, LanguageMode } from '../../types/board';
@@ -71,6 +72,7 @@ export const EditorToolbar = ({
   centerSlot,
   rightSlot,
 }: EditorToolbarProps) => {
+  const { t } = useTranslation();
   const { files, codeChangedSinceLastCompile, markCompiled } = useEditorStore();
   const {
     boards,
@@ -629,7 +631,7 @@ export const EditorToolbar = ({
                 if (activeBoardId)
                   setBoardLanguageMode(activeBoardId, e.target.value as LanguageMode);
               }}
-              title="Language mode"
+              title={t('editor.toolbar.languageMode')}
               style={{
                 background: '#2d2d2d',
                 color: '#ccc',
@@ -655,12 +657,12 @@ export const EditorToolbar = ({
               className="tb-btn tb-btn-compile"
               title={
                 !activeBoard
-                  ? 'Add a board to compile'
+                  ? t('editor.toolbar.compile.addBoard')
                   : compiling
-                    ? 'Loading…'
+                    ? t('editor.toolbar.compile.loading')
                     : activeBoard?.languageMode === 'micropython'
-                      ? 'Load MicroPython'
-                      : 'Compile (Ctrl+B)'
+                      ? t('editor.toolbar.compile.loadMicropython')
+                      : t('editor.toolbar.compile.compile')
               }
             >
               {compiling ? (
@@ -702,10 +704,10 @@ export const EditorToolbar = ({
               className="tb-btn tb-btn-run"
               title={
                 !activeBoard
-                  ? 'Add a board to run'
+                  ? t('editor.toolbar.run.addBoard')
                   : activeBoard?.languageMode === 'micropython'
-                    ? 'Run MicroPython'
-                    : 'Run (auto-compiles if needed)'
+                    ? t('editor.toolbar.run.runMicropython')
+                    : t('editor.toolbar.run.run')
               }
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
@@ -718,7 +720,7 @@ export const EditorToolbar = ({
               onClick={handleStop}
               disabled={!running}
               className="tb-btn tb-btn-stop"
-              title="Stop"
+              title={t('editor.toolbar.stop')}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                 <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -730,7 +732,7 @@ export const EditorToolbar = ({
               onClick={handleReset}
               disabled={!compiledHex && !activeBoard?.compiledProgram}
               className="tb-btn tb-btn-reset"
-              title="Reset"
+              title={t('editor.toolbar.reset')}
             >
               <svg
                 width="18"
@@ -756,7 +758,7 @@ export const EditorToolbar = ({
                   onClick={handleCompileAll}
                   disabled={compileAllRunning}
                   className="tb-btn tb-btn-compile-all"
-                  title="Compile all boards"
+                  title={t('editor.toolbar.compileAll')}
                 >
                   <svg
                     width="18"
@@ -778,7 +780,7 @@ export const EditorToolbar = ({
                   onClick={handleRunAll}
                   disabled={running}
                   className="tb-btn tb-btn-run-all"
-                  title="Run all boards"
+                  title={t('editor.toolbar.runAll')}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                     <polygon points="3,3 11,12 3,21" />
@@ -817,7 +819,7 @@ export const EditorToolbar = ({
                 setLibManagerOpen(true);
               }}
               className="tb-btn-libraries"
-              title="Search and install Arduino libraries"
+              title={t('editor.toolbar.libraries.title')}
             >
               <svg
                 width="16"
@@ -833,7 +835,7 @@ export const EditorToolbar = ({
                 <path d="m3.3 7 8.7 5 8.7-5" />
                 <path d="M12 22V12" />
               </svg>
-              <span className="tb-libraries-label">Libraries</span>
+              <span className="tb-libraries-label">{t('editor.toolbar.libraries.label')}</span>
             </button>
 
             {/* Import zip — was previously hidden in a 3-dot overflow menu;
@@ -842,7 +844,7 @@ export const EditorToolbar = ({
             <button
               onClick={() => importInputRef.current?.click()}
               className="tb-btn"
-              title="Import a project from a .zip file"
+              title={t('editor.toolbar.import')}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -853,7 +855,7 @@ export const EditorToolbar = ({
             <button
               onClick={() => handleExport()}
               className="tb-btn"
-              title="Export the current project as a .zip file"
+              title={t('editor.toolbar.export')}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -864,7 +866,7 @@ export const EditorToolbar = ({
             <button
               onClick={() => firmwareInputRef.current?.click()}
               className="tb-btn"
-              title="Upload firmware (.hex, .bin, .elf, .ihex) to bypass compilation"
+              title={t('editor.toolbar.uploadFirmware')}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
@@ -879,7 +881,7 @@ export const EditorToolbar = ({
             <button
               onClick={() => setConsoleOpen((v) => !v)}
               className={`tb-btn tb-btn-output${consoleOpen ? ' tb-btn-output-active' : ''}`}
-              title="Toggle Output Console"
+              title={t('editor.toolbar.toggleConsole')}
             >
               <svg
                 width="18"
@@ -922,7 +924,7 @@ export const EditorToolbar = ({
             <line x1="12" y1="8" x2="12" y2="12" />
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
-          <span>Missing library? Install it from the</span>
+          <span>{t('editor.toolbar.libHint.message')}</span>
           <button
             className="tb-lib-hint-btn"
             onClick={() => {
@@ -931,12 +933,12 @@ export const EditorToolbar = ({
               setMissingLibHint(false);
             }}
           >
-            Library Manager
+            {t('editor.toolbar.libHint.cta')}
           </button>
           <button
             className="tb-lib-hint-close"
             onClick={() => setMissingLibHint(false)}
-            title="Dismiss"
+            title={t('editor.toolbar.libHint.dismiss')}
           >
             &times;
           </button>

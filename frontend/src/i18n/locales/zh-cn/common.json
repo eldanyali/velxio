@@ -76,5 +76,38 @@
       "ctaSponsors": "GitHub Sponsors",
       "ctaPaypal": "通过 PayPal 捐赠"
     }
+  },
+  "editor": {
+    "toolbar": {
+      "languageMode": "语言模式",
+      "compile": {
+        "addBoard": "请先添加开发板才能编译",
+        "loading": "加载中…",
+        "loadMicropython": "加载 MicroPython",
+        "compile": "编译 (Ctrl+B)"
+      },
+      "run": {
+        "addBoard": "请先添加开发板才能运行",
+        "runMicropython": "运行 MicroPython",
+        "run": "运行（如需要会自动编译）"
+      },
+      "stop": "停止",
+      "reset": "重置",
+      "compileAll": "编译所有开发板",
+      "runAll": "运行所有开发板",
+      "libraries": {
+        "title": "搜索并安装 Arduino 库",
+        "label": "库"
+      },
+      "import": "从 .zip 文件导入项目",
+      "export": "将当前项目导出为 .zip 文件",
+      "uploadFirmware": "上传固件（.hex、.bin、.elf、.ihex）以跳过编译",
+      "toggleConsole": "切换输出控制台",
+      "libHint": {
+        "message": "缺少库？从这里安装",
+        "cta": "库管理器",
+        "dismiss": "关闭"
+      }
+    }
   }
 }
