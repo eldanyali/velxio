@@ -40,6 +40,35 @@
       "titleLine1": "Toda arquitetura.",
       "titleLine2": "Uma única ferramenta.",
       "subtitle": "19 placas em 5 arquiteturas de CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tudo executa localmente, sem nuvem."
+    },
+    "features": {
+      "label": "Recursos",
+      "title": "Tudo o que você precisa.",
+      "subtitle": "Um IDE completo, compilador e simulador multi-arquitetura — tudo local, sem serviços externos.",
+      "spice": {
+        "title": "Analógico SPICE em tempo real",
+        "desc": "Motor ngspice-WASM — Análise Nodal Modificada completa a ~60 Hz. Resistores, capacitores, amplificadores operacionais, BJTs, MOSFETs e reguladores se comportam como silício real, não modelos idealizados."
+      },
+      "engines": {
+        "title": "5 motores de emulação",
+        "desc": "AVR8 (ATmega328P, ATmega2560, ATtiny85), RP2040 (ARM Cortex-M0+), RV32IMC (ESP32-C3, CH32V003 via QEMU), Xtensa LX6/LX7 (ESP32 via QEMU) e ARM Cortex-A53 (Raspberry Pi 3 Linux)."
+      },
+      "customChips": {
+        "title": "Chips personalizados",
+        "desc": "Crie seus próprios circuitos integrados em C, Rust ou AssemblyScript usando a API Wokwi Custom Chips. Compile para WebAssembly e reutilize em qualquer projeto."
+      },
+      "components": {
+        "title": "100+ componentes",
+        "desc": "Peças analógicas com precisão SPICE mais 48+ componentes visuais wokwi — LEDs, LCDs, TFT ILI9341, servos, buzzers, sensores ultrassônicos, teclados, fitas NeoPixel."
+      },
+      "instruments": {
+        "title": "Instrumentos ao vivo",
+        "desc": "Osciloscópio multicanal, voltímetro, amperímetro, gerador de sinais. Coloque em qualquer nó e veja as formas de onda atualizando em tempo real durante a simulação."
+      },
+      "monaco": {
+        "title": "Monaco Editor + arduino-cli",
+        "desc": "Editor C++ no nível VS Code com workspace multi-arquivo. arduino-cli local compila para arquivos .hex / .uf2 / .bin reais — sem ida-e-volta à nuvem."
+      }
     }
   }
 }

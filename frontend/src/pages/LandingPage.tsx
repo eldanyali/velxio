@@ -575,39 +575,19 @@ const BoardEsp32C3 = () => (
   </svg>
 );
 
-/* ── Features ─────────────────────────────────────────── */
+/* ── Features ─────────────────────────────────────────────
+ * Title / description copy lives in src/i18n/locales/<lang>/common.json
+ * under landing.features.<key>.{title,desc}; the array here just maps
+ * an icon to each translation key.
+ * ──────────────────────────────────────────────────────────── */
 const features = [
-  {
-    icon: <IcoZap />,
-    title: 'Real-Time SPICE Analog',
-    desc: 'ngspice-WASM engine — full Modified Nodal Analysis at ~60 Hz. Resistors, capacitors, op-amps, BJTs, MOSFETs, regulators behave like real silicon, not idealised models.',
-  },
-  {
-    icon: <IcoCpu />,
-    title: '5 Emulation Engines',
-    desc: 'AVR8 (ATmega328P, ATmega2560, ATtiny85), RP2040 (ARM Cortex-M0+), RV32IMC (ESP32-C3, CH32V003 via QEMU), Xtensa LX6/LX7 (ESP32 via QEMU), and ARM Cortex-A53 (Raspberry Pi 3 Linux).',
-  },
-  {
-    icon: <IcoChip />,
-    title: 'Custom Chips',
-    desc: 'Author your own integrated circuits in C, Rust, or AssemblyScript using the Wokwi Custom Chips API. Compile to WebAssembly and reuse across projects.',
-  },
-  {
-    icon: <IcoLayers />,
-    title: '100+ Components',
-    desc: 'SPICE-accurate analog parts plus 48+ wokwi visual components — LEDs, LCDs, ILI9341 TFT, servos, buzzers, ultrasonic sensors, keypads, NeoPixel strips.',
-  },
-  {
-    icon: <IcoMonitor />,
-    title: 'Live Instruments',
-    desc: 'Multi-channel oscilloscope, voltmeter, ammeter, signal generator. Drop on any node and watch waveforms update in real time as the simulation runs.',
-  },
-  {
-    icon: <IcoCode />,
-    title: 'Monaco Editor + arduino-cli',
-    desc: 'VS Code-grade C++ editor with multi-file workspace. Local arduino-cli compiles to real .hex / .uf2 / .bin files — no cloud round-trip.',
-  },
-];
+  { icon: <IcoZap />,     key: 'spice' },
+  { icon: <IcoCpu />,     key: 'engines' },
+  { icon: <IcoChip />,    key: 'customChips' },
+  { icon: <IcoLayers />,  key: 'components' },
+  { icon: <IcoMonitor />, key: 'instruments' },
+  { icon: <IcoCode />,    key: 'monaco' },
+] as const;
 
 /* ── Sponsor SVG icon ─────────────────────────────────── */
 const IcoSponsor = () => (
@@ -1188,19 +1168,16 @@ export const LandingPage: React.FC = () => {
       {/* Features */}
       <section className="landing-section landing-section-alt">
         <div className="section-header">
-          <span className="section-label">Features</span>
-          <h2 className="section-title">Everything you need.</h2>
-          <p className="section-sub">
-            A complete IDE, compiler, and multi-architecture simulator — running locally with no
-            external services required.
-          </p>
+          <span className="section-label">{t('landing.features.label')}</span>
+          <h2 className="section-title">{t('landing.features.title')}</h2>
+          <p className="section-sub">{t('landing.features.subtitle')}</p>
         </div>
         <div className="features-grid">
           {features.map((f) => (
-            <div key={f.title} className="feature-card">
+            <div key={f.key} className="feature-card">
               <div className="feature-icon">{f.icon}</div>
-              <h3 className="feature-title">{f.title}</h3>
-              <p className="feature-desc">{f.desc}</p>
+              <h3 className="feature-title">{t(`landing.features.${f.key}.title`)}</h3>
+              <p className="feature-desc">{t(`landing.features.${f.key}.desc`)}</p>
             </div>
           ))}
         </div>

@@ -40,6 +40,35 @@
       "titleLine1": "あらゆるアーキテクチャ。",
       "titleLine2": "ひとつのツール。",
       "subtitle": "5 つの CPU アーキテクチャに対応した 19 種のボード — AVR8、ARM Cortex-M0+、RISC-V、Xtensa、Linux。すべてローカルで動作し、クラウドは不要です。"
+    },
+    "features": {
+      "label": "機能",
+      "title": "必要なものすべてを。",
+      "subtitle": "IDE、コンパイラ、マルチアーキテクチャ・シミュレータが一体に — すべてローカルで動作し、外部サービスは一切不要です。",
+      "spice": {
+        "title": "リアルタイム SPICE アナログ",
+        "desc": "ngspice-WASM エンジン — 完全な修正ノード解析を約 60 Hz で実行。抵抗、コンデンサ、オペアンプ、BJT、MOSFET、レギュレータは理想化されたモデルではなく、実シリコンのように振る舞います。"
+      },
+      "engines": {
+        "title": "5 つのエミュレーションエンジン",
+        "desc": "AVR8（ATmega328P、ATmega2560、ATtiny85）、RP2040（ARM Cortex-M0+）、RV32IMC（QEMU 経由の ESP32-C3、CH32V003）、Xtensa LX6/LX7（QEMU 経由の ESP32）、そして ARM Cortex-A53（Raspberry Pi 3 Linux）。"
+      },
+      "customChips": {
+        "title": "カスタムチップ",
+        "desc": "Wokwi Custom Chips API を使って、C、Rust、または AssemblyScript で独自の集積回路を作成できます。WebAssembly にコンパイルすればプロジェクト間で再利用できます。"
+      },
+      "components": {
+        "title": "100 以上のコンポーネント",
+        "desc": "SPICE 精度のアナログ部品に加え、48 以上の wokwi ビジュアルコンポーネント — LED、LCD、ILI9341 TFT、サーボ、ブザー、超音波センサー、キーパッド、NeoPixel ストリップ。"
+      },
+      "instruments": {
+        "title": "ライブ計測機器",
+        "desc": "マルチチャンネル・オシロスコープ、電圧計、電流計、信号発生器。任意のノードに配置すれば、シミュレーション実行中に波形がリアルタイムで更新されます。"
+      },
+      "monaco": {
+        "title": "Monaco Editor + arduino-cli",
+        "desc": "VS Code 相当の C++ エディタとマルチファイルワークスペース。ローカルの arduino-cli が実際の .hex / .uf2 / .bin ファイルにコンパイルします — クラウドへの往復は不要です。"
+      }
     }
   }
 }

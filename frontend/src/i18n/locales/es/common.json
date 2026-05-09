@@ -40,6 +40,35 @@
       "titleLine1": "Cada arquitectura.",
       "titleLine2": "Una sola herramienta.",
       "subtitle": "19 placas en 5 arquitecturas de CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa y Linux. Todo se ejecuta localmente, sin nube."
+    },
+    "features": {
+      "label": "Funcionalidades",
+      "title": "Todo lo que necesitas.",
+      "subtitle": "Un IDE completo, compilador y simulador multi-arquitectura — todo en local, sin servicios externos.",
+      "spice": {
+        "title": "Analógico SPICE en tiempo real",
+        "desc": "Motor ngspice-WASM — Análisis Nodal Modificado completo a ~60 Hz. Resistencias, condensadores, amplificadores operacionales, BJTs, MOSFETs y reguladores se comportan como silicio real, no como modelos idealizados."
+      },
+      "engines": {
+        "title": "5 motores de emulación",
+        "desc": "AVR8 (ATmega328P, ATmega2560, ATtiny85), RP2040 (ARM Cortex-M0+), RV32IMC (ESP32-C3, CH32V003 vía QEMU), Xtensa LX6/LX7 (ESP32 vía QEMU) y ARM Cortex-A53 (Raspberry Pi 3 Linux)."
+      },
+      "customChips": {
+        "title": "Chips personalizados",
+        "desc": "Crea tus propios circuitos integrados en C, Rust o AssemblyScript usando la API Wokwi Custom Chips. Compila a WebAssembly y reutilízalos en cualquier proyecto."
+      },
+      "components": {
+        "title": "Más de 100 componentes",
+        "desc": "Componentes analógicos con precisión SPICE más de 48 componentes visuales de wokwi — LEDs, LCDs, TFT ILI9341, servos, zumbadores, sensores ultrasónicos, teclados, tiras NeoPixel."
+      },
+      "instruments": {
+        "title": "Instrumentos en vivo",
+        "desc": "Osciloscopio multicanal, voltímetro, amperímetro, generador de señales. Conéctalos a cualquier nodo y observa las formas de onda en tiempo real mientras corre la simulación."
+      },
+      "monaco": {
+        "title": "Monaco Editor + arduino-cli",
+        "desc": "Editor de C++ a nivel de VS Code con workspace multi-archivo. arduino-cli local compila a archivos .hex / .uf2 / .bin reales — sin viajes a la nube."
+      }
     }
   }
 }

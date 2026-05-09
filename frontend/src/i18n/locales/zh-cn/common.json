@@ -40,6 +40,35 @@
       "titleLine1": "每种架构。",
       "titleLine2": "一个工具。",
       "subtitle": "覆盖 5 种 CPU 架构的 19 款开发板 —— AVR8、ARM Cortex-M0+、RISC-V、Xtensa 和 Linux。全部在本地运行，无需云端。"
+    },
+    "features": {
+      "label": "功能特性",
+      "title": "您需要的一切。",
+      "subtitle": "完整的 IDE、编译器和多架构模拟器 —— 全部在本地运行，无需任何外部服务。",
+      "spice": {
+        "title": "实时 SPICE 模拟",
+        "desc": "ngspice-WASM 引擎 —— 以 ~60 Hz 运行完整的修正节点分析法。电阻、电容、运放、BJT、MOSFET 和稳压器表现得像真实硅片，而非理想化模型。"
+      },
+      "engines": {
+        "title": "5 种仿真引擎",
+        "desc": "AVR8（ATmega328P、ATmega2560、ATtiny85）、RP2040（ARM Cortex-M0+）、RV32IMC（通过 QEMU 的 ESP32-C3、CH32V003）、Xtensa LX6/LX7（通过 QEMU 的 ESP32）以及 ARM Cortex-A53（Raspberry Pi 3 Linux）。"
+      },
+      "customChips": {
+        "title": "自定义芯片",
+        "desc": "使用 Wokwi Custom Chips API，用 C、Rust 或 AssemblyScript 编写您自己的集成电路。编译为 WebAssembly 后即可在多个项目中复用。"
+      },
+      "components": {
+        "title": "100+ 元件",
+        "desc": "SPICE 精度的模拟元件 加上 48+ 个 wokwi 可视元件 —— LED、LCD、ILI9341 TFT、舵机、蜂鸣器、超声波传感器、键盘、NeoPixel 灯带。"
+      },
+      "instruments": {
+        "title": "实时仪表",
+        "desc": "多通道示波器、电压表、电流表、信号发生器。放在任意节点上，仿真运行时即可实时查看波形。"
+      },
+      "monaco": {
+        "title": "Monaco Editor + arduino-cli",
+        "desc": "VS Code 级别的 C++ 编辑器，支持多文件工作区。本地 arduino-cli 编译为真实的 .hex / .uf2 / .bin 文件 —— 无需云端往返。"
+      }
     }
   }
 }
