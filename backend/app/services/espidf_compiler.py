@@ -22,7 +22,10 @@ import re
 import shutil
 import subprocess
 import tempfile
+import threading
+from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
+from typing import Callable, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +74,96 @@ def _idf_version_signature() -> str:
         except OSError:
             parts.append('unknown')
     return '|'.join(parts)
+
+
+# Type for live progress callback. Called from a worker thread for every
+# stdout/stderr line as the build runs. Implementations should be cheap and
+# thread-safe (callers commonly stash lines into a dict shared with the main
+# event loop). Exceptions raised from the callback are swallowed so a faulty
+# UI hook can never break the build.
+ProgressCallback = Callable[[str], None]
+
+
+@dataclass
+class _RunResult:
+    """Drop-in replacement for the fields we read off subprocess.CompletedProcess."""
+    returncode: int
+    stdout: str
+    stderr: str
+
+
+def _run_with_streaming(
+    cmd: list[str],
+    *,
+    cwd: str,
+    env: dict[str, str],
+    timeout: float,
+    progress_callback: Optional[ProgressCallback],
+) -> _RunResult:
+    """Run `cmd` synchronously and stream stdout + stderr line-by-line.
+
+    Behaves like subprocess.run(capture_output=True, text=True) but invokes
+    `progress_callback(line)` for every line as it arrives. When
+    progress_callback is None this falls back to a single subprocess.run call
+    so we don't pay the threading cost on the unit-test path that doesn't
+    care about live output.
+
+    Raises subprocess.TimeoutExpired on timeout (matches the existing flow).
+    """
+    if progress_callback is None:
+        cp = subprocess.run(
+            cmd, cwd=cwd, env=env, capture_output=True, text=True, timeout=timeout,
+        )
+        return _RunResult(returncode=cp.returncode, stdout=cp.stdout, stderr=cp.stderr)
+
+    proc = subprocess.Popen(
+        cmd,
+        cwd=cwd,
+        env=env,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        bufsize=1,  # line-buffered
+    )
+    stdout_lines: list[str] = []
+    stderr_lines: list[str] = []
+
+    def _drain(stream, sink: list[str]) -> None:
+        try:
+            for line in iter(stream.readline, ''):
+                sink.append(line)
+                try:
+                    progress_callback(line)
+                except Exception:
+                    # A faulty progress sink must never break the build.
+                    pass
+        finally:
+            try:
+                stream.close()
+            except Exception:
+                pass
+
+    t_out = threading.Thread(target=_drain, args=(proc.stdout, stdout_lines), daemon=True)
+    t_err = threading.Thread(target=_drain, args=(proc.stderr, stderr_lines), daemon=True)
+    t_out.start()
+    t_err.start()
+
+    try:
+        proc.wait(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        # Give drain threads a chance to flush before we raise.
+        t_out.join(timeout=2)
+        t_err.join(timeout=2)
+        raise
+
+    t_out.join(timeout=5)
+    t_err.join(timeout=5)
+    return _RunResult(
+        returncode=proc.returncode,
+        stdout=''.join(stdout_lines),
+        stderr=''.join(stderr_lines),
+    )
 
 
 def _prepare_persistent_project_dir(idf_target: str) -> Path:
@@ -883,7 +976,12 @@ class ESPIDFCompiler:
         )
         return merged_path
 
-    async def compile(self, files: list[dict], board_fqbn: str) -> dict:
+    async def compile(
+        self,
+        files: list[dict],
+        board_fqbn: str,
+        progress_callback: Optional[ProgressCallback] = None,
+    ) -> dict:
         """
         Compile Arduino sketch using ESP-IDF.
 
@@ -901,6 +999,11 @@ class ESPIDFCompiler:
         The caller (routes/compile.py:_compile_job) holds a per-target
         asyncio.Lock for the duration of this call, so the persistent dir
         is never accessed by two compiles at once.
+
+        progress_callback (optional): if provided, called from a worker
+        thread for every stdout/stderr line as cmake and ninja run. Used
+        by the async compile path to expose live build output to clients
+        polling /api/compile/status/{job_id}.
         """
         if not self.available:
             return {
@@ -919,13 +1022,17 @@ class ESPIDFCompiler:
         if _USE_PERSISTENT_DIR:
             project_dir = _prepare_persistent_project_dir(idf_target)
             logger.info(f'[espidf] Using persistent build dir: {project_dir}')
-            return await self._compile_in_dir(project_dir, files, idf_target, is_c3)
+            return await self._compile_in_dir(
+                project_dir, files, idf_target, is_c3, progress_callback,
+            )
 
         with tempfile.TemporaryDirectory(prefix='espidf_') as temp_dir:
             project_dir = Path(temp_dir) / 'project'
             shutil.copytree(_TEMPLATE_DIR, project_dir)
             logger.info(f'[espidf] Using ephemeral build dir: {project_dir}')
-            return await self._compile_in_dir(project_dir, files, idf_target, is_c3)
+            return await self._compile_in_dir(
+                project_dir, files, idf_target, is_c3, progress_callback,
+            )
 
     async def _compile_in_dir(
         self,
@@ -933,6 +1040,7 @@ class ESPIDFCompiler:
         files: list[dict],
         idf_target: str,
         is_c3: bool,
+        progress_callback: Optional[ProgressCallback] = None,
     ) -> dict:
         """Inner compile body: writes sketch + libs into `project_dir`,
         runs cmake + ninja, merges binaries. Caller is responsible for
@@ -1075,13 +1183,12 @@ class ESPIDFCompiler:
         logger.info(f'[espidf] cmake: {" ".join(cmake_cmd)}')
 
         def _run_cmake():
-            return subprocess.run(
+            return _run_with_streaming(
                 cmake_cmd,
                 cwd=str(build_dir),
-                capture_output=True,
-                text=True,
                 env=env,
                 timeout=120,
+                progress_callback=progress_callback,
             )
 
         try:
@@ -1115,13 +1222,12 @@ class ESPIDFCompiler:
         NINJA_TIMEOUT_S = 600
 
         def _run_ninja():
-            return subprocess.run(
+            return _run_with_streaming(
                 ninja_cmd,
                 cwd=str(build_dir),
-                capture_output=True,
-                text=True,
                 env=env,
                 timeout=NINJA_TIMEOUT_S,
+                progress_callback=progress_callback,
             )
 
         try:

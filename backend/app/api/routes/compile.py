@@ -152,11 +152,21 @@ def _resolve_files(request: CompileRequest) -> list[dict[str, str]]:
 async def _run_compile(
     request: CompileRequest,
     files: list[dict[str, str]],
+    progress_callback: Any = None,
 ) -> CompileResponse:
-    """Do the actual compile (ESP-IDF for esp32:*, arduino-cli otherwise)."""
+    """Do the actual compile (ESP-IDF for esp32:*, arduino-cli otherwise).
+
+    `progress_callback`, if provided, receives every stdout/stderr line as
+    cmake + ninja run. Wired into the async compile path so the live build
+    output is exposed via /api/compile/status/{job_id}'s `stdout` field.
+    AVR / RP2040 builds via arduino-cli don't surface progress yet — those
+    typically finish in seconds anyway.
+    """
     if request.board_fqbn.startswith("esp32:") and espidf_compiler.available:
         logger.info(f"[compile] Using ESP-IDF for {request.board_fqbn}")
-        result = await espidf_compiler.compile(files, request.board_fqbn)
+        result = await espidf_compiler.compile(
+            files, request.board_fqbn, progress_callback=progress_callback,
+        )
         return CompileResponse(
             success=result["success"],
             hex_content=result.get("hex_content"),
@@ -241,11 +251,34 @@ async def _compile_job(
     `state=pending` while waiting on either gate; transitions to `running`
     only once the actual build is about to start, so clients polling
     /compile/status see an accurate snapshot of where their job is.
+
+    Live build output is appended to COMPILE_JOBS[job_id]['stdout_buffer']
+    line-by-line as cmake + ninja emit it, so /compile/status responses
+    stream a growing log instead of returning everything at the end.
     """
     started = time.monotonic()
     job = COMPILE_JOBS[job_id]
     started_at = job["started_at"]
     job_key = job.get("key")
+
+    # Live stdout buffer — written from a worker thread (espidf_compiler
+    # drain threads). dict[str].update with a single str assignment is GIL-
+    # protected so we don't need an explicit lock; the polling endpoint
+    # reads the same field.
+    COMPILE_JOBS[job_id]["stdout_buffer"] = ""
+
+    def on_progress_line(line: str) -> None:
+        # Cap buffer at 256 KB so a runaway build can't OOM the process.
+        # Keep the tail (most recent output) — that's what the user wants
+        # to see anyway.
+        current = COMPILE_JOBS.get(job_id)
+        if current is None:
+            return
+        new = (current.get("stdout_buffer", "") or "") + line
+        if len(new) > 262_144:
+            new = new[-262_144:]
+        current["stdout_buffer"] = new
+
     try:
         async with _COMPILE_SEMAPHORE:
             async with _target_lock(request.board_fqbn):
@@ -255,13 +288,19 @@ async def _compile_job(
                     logger.info(f"[compile] job {job_id} purged before run; skipping")
                     return
                 COMPILE_JOBS[job_id]["state"] = "running"
-                response = await _run_compile(request, files)
+                response = await _run_compile(
+                    request, files, progress_callback=on_progress_line,
+                )
         COMPILE_JOBS[job_id] = {
             "state": "done",
             "started_at": started_at,
             "finished_at": time.time(),
             "result": response.model_dump(),
             "key": job_key,
+            # Preserve the streamed buffer post-completion so a late poll
+            # still has access to the live log (clients usually display
+            # result.stdout once state=done, but having both costs nothing).
+            "stdout_buffer": COMPILE_JOBS.get(job_id, {}).get("stdout_buffer", ""),
         }
         error_kind = (
             None if response.success
@@ -284,6 +323,7 @@ async def _compile_job(
             "finished_at": time.time(),
             "error": str(exc)[:500],
             "key": job_key,
+            "stdout_buffer": COMPILE_JOBS.get(job_id, {}).get("stdout_buffer", ""),
         }
         await _record_async_metric(
             user_id=user_id,
@@ -355,6 +395,11 @@ class CompileStatusResponse(BaseModel):
     state: str  # 'pending' | 'running' | 'done' | 'error'
     started_at: float
     finished_at: float | None = None
+    # Live build output. Grows line-by-line during state=running so the
+    # frontend can stream it into the compilation console instead of
+    # waiting for everything to land at the end. Capped at 256 KB
+    # (most recent tail kept).
+    stdout: str = ""
     result: CompileResponse | None = None
     error: str | None = None
 
@@ -406,7 +451,14 @@ async def compile_start(
 
 @router.get("/status/{job_id}", response_model=CompileStatusResponse)
 async def compile_status(job_id: str):
-    """Poll the status of an async compile job submitted via /compile/start."""
+    """Poll the status of an async compile job submitted via /compile/start.
+
+    `stdout` carries live cmake + ninja output captured line-by-line as
+    the build runs. Clients should poll every 1-2s and re-render the
+    full string each time (or compute a length delta). Once state=done,
+    `result.stdout` carries the same content too — both are kept so a
+    late-arriving poll always has the log available.
+    """
     job = COMPILE_JOBS.get(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="job not found or expired")
@@ -414,6 +466,7 @@ async def compile_status(job_id: str):
         state=job["state"],
         started_at=job["started_at"],
         finished_at=job.get("finished_at"),
+        stdout=job.get("stdout_buffer", "") or "",
         result=job.get("result"),
         error=job.get("error"),
     )
