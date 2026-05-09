@@ -101,6 +101,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ninja-build \
     libusb-1.0-0 \
     git \
+    ccache \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && pip install --no-cache-dir packaging
@@ -170,6 +171,24 @@ COPY --from=espidf-builder /opt/arduino-esp32 /opt/arduino-esp32
 ENV IDF_PATH=/opt/esp-idf
 ENV IDF_TOOLS_PATH=/root/.espressif
 ENV ARDUINO_ESP32_PATH=/opt/arduino-esp32
+
+# ── ccache for ESP-IDF compiles ──────────────────────────────────────────────
+# ESP-IDF's build system honours IDF_CCACHE_ENABLE=1 and routes every C/C++
+# compile through ccache. Cold first compile per container is unchanged
+# (cache is empty), but the second and subsequent compiles drop from
+# ~5-7 minutes to ~30-60 seconds because every ESP-IDF base object
+# (FreeRTOS, lwIP, esp_wifi, libsodium, …) hits the cache.
+#
+# Cache lives at /var/cache/ccache. Mount as a docker volume in
+# docker-compose.yml so the cache survives `docker compose up -d --build`.
+# Without the volume, the cache rebuilds itself on first compile after each
+# image rebuild — still better than no cache.
+ENV CCACHE_DIR=/var/cache/ccache
+ENV IDF_CCACHE_ENABLE=1
+RUN mkdir -p /var/cache/ccache \
+    && ccache --max-size=2G \
+    && ccache --set-config=compression=true \
+    && ccache --set-config=compression_level=6
 
 # Install ESP-IDF Python dependencies using the final image's Python
 # The requirements.txt has version constraints required by ESP-IDF 4.4.x

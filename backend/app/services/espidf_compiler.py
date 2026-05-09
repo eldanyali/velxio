@@ -951,6 +951,14 @@ class ESPIDFCompiler:
                 str(project_dir),
             ]
 
+            # ccache: ESP-IDF's tools/cmake/project.cmake enables ccache iff
+            # the CMake variable `CCACHE_ENABLE` is truthy. We don't go through
+            # `idf.py` (which would translate the env var for us), so wire it
+            # in here. Default ON; set IDF_CCACHE_ENABLE=0 in the env to
+            # bypass without rebuilding the image.
+            if os.environ.get('IDF_CCACHE_ENABLE', '1') not in ('0', 'false', 'False', ''):
+                cmake_cmd.append('-DCCACHE_ENABLE=1')
+
             logger.info(f'[espidf] cmake: {" ".join(cmake_cmd)}')
 
             def _run_cmake():
