@@ -137,6 +137,48 @@
       "confirmClose": "¿Cerrar archivo con cambios sin guardar?",
       "closeAnyway": "Cerrar igualmente",
       "cancel": "Cancelar"
+    },
+    "loginPrompt": {
+      "title": "Inicia sesión para guardar tu proyecto",
+      "body": "Crea una cuenta gratis para guardar y compartir tus proyectos.",
+      "createAccount": "Crear cuenta",
+      "cancel": "Cancelar"
+    },
+    "saveProject": {
+      "titleSave": "Guardar proyecto",
+      "titleUpdate": "Actualizar proyecto",
+      "nameLabel": "Nombre del proyecto *",
+      "namePlaceholder": "Mi proyecto increíble",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Opcional",
+      "save": "Guardar",
+      "update": "Actualizar",
+      "saving": "Guardando…",
+      "cancel": "Cancelar",
+      "visibility": {
+        "public": "Público",
+        "publicHint": "Cualquiera con el enlace puede verlo",
+        "private": "Privado",
+        "privateHint": "Solo tú puedes verlo"
+      },
+      "errors": {
+        "nameRequired": "El nombre del proyecto es obligatorio.",
+        "unreachable": "Servidor no disponible. Comprueba la conexión e inténtalo de nuevo.",
+        "notAuth": "No autenticado. Inicia sesión e inténtalo de nuevo.",
+        "failedStatus": "Error al guardar ({{status}})."
+      }
+    },
+    "share": {
+      "title": "Compartir proyecto",
+      "public": "Público",
+      "private": "Privado",
+      "publicHint": "Cualquiera con el enlace puede ver este proyecto",
+      "privateHint": "Solo tú puedes ver este proyecto",
+      "makePrivate": "Hacer privado",
+      "makePublic": "Hacer público",
+      "copy": "Copiar",
+      "privateWarning": "Este proyecto es privado. Otros verán un error 403 al abrir este enlace.",
+      "close": "Cerrar"
     }
   }
 }

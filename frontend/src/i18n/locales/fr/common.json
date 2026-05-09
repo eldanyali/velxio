@@ -137,6 +137,48 @@
       "confirmClose": "Fermer le fichier avec des modifications non enregistrées ?",
       "closeAnyway": "Fermer quand même",
       "cancel": "Annuler"
+    },
+    "loginPrompt": {
+      "title": "Connectez-vous pour enregistrer votre projet",
+      "body": "Créez un compte gratuit pour enregistrer et partager vos projets.",
+      "createAccount": "Créer un compte",
+      "cancel": "Annuler"
+    },
+    "saveProject": {
+      "titleSave": "Enregistrer le projet",
+      "titleUpdate": "Mettre à jour le projet",
+      "nameLabel": "Nom du projet *",
+      "namePlaceholder": "Mon super projet",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optionnel",
+      "save": "Enregistrer",
+      "update": "Mettre à jour",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler",
+      "visibility": {
+        "public": "Public",
+        "publicHint": "Toute personne avec le lien peut voir",
+        "private": "Privé",
+        "privateHint": "Vous seul pouvez le voir"
+      },
+      "errors": {
+        "nameRequired": "Le nom du projet est obligatoire.",
+        "unreachable": "Serveur injoignable. Vérifiez votre connexion et réessayez.",
+        "notAuth": "Non authentifié. Connectez-vous et réessayez.",
+        "failedStatus": "Échec de l'enregistrement ({{status}})."
+      }
+    },
+    "share": {
+      "title": "Partager le projet",
+      "public": "Public",
+      "private": "Privé",
+      "publicHint": "Toute personne avec le lien peut voir ce projet",
+      "privateHint": "Vous seul pouvez voir ce projet",
+      "makePrivate": "Rendre privé",
+      "makePublic": "Rendre public",
+      "copy": "Copier",
+      "privateWarning": "Ce projet est privé. Les autres verront une erreur 403 en ouvrant ce lien.",
+      "close": "Fermer"
     }
   }
 }

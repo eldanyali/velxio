@@ -137,6 +137,48 @@
       "confirmClose": "确定关闭包含未保存更改的文件吗？",
       "closeAnyway": "仍然关闭",
       "cancel": "取消"
+    },
+    "loginPrompt": {
+      "title": "登录以保存您的项目",
+      "body": "免费创建账户即可保存并分享您的项目。",
+      "createAccount": "创建账户",
+      "cancel": "取消"
+    },
+    "saveProject": {
+      "titleSave": "保存项目",
+      "titleUpdate": "更新项目",
+      "nameLabel": "项目名称 *",
+      "namePlaceholder": "我的精彩项目",
+      "descriptionLabel": "描述",
+      "descriptionPlaceholder": "可选",
+      "save": "保存",
+      "update": "更新",
+      "saving": "保存中…",
+      "cancel": "取消",
+      "visibility": {
+        "public": "公开",
+        "publicHint": "任何拥有此链接的人都可以查看",
+        "private": "私有",
+        "privateHint": "仅您可见"
+      },
+      "errors": {
+        "nameRequired": "项目名称必填。",
+        "unreachable": "无法连接到服务器。请检查网络后重试。",
+        "notAuth": "未登录。请登录后重试。",
+        "failedStatus": "保存失败 ({{status}})。"
+      }
+    },
+    "share": {
+      "title": "分享项目",
+      "public": "公开",
+      "private": "私有",
+      "publicHint": "任何拥有此链接的人都可以查看本项目",
+      "privateHint": "仅您可见本项目",
+      "makePrivate": "设为私有",
+      "makePublic": "设为公开",
+      "copy": "复制",
+      "privateWarning": "此项目为私有。他人打开此链接将看到 403 错误。",
+      "close": "关闭"
     }
   }
 }

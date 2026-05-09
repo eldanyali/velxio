@@ -4,6 +4,7 @@
 
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
 import { useProjectStore } from '../../store/useProjectStore';
 import { updateProject } from '../../services/projectService';
 
@@ -12,6 +13,7 @@ interface ShareModalProps {
 }
 
 export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
+  const { t } = useTranslation();
   const currentProject = useProjectStore((s) => s.currentProject);
   const setVisibility = useProjectStore((s) => s.setVisibility);
   const [copied, setCopied] = useState(false);
@@ -44,7 +46,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
   return createPortal(
     <div style={styles.overlay} onClick={onClose}>
       <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <h2 style={styles.title}>Share project</h2>
+        <h2 style={styles.title}>{t('editor.share.title')}</h2>
 
         {/* Visibility toggle */}
         <div style={styles.visibilityRow}>
@@ -83,13 +85,11 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
               <span
                 style={{ color: isPublic ? '#4ade80' : '#f59e0b', fontWeight: 600, fontSize: 13 }}
               >
-                {isPublic ? 'Public' : 'Private'}
+                {isPublic ? t('editor.share.public') : t('editor.share.private')}
               </span>
             </span>
             <span style={{ color: '#888', fontSize: 12 }}>
-              {isPublic
-                ? 'Anyone with the link can view this project'
-                : 'Only you can see this project'}
+              {isPublic ? t('editor.share.publicHint') : t('editor.share.privateHint')}
             </span>
           </div>
           <button
@@ -100,7 +100,11 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
               opacity: toggling ? 0.5 : 1,
             }}
           >
-            {toggling ? '...' : isPublic ? 'Make private' : 'Make public'}
+            {toggling
+              ? '...'
+              : isPublic
+                ? t('editor.share.makePrivate')
+                : t('editor.share.makePublic')}
           </button>
         </div>
 
@@ -128,20 +132,18 @@ export const ShareModal: React.FC<ShareModalProps> = ({ onClose }) => {
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             ) : (
-              'Copy'
+              t('editor.share.copy')
             )}
           </button>
         </div>
 
         {!isPublic && (
-          <div style={styles.warning}>
-            This project is private. Others will see a 403 error when opening this link.
-          </div>
+          <div style={styles.warning}>{t('editor.share.privateWarning')}</div>
         )}
 
         <div style={styles.actions}>
           <button onClick={onClose} style={styles.closeBtn}>
-            Close
+            {t('editor.share.close')}
           </button>
         </div>
       </div>

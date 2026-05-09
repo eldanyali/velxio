@@ -137,6 +137,48 @@
       "confirmClose": "Close file with unsaved changes?",
       "closeAnyway": "Close anyway",
       "cancel": "Cancel"
+    },
+    "loginPrompt": {
+      "title": "Sign in to save your project",
+      "body": "Create a free account to save and share your projects.",
+      "createAccount": "Create account",
+      "cancel": "Cancel"
+    },
+    "saveProject": {
+      "titleSave": "Save project",
+      "titleUpdate": "Update project",
+      "nameLabel": "Project name *",
+      "namePlaceholder": "My awesome project",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optional",
+      "save": "Save",
+      "update": "Update",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "visibility": {
+        "public": "Public",
+        "publicHint": "Anyone with the link can view",
+        "private": "Private",
+        "privateHint": "Only you can see this"
+      },
+      "errors": {
+        "nameRequired": "Project name is required.",
+        "unreachable": "Server unreachable. Check your connection and try again.",
+        "notAuth": "Not authenticated. Please log in and try again.",
+        "failedStatus": "Save failed ({{status}})."
+      }
+    },
+    "share": {
+      "title": "Share project",
+      "public": "Public",
+      "private": "Private",
+      "publicHint": "Anyone with the link can view this project",
+      "privateHint": "Only you can see this project",
+      "makePrivate": "Make private",
+      "makePublic": "Make public",
+      "copy": "Copy",
+      "privateWarning": "This project is private. Others will see a 403 error when opening this link.",
+      "close": "Close"
     }
   }
 }

@@ -137,6 +137,48 @@
       "confirmClose": "未保存の変更があるファイルを閉じますか？",
       "closeAnyway": "それでも閉じる",
       "cancel": "キャンセル"
+    },
+    "loginPrompt": {
+      "title": "プロジェクトを保存するにはサインインしてください",
+      "body": "無料アカウントを作成して、プロジェクトを保存・共有しましょう。",
+      "createAccount": "アカウントを作成",
+      "cancel": "キャンセル"
+    },
+    "saveProject": {
+      "titleSave": "プロジェクトを保存",
+      "titleUpdate": "プロジェクトを更新",
+      "nameLabel": "プロジェクト名 *",
+      "namePlaceholder": "私の素敵なプロジェクト",
+      "descriptionLabel": "説明",
+      "descriptionPlaceholder": "任意",
+      "save": "保存",
+      "update": "更新",
+      "saving": "保存中…",
+      "cancel": "キャンセル",
+      "visibility": {
+        "public": "公開",
+        "publicHint": "リンクを持つ人なら誰でも閲覧できます",
+        "private": "非公開",
+        "privateHint": "あなただけが閲覧できます"
+      },
+      "errors": {
+        "nameRequired": "プロジェクト名は必須です。",
+        "unreachable": "サーバーに接続できません。接続を確認してもう一度お試しください。",
+        "notAuth": "認証されていません。ログインしてもう一度お試しください。",
+        "failedStatus": "保存に失敗しました（{{status}}）。"
+      }
+    },
+    "share": {
+      "title": "プロジェクトを共有",
+      "public": "公開",
+      "private": "非公開",
+      "publicHint": "リンクを持つ人なら誰でもこのプロジェクトを閲覧できます",
+      "privateHint": "このプロジェクトはあなただけが閲覧できます",
+      "makePrivate": "非公開にする",
+      "makePublic": "公開にする",
+      "copy": "コピー",
+      "privateWarning": "このプロジェクトは非公開です。他の人がこのリンクを開くと 403 エラーが表示されます。",
+      "close": "閉じる"
     }
   }
 }

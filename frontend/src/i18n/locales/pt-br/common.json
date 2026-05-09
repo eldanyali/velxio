@@ -137,6 +137,48 @@
       "confirmClose": "Fechar arquivo com alterações não salvas?",
       "closeAnyway": "Fechar mesmo assim",
       "cancel": "Cancelar"
+    },
+    "loginPrompt": {
+      "title": "Entre para salvar seu projeto",
+      "body": "Crie uma conta gratuita para salvar e compartilhar seus projetos.",
+      "createAccount": "Criar conta",
+      "cancel": "Cancelar"
+    },
+    "saveProject": {
+      "titleSave": "Salvar projeto",
+      "titleUpdate": "Atualizar projeto",
+      "nameLabel": "Nome do projeto *",
+      "namePlaceholder": "Meu projeto incrível",
+      "descriptionLabel": "Descrição",
+      "descriptionPlaceholder": "Opcional",
+      "save": "Salvar",
+      "update": "Atualizar",
+      "saving": "Salvando…",
+      "cancel": "Cancelar",
+      "visibility": {
+        "public": "Público",
+        "publicHint": "Qualquer pessoa com o link pode visualizar",
+        "private": "Privado",
+        "privateHint": "Somente você pode ver"
+      },
+      "errors": {
+        "nameRequired": "O nome do projeto é obrigatório.",
+        "unreachable": "Servidor inacessível. Verifique sua conexão e tente novamente.",
+        "notAuth": "Não autenticado. Faça login e tente novamente.",
+        "failedStatus": "Falha ao salvar ({{status}})."
+      }
+    },
+    "share": {
+      "title": "Compartilhar projeto",
+      "public": "Público",
+      "private": "Privado",
+      "publicHint": "Qualquer pessoa com o link pode ver este projeto",
+      "privateHint": "Somente você pode ver este projeto",
+      "makePrivate": "Tornar privado",
+      "makePublic": "Tornar público",
+      "copy": "Copiar",
+      "privateWarning": "Este projeto é privado. Outros verão um erro 403 ao abrir este link.",
+      "close": "Fechar"
     }
   }
 }

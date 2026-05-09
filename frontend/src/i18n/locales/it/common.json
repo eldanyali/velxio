@@ -137,6 +137,48 @@
       "confirmClose": "Chiudere il file con modifiche non salvate?",
       "closeAnyway": "Chiudi comunque",
       "cancel": "Annulla"
+    },
+    "loginPrompt": {
+      "title": "Accedi per salvare il tuo progetto",
+      "body": "Crea un account gratuito per salvare e condividere i tuoi progetti.",
+      "createAccount": "Crea account",
+      "cancel": "Annulla"
+    },
+    "saveProject": {
+      "titleSave": "Salva progetto",
+      "titleUpdate": "Aggiorna progetto",
+      "nameLabel": "Nome del progetto *",
+      "namePlaceholder": "Il mio fantastico progetto",
+      "descriptionLabel": "Descrizione",
+      "descriptionPlaceholder": "Opzionale",
+      "save": "Salva",
+      "update": "Aggiorna",
+      "saving": "Salvataggio…",
+      "cancel": "Annulla",
+      "visibility": {
+        "public": "Pubblico",
+        "publicHint": "Chiunque abbia il link può vederlo",
+        "private": "Privato",
+        "privateHint": "Solo tu puoi vederlo"
+      },
+      "errors": {
+        "nameRequired": "Il nome del progetto è obbligatorio.",
+        "unreachable": "Server irraggiungibile. Controlla la connessione e riprova.",
+        "notAuth": "Non autenticato. Effettua l'accesso e riprova.",
+        "failedStatus": "Salvataggio fallito ({{status}})."
+      }
+    },
+    "share": {
+      "title": "Condividi progetto",
+      "public": "Pubblico",
+      "private": "Privato",
+      "publicHint": "Chiunque abbia il link può vedere questo progetto",
+      "privateHint": "Solo tu puoi vedere questo progetto",
+      "makePrivate": "Rendi privato",
+      "makePublic": "Rendi pubblico",
+      "copy": "Copia",
+      "privateWarning": "Questo progetto è privato. Gli altri vedranno un errore 403 aprendo il link.",
+      "close": "Chiudi"
     }
   }
 }
