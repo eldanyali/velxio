@@ -1262,18 +1262,10 @@ export const LandingPage: React.FC = () => {
           <Link to="/about">About</Link>
         </div>
         <p className="footer-copy">
-          MIT License · Powered by{' '}
-          <a href="https://github.com/wokwi/avr8js" target="_blank" rel="noopener noreferrer">
-            avr8js
-          </a>{' '}
-          &amp;{' '}
-          <a
-            href="https://github.com/wokwi/wokwi-elements"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            wokwi-elements
-          </a>
+          Velxio is a free, open-source circuit and microcontroller simulator
+          that runs entirely in your browser. Arduino, ESP32, RP2040 and
+          ATtiny85, with SPICE-accurate analog co-simulation. Built for
+          makers, students and embedded engineers learning by doing. AGPLv3.
         </p>
       </footer>
     </div>

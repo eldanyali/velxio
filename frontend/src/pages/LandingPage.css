@@ -972,9 +972,11 @@
 }
 
 .footer-copy {
-  font-size: 11.5px;
+  font-size: 12px;
+  line-height: 1.7;
   color: var(--text-dim);
-  margin: 0;
+  margin: 0 auto;
+  max-width: 680px;
   width: 100%;
   text-align: center;
   font-family: var(--mono);
