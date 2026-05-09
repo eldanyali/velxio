@@ -108,6 +108,35 @@
         "cta": "Bibliotheksmanager",
         "dismiss": "Schließen"
       }
+    },
+    "fileExplorer": {
+      "workspace": "ARBEITSBEREICH",
+      "newWorkspace": "Neuer Arbeitsbereich (entfernt Boards, Bauteile, Drähte und Dateien)",
+      "saveProject": "Projekt speichern (Strg+S)",
+      "clickToEdit": "zum Bearbeiten klicken",
+      "collapse": "Einklappen",
+      "expand": "Aufklappen",
+      "newFileInBoard": "Neue Datei auf diesem Board",
+      "unsavedChanges": "Nicht gespeicherte Änderungen",
+      "unsavedSuffix": "nicht gespeichert",
+      "emptyState": "Füge ein Board zur Leinwand hinzu, um Code zu schreiben.",
+      "confirmDelete": "Diese Datei löschen?",
+      "status": {
+        "running": "Läuft",
+        "compiled": "Kompiliert",
+        "idle": "Inaktiv"
+      },
+      "contextMenu": {
+        "rename": "Umbenennen",
+        "delete": "Löschen"
+      }
+    },
+    "fileTabs": {
+      "unsavedChanges": "Nicht gespeicherte Änderungen",
+      "close": "Schließen",
+      "confirmClose": "Datei mit nicht gespeicherten Änderungen schließen?",
+      "closeAnyway": "Trotzdem schließen",
+      "cancel": "Abbrechen"
     }
   }
 }

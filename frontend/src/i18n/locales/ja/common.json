@@ -108,6 +108,35 @@
         "cta": "ライブラリマネージャー",
         "dismiss": "閉じる"
       }
+    },
+    "fileExplorer": {
+      "workspace": "ワークスペース",
+      "newWorkspace": "新しいワークスペース（ボード、コンポーネント、配線、ファイルをすべて削除）",
+      "saveProject": "プロジェクトを保存 (Ctrl+S)",
+      "clickToEdit": "クリックして編集",
+      "collapse": "折りたたむ",
+      "expand": "展開",
+      "newFileInBoard": "このボードに新規ファイル",
+      "unsavedChanges": "未保存の変更",
+      "unsavedSuffix": "未保存",
+      "emptyState": "キャンバスにボードを追加してコードの編集を開始しましょう。",
+      "confirmDelete": "このファイルを削除しますか？",
+      "status": {
+        "running": "実行中",
+        "compiled": "コンパイル済み",
+        "idle": "アイドル"
+      },
+      "contextMenu": {
+        "rename": "名前を変更",
+        "delete": "削除"
+      }
+    },
+    "fileTabs": {
+      "unsavedChanges": "未保存の変更",
+      "close": "閉じる",
+      "confirmClose": "未保存の変更があるファイルを閉じますか？",
+      "closeAnyway": "それでも閉じる",
+      "cancel": "キャンセル"
     }
   }
 }

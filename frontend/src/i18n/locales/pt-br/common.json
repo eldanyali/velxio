@@ -108,6 +108,35 @@
         "cta": "Gerenciador de Bibliotecas",
         "dismiss": "Dispensar"
       }
+    },
+    "fileExplorer": {
+      "workspace": "ESPAÇO DE TRABALHO",
+      "newWorkspace": "Novo espaço de trabalho (limpa placas, componentes, fios e arquivos)",
+      "saveProject": "Salvar projeto (Ctrl+S)",
+      "clickToEdit": "clique para editar",
+      "collapse": "Recolher",
+      "expand": "Expandir",
+      "newFileInBoard": "Novo arquivo nesta placa",
+      "unsavedChanges": "Alterações não salvas",
+      "unsavedSuffix": "não salvo",
+      "emptyState": "Adicione uma placa à tela para começar a editar código.",
+      "confirmDelete": "Excluir este arquivo?",
+      "status": {
+        "running": "Em execução",
+        "compiled": "Compilado",
+        "idle": "Inativo"
+      },
+      "contextMenu": {
+        "rename": "Renomear",
+        "delete": "Excluir"
+      }
+    },
+    "fileTabs": {
+      "unsavedChanges": "Alterações não salvas",
+      "close": "Fechar",
+      "confirmClose": "Fechar arquivo com alterações não salvas?",
+      "closeAnyway": "Fechar mesmo assim",
+      "cancel": "Cancelar"
     }
   }
 }

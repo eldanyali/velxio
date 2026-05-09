@@ -108,6 +108,35 @@
         "cta": "Gestor de librerías",
         "dismiss": "Descartar"
       }
+    },
+    "fileExplorer": {
+      "workspace": "ESPACIO DE TRABAJO",
+      "newWorkspace": "Nuevo espacio de trabajo (borra placas, componentes, cables y archivos)",
+      "saveProject": "Guardar proyecto (Ctrl+S)",
+      "clickToEdit": "haz clic para editar",
+      "collapse": "Plegar",
+      "expand": "Expandir",
+      "newFileInBoard": "Nuevo archivo en esta placa",
+      "unsavedChanges": "Cambios sin guardar",
+      "unsavedSuffix": "sin guardar",
+      "emptyState": "Añade una placa al lienzo para empezar a editar código.",
+      "confirmDelete": "¿Eliminar este archivo?",
+      "status": {
+        "running": "En ejecución",
+        "compiled": "Compilado",
+        "idle": "Inactivo"
+      },
+      "contextMenu": {
+        "rename": "Renombrar",
+        "delete": "Eliminar"
+      }
+    },
+    "fileTabs": {
+      "unsavedChanges": "Cambios sin guardar",
+      "close": "Cerrar",
+      "confirmClose": "¿Cerrar archivo con cambios sin guardar?",
+      "closeAnyway": "Cerrar igualmente",
+      "cancel": "Cancelar"
     }
   }
 }

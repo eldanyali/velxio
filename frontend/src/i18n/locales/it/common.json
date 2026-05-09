@@ -108,6 +108,35 @@
         "cta": "Gestore Librerie",
         "dismiss": "Ignora"
       }
+    },
+    "fileExplorer": {
+      "workspace": "WORKSPACE",
+      "newWorkspace": "Nuovo workspace (cancella schede, componenti, fili e file)",
+      "saveProject": "Salva progetto (Ctrl+S)",
+      "clickToEdit": "clic per modificare",
+      "collapse": "Comprimi",
+      "expand": "Espandi",
+      "newFileInBoard": "Nuovo file su questa scheda",
+      "unsavedChanges": "Modifiche non salvate",
+      "unsavedSuffix": "non salvato",
+      "emptyState": "Aggiungi una scheda sul canvas per iniziare a scrivere codice.",
+      "confirmDelete": "Eliminare questo file?",
+      "status": {
+        "running": "In esecuzione",
+        "compiled": "Compilato",
+        "idle": "Inattivo"
+      },
+      "contextMenu": {
+        "rename": "Rinomina",
+        "delete": "Elimina"
+      }
+    },
+    "fileTabs": {
+      "unsavedChanges": "Modifiche non salvate",
+      "close": "Chiudi",
+      "confirmClose": "Chiudere il file con modifiche non salvate?",
+      "closeAnyway": "Chiudi comunque",
+      "cancel": "Annulla"
     }
   }
 }

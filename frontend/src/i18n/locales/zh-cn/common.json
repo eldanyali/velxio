@@ -108,6 +108,35 @@
         "cta": "库管理器",
         "dismiss": "关闭"
       }
+    },
+    "fileExplorer": {
+      "workspace": "工作区",
+      "newWorkspace": "新建工作区（清空开发板、元件、连线和文件）",
+      "saveProject": "保存项目 (Ctrl+S)",
+      "clickToEdit": "点击编辑",
+      "collapse": "折叠",
+      "expand": "展开",
+      "newFileInBoard": "在此开发板上新建文件",
+      "unsavedChanges": "未保存的更改",
+      "unsavedSuffix": "未保存",
+      "emptyState": "请将开发板添加到画布上以开始编写代码。",
+      "confirmDelete": "删除此文件？",
+      "status": {
+        "running": "运行中",
+        "compiled": "已编译",
+        "idle": "空闲"
+      },
+      "contextMenu": {
+        "rename": "重命名",
+        "delete": "删除"
+      }
+    },
+    "fileTabs": {
+      "unsavedChanges": "未保存的更改",
+      "close": "关闭",
+      "confirmClose": "确定关闭包含未保存更改的文件吗？",
+      "closeAnyway": "仍然关闭",
+      "cancel": "取消"
     }
   }
 }

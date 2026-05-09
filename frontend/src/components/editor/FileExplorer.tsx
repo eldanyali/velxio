@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEditorStore } from '../../store/useEditorStore';
 import { useSimulatorStore } from '../../store/useSimulatorStore';
 import type { BoardKind } from '../../types/board';
@@ -151,6 +152,7 @@ interface FileExplorerProps {
 }
 
 export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewClick }) => {
+  const { t } = useTranslation();
   const {
     fileGroups,
     activeFileId,
@@ -244,7 +246,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewCl
     setContextMenu(null);
     const files = fileGroups[groupId] ?? [];
     if (files.length <= 1) return;
-    if (!window.confirm('Delete this file?')) return;
+    if (!window.confirm(t('editor.fileExplorer.confirmDelete'))) return;
     deleteFile(fileId);
   };
 
@@ -270,18 +272,18 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewCl
   return (
     <div className="file-explorer">
       <div className="file-explorer-header">
-        <span className="file-explorer-title">WORKSPACE</span>
+        <span className="file-explorer-title">{t('editor.fileExplorer.workspace')}</span>
         <div className="file-explorer-header-actions">
           <button
             className="file-explorer-new-btn"
-            title="New workspace (clears boards, components, wires and files)"
+            title={t('editor.fileExplorer.newWorkspace')}
             onClick={onNewClick}
           >
             <IcoNewWorkspace />
           </button>
           <button
             className="file-explorer-save-btn"
-            title="Save project (Ctrl+S)"
+            title={t('editor.fileExplorer.saveProject')}
             onClick={onSaveClick}
           >
             <IcoSave />
@@ -313,7 +315,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewCl
                   switchToBoard(board.id, groupId);
                   if (!isOpen) toggleCollapse(board.id);
                 }}
-                title={`${BOARD_KIND_LABELS[board.boardKind]} — click to edit`}
+                title={`${BOARD_KIND_LABELS[board.boardKind]} — ${t('editor.fileExplorer.clickToEdit')}`}
               >
                 <button
                   className="fe-collapse-btn"
@@ -321,7 +323,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewCl
                     e.stopPropagation();
                     toggleCollapse(board.id);
                   }}
-                  title={isOpen ? 'Collapse' : 'Expand'}
+                  title={isOpen ? t('editor.fileExplorer.collapse') : t('editor.fileExplorer.expand')}
                 >
                   <IcoChevron open={isOpen} />
                 </button>
@@ -335,13 +337,19 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewCl
                 <span
                   className="fe-status-dot"
                   style={{ background: statusColor }}
-                  title={board.running ? 'Running' : board.compiledProgram ? 'Compiled' : 'Idle'}
+                  title={
+                    board.running
+                      ? t('editor.fileExplorer.status.running')
+                      : board.compiledProgram
+                        ? t('editor.fileExplorer.status.compiled')
+                        : t('editor.fileExplorer.status.idle')
+                  }
                 />
 
                 {/* New file button — visible on hover */}
                 <button
                   className="fe-board-new-btn"
-                  title="New file in this board"
+                  title={t('editor.fileExplorer.newFileInBoard')}
                   onClick={(e) => {
                     e.stopPropagation();
                     startCreateFile(board.id, groupId);
@@ -366,7 +374,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewCl
                           switchToBoard(board.id, groupId);
                           startRename(file.id, groupId);
                         }}
-                        title={`${file.name}${file.modified ? ' (unsaved)' : ''}`}
+                        title={`${file.name}${file.modified ? ` (${t('editor.fileExplorer.unsavedSuffix')})` : ''}`}
                       >
                         <span className="file-explorer-icon">
                           <FileIcon name={file.name} />
@@ -390,7 +398,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewCl
                         )}
 
                         {file.modified && (
-                          <span className="file-explorer-dot" title="Unsaved changes" />
+                          <span className="file-explorer-dot" title={t('editor.fileExplorer.unsavedChanges')} />
                         )}
                       </div>
                     );
@@ -429,7 +437,7 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewCl
         {/* Fallback: no boards yet */}
         {boards.length === 0 && (
           <div style={{ color: '#666', fontSize: 11, padding: '12px 12px', lineHeight: 1.5 }}>
-            Add a board to the canvas to start editing code.
+            {t('editor.fileExplorer.emptyState')}
           </div>
         )}
       </div>
@@ -441,14 +449,14 @@ export const FileExplorer: React.FC<FileExplorerProps> = ({ onSaveClick, onNewCl
           onClick={(e) => e.stopPropagation()}
         >
           <button onClick={() => startRename(contextMenu.fileId, contextMenu.boardGroupId)}>
-            Rename
+            {t('editor.fileExplorer.contextMenu.rename')}
           </button>
           <button
             className="ctx-delete"
             onClick={() => handleDelete(contextMenu.fileId, contextMenu.boardGroupId)}
             disabled={(fileGroups[contextMenu.boardGroupId] ?? []).length <= 1}
           >
-            Delete
+            {t('editor.fileExplorer.contextMenu.delete')}
           </button>
         </div>
       )}

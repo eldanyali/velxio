@@ -108,6 +108,35 @@
         "cta": "Library Manager",
         "dismiss": "Dismiss"
       }
+    },
+    "fileExplorer": {
+      "workspace": "WORKSPACE",
+      "newWorkspace": "New workspace (clears boards, components, wires and files)",
+      "saveProject": "Save project (Ctrl+S)",
+      "clickToEdit": "click to edit",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "newFileInBoard": "New file in this board",
+      "unsavedChanges": "Unsaved changes",
+      "unsavedSuffix": "unsaved",
+      "emptyState": "Add a board to the canvas to start editing code.",
+      "confirmDelete": "Delete this file?",
+      "status": {
+        "running": "Running",
+        "compiled": "Compiled",
+        "idle": "Idle"
+      },
+      "contextMenu": {
+        "rename": "Rename",
+        "delete": "Delete"
+      }
+    },
+    "fileTabs": {
+      "unsavedChanges": "Unsaved changes",
+      "close": "Close",
+      "confirmClose": "Close file with unsaved changes?",
+      "closeAnyway": "Close anyway",
+      "cancel": "Cancel"
     }
   }
 }

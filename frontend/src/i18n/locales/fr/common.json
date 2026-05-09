@@ -108,6 +108,35 @@
         "cta": "Gestionnaire de bibliothèques",
         "dismiss": "Fermer"
       }
+    },
+    "fileExplorer": {
+      "workspace": "ESPACE DE TRAVAIL",
+      "newWorkspace": "Nouvel espace de travail (efface cartes, composants, fils et fichiers)",
+      "saveProject": "Enregistrer le projet (Ctrl+S)",
+      "clickToEdit": "cliquer pour modifier",
+      "collapse": "Réduire",
+      "expand": "Développer",
+      "newFileInBoard": "Nouveau fichier sur cette carte",
+      "unsavedChanges": "Modifications non enregistrées",
+      "unsavedSuffix": "non enregistré",
+      "emptyState": "Ajoutez une carte au canevas pour commencer à éditer du code.",
+      "confirmDelete": "Supprimer ce fichier ?",
+      "status": {
+        "running": "En cours",
+        "compiled": "Compilé",
+        "idle": "Inactif"
+      },
+      "contextMenu": {
+        "rename": "Renommer",
+        "delete": "Supprimer"
+      }
+    },
+    "fileTabs": {
+      "unsavedChanges": "Modifications non enregistrées",
+      "close": "Fermer",
+      "confirmClose": "Fermer le fichier avec des modifications non enregistrées ?",
+      "closeAnyway": "Fermer quand même",
+      "cancel": "Annuler"
     }
   }
 }
