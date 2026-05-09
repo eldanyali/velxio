@@ -1,4 +1,5 @@
 import asyncio
+import hashlib
 import logging
 import time
 import uuid
@@ -29,11 +30,53 @@ arduino_cli = ArduinoCLIService()
 # Single-instance only: if velxio ever scales to multiple FastAPI workers, this
 # needs to move to Redis or the sqlite database. For now one process is fine.
 COMPILE_JOBS: dict[str, dict[str, Any]] = {}
+JOB_BY_KEY: dict[str, str] = {}  # content_hash → job_id, for deduplication
 JOB_TTL_S = 1800  # purge results 30 min after completion
+
+# ── Concurrency control ──────────────────────────────────────────────────────
+# Cap simultaneous ESP-IDF compiles. The VPS is modest (saw load avg 30 with
+# 6 ninja processes peeling each other apart). Two parallel compiles to
+# different targets are fine; concurrent compiles to the SAME target would
+# corrupt the persistent build dir, so we serialize those with a per-target
+# lock layered on top.
+_COMPILE_SEMAPHORE = asyncio.Semaphore(2)
+_TARGET_LOCKS: dict[str, asyncio.Lock] = {}
+
+
+def _target_lock(board_fqbn: str) -> asyncio.Lock:
+    """Lazy-initialised per-target lock so concurrent compiles to the same
+    board serialise. Different boards still run in parallel up to the
+    semaphore cap."""
+    lock = _TARGET_LOCKS.get(board_fqbn)
+    if lock is None:
+        lock = asyncio.Lock()
+        _TARGET_LOCKS[board_fqbn] = lock
+    return lock
+
+
+def _job_key(files: list[dict[str, str]], board_fqbn: str) -> str:
+    """Stable content hash of (files, board) used as deduplication key.
+
+    Excludes project_id (analytics-only — different projects with identical
+    code should still dedup to one build). File order is normalised so the
+    same set of files in any order produces the same key.
+    """
+    h = hashlib.sha256()
+    h.update(board_fqbn.encode())
+    h.update(b"\0")
+    for f in sorted(files, key=lambda x: x["name"]):
+        h.update(f["name"].encode())
+        h.update(b"\0")
+        h.update(f["content"].encode())
+        h.update(b"\0")
+    return h.hexdigest()
 
 
 def _purge_expired_jobs() -> None:
-    """Drop completed jobs older than JOB_TTL_S so the dict doesn't grow forever."""
+    """Drop completed jobs older than JOB_TTL_S so the dict doesn't grow
+    forever. Also evicts the matching JOB_BY_KEY entry so the next request
+    with the same content schedules a fresh build instead of dedupping to
+    a stale job_id."""
     now = time.time()
     stale = [
         jid for jid, job in COMPILE_JOBS.items()
@@ -41,7 +84,14 @@ def _purge_expired_jobs() -> None:
         and now - job.get("finished_at", now) > JOB_TTL_S
     ]
     for jid in stale:
-        COMPILE_JOBS.pop(jid, None)
+        job = COMPILE_JOBS.pop(jid, None)
+        if job is not None:
+            key = job.get("key")
+            # Only remove the JOB_BY_KEY entry if it still points at this job —
+            # a newer job with the same key may have replaced it after this one
+            # finished but before TTL elapsed.
+            if key and JOB_BY_KEY.get(key) == jid:
+                JOB_BY_KEY.pop(key, None)
 
 
 class SketchFile(BaseModel):
@@ -185,16 +235,33 @@ async def _compile_job(
     files: list[dict[str, str]],
     user_id: int | None,
 ) -> None:
-    """Background worker: run the compile, store result in COMPILE_JOBS."""
+    """Background worker: acquire global semaphore + per-target lock, run the
+    compile, store result in COMPILE_JOBS.
+
+    `state=pending` while waiting on either gate; transitions to `running`
+    only once the actual build is about to start, so clients polling
+    /compile/status see an accurate snapshot of where their job is.
+    """
     started = time.monotonic()
+    job = COMPILE_JOBS[job_id]
+    started_at = job["started_at"]
+    job_key = job.get("key")
     try:
-        COMPILE_JOBS[job_id]["state"] = "running"
-        response = await _run_compile(request, files)
+        async with _COMPILE_SEMAPHORE:
+            async with _target_lock(request.board_fqbn):
+                # Job may have been purged or replaced while we were queued.
+                # Re-fetch and bail out if so.
+                if COMPILE_JOBS.get(job_id) is None:
+                    logger.info(f"[compile] job {job_id} purged before run; skipping")
+                    return
+                COMPILE_JOBS[job_id]["state"] = "running"
+                response = await _run_compile(request, files)
         COMPILE_JOBS[job_id] = {
             "state": "done",
-            "started_at": COMPILE_JOBS[job_id]["started_at"],
+            "started_at": started_at,
             "finished_at": time.time(),
             "result": response.model_dump(),
+            "key": job_key,
         }
         error_kind = (
             None if response.success
@@ -213,9 +280,10 @@ async def _compile_job(
         logger.exception(f"[compile] async job {job_id} failed")
         COMPILE_JOBS[job_id] = {
             "state": "error",
-            "started_at": COMPILE_JOBS[job_id]["started_at"],
+            "started_at": started_at,
             "finished_at": time.time(),
             "error": str(exc)[:500],
+            "key": job_key,
         }
         await _record_async_metric(
             user_id=user_id,
@@ -303,12 +371,27 @@ async def compile_start(
     `GET /compile/status/{job_id}` every couple of seconds until state is
     `done` or `error`. This sidesteps Cloudflare's 100s HTTP edge timeout —
     each individual request returns in milliseconds.
+
+    Deduplication: identical (files, board_fqbn) submissions while a
+    matching job is still pending or running return the existing job_id
+    instead of spawning a new build. Prevents the "user clicks compile six
+    times → six concurrent ninja processes peeling each other apart"
+    failure mode.
     """
     files = _resolve_files(request)
     _purge_expired_jobs()
 
+    key = _job_key(files, request.board_fqbn)
+    existing_id = JOB_BY_KEY.get(key)
+    if existing_id is not None:
+        existing = COMPILE_JOBS.get(existing_id)
+        if existing is not None and existing.get("state") in ("pending", "running"):
+            logger.info(f"[compile] dedup hit — reusing job {existing_id}")
+            return CompileStartResponse(job_id=existing_id)
+
     job_id = uuid.uuid4().hex
-    COMPILE_JOBS[job_id] = {"state": "pending", "started_at": time.time()}
+    COMPILE_JOBS[job_id] = {"state": "pending", "started_at": time.time(), "key": key}
+    JOB_BY_KEY[key] = job_id
 
     asyncio.create_task(
         _compile_job(

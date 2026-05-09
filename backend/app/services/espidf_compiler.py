@@ -29,6 +29,90 @@ logger = logging.getLogger(__name__)
 # Location of the ESP-IDF project template (relative to this file)
 _TEMPLATE_DIR = Path(__file__).parent / 'esp-idf-template'
 
+# ── Persistent build dir ─────────────────────────────────────────────────────
+# Cold ESP-IDF compiles rebuild ~1480 base objects (FreeRTOS, lwIP, esp_wifi,
+# libsodium, …). The default tempfile.TemporaryDirectory flow gave each compile
+# a fresh path under /tmp/espidf_<random>/, which baked into -I and
+# -fmacro-prefix-map flags and made ccache 0% effective (different cwd → hash
+# miss every time). With the persistent dir, /var/lib/velxio-build/<target>/
+# is a stable anchor: ninja's incremental cache + ccache hits combine to bring
+# warm compiles down to ~5-30s.
+#
+# Concurrent compiles to the SAME target would corrupt the shared build dir;
+# they're serialised by the per-target asyncio.Lock in routes/compile.py.
+# Different targets get different subdirs and run in parallel.
+#
+# Set VELXIO_PERSISTENT_BUILD_DIR=0 to fall back to the legacy tempfile flow
+# without rebuilding the image (escape hatch if the persistent dir misbehaves
+# in production).
+_BUILD_ROOT = Path(os.environ.get('VELXIO_BUILD_ROOT', '/var/lib/velxio-build'))
+_USE_PERSISTENT_DIR = (
+    os.environ.get('VELXIO_PERSISTENT_BUILD_DIR', '1')
+    not in ('0', 'false', 'False', '')
+)
+
+
+def _idf_version_signature() -> str:
+    """Snapshot of the ESP-IDF + arduino-esp32 toolchain version. Used to
+    invalidate persistent build dirs after an upstream submodule bump (the
+    cached object files on disk are no longer ABI-compatible)."""
+    parts = []
+    idf_version_file = Path('/opt/esp-idf/version.txt')
+    if idf_version_file.exists():
+        parts.append(idf_version_file.read_text(encoding='utf-8').strip())
+    arduino_version_file = Path('/opt/arduino-esp32/version.txt')
+    if arduino_version_file.exists():
+        parts.append(arduino_version_file.read_text(encoding='utf-8').strip())
+    if not parts:
+        # Fall back to mtime of the IDF tree root — coarse but stable per
+        # image build.
+        try:
+            parts.append(str(int(Path('/opt/esp-idf').stat().st_mtime)))
+        except OSError:
+            parts.append('unknown')
+    return '|'.join(parts)
+
+
+def _prepare_persistent_project_dir(idf_target: str) -> Path:
+    """Return the path to a per-target persistent project dir, materialising
+    it from the template on first use and resetting the per-compile parts
+    (main/, user_libs/) on every call so a previous sketch's files don't
+    leak into the next compile.
+
+    Keeps the `build/` directory intact across calls — that's where ninja's
+    incremental cache + the .o files we want ccache to hit live.
+    """
+    target_dir = _BUILD_ROOT / idf_target
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    # Wipe the whole target dir if the toolchain version changed (the cached
+    # .o files are no longer compatible).
+    sentinel = target_dir / '.idf_version'
+    current_signature = _idf_version_signature()
+    if sentinel.exists() and sentinel.read_text(encoding='utf-8').strip() != current_signature:
+        logger.info(
+            f'[espidf] toolchain version changed; wiping persistent build dir {target_dir}'
+        )
+        shutil.rmtree(target_dir)
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+    project_dir = target_dir / 'project'
+
+    if not project_dir.exists():
+        # First use of this target — full template copy.
+        shutil.copytree(_TEMPLATE_DIR, project_dir)
+    else:
+        # Subsequent compile — reset the per-compile parts only, keep build/.
+        # main/ is overwritten with the user's sketch + any extra files.
+        # user_libs/ is rebuilt by _resolve_library_components based on the
+        # sketch's #includes.
+        shutil.rmtree(project_dir / 'main', ignore_errors=True)
+        shutil.copytree(_TEMPLATE_DIR / 'main', project_dir / 'main')
+        shutil.rmtree(project_dir / 'user_libs', ignore_errors=True)
+
+    sentinel.write_text(current_signature, encoding='utf-8')
+    return project_dir
+
 # Static IP that matches slirp DHCP range (first client = x.x.x.15)
 _STATIC_IP = '192.168.4.15'
 _GATEWAY_IP = '192.168.4.2'
@@ -805,6 +889,18 @@ class ESPIDFCompiler:
 
         Returns dict compatible with ArduinoCLIService.compile():
             success, binary_content (base64), binary_type, stdout, stderr, error
+
+        Build dir layout:
+        - With VELXIO_PERSISTENT_BUILD_DIR=1 (default): a per-target dir at
+          /var/lib/velxio-build/<idf_target>/project/ is reused across compiles.
+          ninja's incremental cache + ccache hits combine to bring warm
+          compiles down to ~5-30s.
+        - With VELXIO_PERSISTENT_BUILD_DIR=0: legacy tempfile.TemporaryDirectory
+          flow. Every compile rebuilds from scratch.
+
+        The caller (routes/compile.py:_compile_job) holds a per-target
+        asyncio.Lock for the duration of this call, so the persistent dir
+        is never accessed by two compiles at once.
         """
         if not self.available:
             return {
@@ -820,299 +916,316 @@ class ESPIDFCompiler:
         logger.info(f'[espidf] Compiling for {idf_target} (FQBN: {board_fqbn})')
         logger.info(f'[espidf] Files: {[f["name"] for f in files]}')
 
+        if _USE_PERSISTENT_DIR:
+            project_dir = _prepare_persistent_project_dir(idf_target)
+            logger.info(f'[espidf] Using persistent build dir: {project_dir}')
+            return await self._compile_in_dir(project_dir, files, idf_target, is_c3)
+
         with tempfile.TemporaryDirectory(prefix='espidf_') as temp_dir:
             project_dir = Path(temp_dir) / 'project'
-
-            # Copy template
             shutil.copytree(_TEMPLATE_DIR, project_dir)
+            logger.info(f'[espidf] Using ephemeral build dir: {project_dir}')
+            return await self._compile_in_dir(project_dir, files, idf_target, is_c3)
 
-            # Get sketch content
-            main_content = ''
-            for f in files:
-                if f['name'].endswith('.ino'):
-                    main_content = f['content']
-                    break
-            if not main_content and files:
-                main_content = files[0]['content']
+    async def _compile_in_dir(
+        self,
+        project_dir: Path,
+        files: list[dict],
+        idf_target: str,
+        is_c3: bool,
+    ) -> dict:
+        """Inner compile body: writes sketch + libs into `project_dir`,
+        runs cmake + ninja, merges binaries. Caller is responsible for
+        creating `project_dir` (with the template tree already copied in)
+        and for managing its lifecycle (persistent vs tempfile).
+        """
+        # Get sketch content
+        main_content = ''
+        for f in files:
+            if f['name'].endswith('.ino'):
+                main_content = f['content']
+                break
+        if not main_content and files:
+            main_content = files[0]['content']
 
-            # ── QEMU WiFi compatibility ──────────────────────────────────────
-            # QEMU's WiFi AP broadcasts "Velxio-GUEST" on channel 6.
-            # We normalize ANY user SSID → "Velxio-GUEST", enforce channel 6,
-            # and use open auth (empty password) so the connection always works.
-            # Detect WiFi BEFORE normalization so the flag reflects the original sketch.
-            has_wifi = self._detect_wifi_usage(main_content)
-            main_content = self._normalize_wifi_for_qemu(main_content)
+        # ── QEMU WiFi compatibility ──────────────────────────────────────
+        # QEMU's WiFi AP broadcasts "Velxio-GUEST" on channel 6.
+        # We normalize ANY user SSID → "Velxio-GUEST", enforce channel 6,
+        # and use open auth (empty password) so the connection always works.
+        # Detect WiFi BEFORE normalization so the flag reflects the original sketch.
+        has_wifi = self._detect_wifi_usage(main_content)
+        main_content = self._normalize_wifi_for_qemu(main_content)
 
-            if self.has_arduino:
-                # Arduino-as-component mode: copy sketch as .cpp
-                sketch_cpp = project_dir / 'main' / 'sketch.ino.cpp'
-                # Prepend Arduino.h + velxio_compat.h if not already included.
-                # velxio_compat.h shims arduino-esp32 3.x APIs (ledcAttach, …)
-                # onto the 2.0.17 toolchain we currently pin. See
-                # esp-idf-template/main/velxio_compat.h.
-                if '#include' not in main_content or 'Arduino.h' not in main_content:
-                    main_content = (
-                        '#include "Arduino.h"\n'
-                        '#include "velxio_compat.h"\n' + main_content
-                    )
-                else:
-                    main_content = main_content.replace(
-                        '#include "Arduino.h"',
-                        '#include "Arduino.h"\n#include "velxio_compat.h"',
-                        1,
-                    )
-                sketch_cpp.write_text(main_content, encoding='utf-8')
-
-                # Copy additional files (.h, .cpp)
-                for f in files:
-                    if not f['name'].endswith('.ino'):
-                        (project_dir / 'main' / f['name']).write_text(
-                            f['content'], encoding='utf-8'
-                        )
-
-                # Remove the pure-C main to avoid conflict
-                main_c = project_dir / 'main' / 'main.c'
-                if main_c.exists():
-                    main_c.unlink()
-                sketch_translated = project_dir / 'main' / 'sketch_translated.c'
-                if sketch_translated.exists():
-                    sketch_translated.unlink()
-
-                # ── Resolve external Arduino libraries as IDF components ──────
-                # arduino-cli installs libraries in ~/Arduino/libraries/ but the
-                # ESP-IDF build system does not scan that path. We create a
-                # user_libs/ directory where each external library becomes a
-                # proper ESP-IDF component with its own CMakeLists.txt and
-                # INCLUDE_DIRS. The root CMakeLists.txt (template) adds user_libs
-                # to EXTRA_COMPONENT_DIRS so ESP-IDF discovers them automatically.
-                ext_headers = self._detect_external_includes(main_content)
-                component_names: list[str] = []
-                # arduino-esp32 component name (directory basename of ARDUINO_ESP32_PATH)
-                arduino_comp_name = Path(self.arduino_path).name if self.arduino_path else 'arduino-esp32'
-
-                if ext_headers:
-                    user_libs_dir = project_dir / 'user_libs'
-                    user_libs_dir.mkdir(exist_ok=True)
-
-                    esp32_libs   = Path(self.arduino_path) / 'libraries' if self.arduino_path else None
-                    arduino_libs = self._find_arduino_libraries_dir()
-
-                    component_names, _ = self._resolve_library_components(
-                        ext_headers, arduino_libs, esp32_libs,
-                        arduino_comp_name, user_libs_dir,
-                    )
-
-                # Patch main/CMakeLists.txt — REQUIRES and INCLUDE_DIRS for user_libs_all.
-                # The single merged component means one entry covers all external headers.
-                if component_names:  # always ['user_libs_all'] when any lib was found
-                    cmake_path = project_dir / 'main' / 'CMakeLists.txt'
-                    cmake_text = cmake_path.read_text(encoding='utf-8')
-
-                    for old_req in [r'REQUIRES ${_arduino_comp_name}', f'REQUIRES {arduino_comp_name}']:
-                        if old_req in cmake_text:
-                            cmake_text = cmake_text.replace(
-                                old_req, f'{old_req} user_libs_all'
-                            )
-                            break
-
-                    cmake_text = cmake_text.replace(
-                        'INCLUDE_DIRS "."',
-                        'INCLUDE_DIRS "." "../user_libs/user_libs_all"',
-                    )
-
-                    cmake_path.write_text(cmake_text, encoding='utf-8')
-                    logger.info('[espidf] Patched main CMakeLists: REQUIRES += user_libs_all, INCLUDE_DIRS += user_libs_all')
+        if self.has_arduino:
+            # Arduino-as-component mode: copy sketch as .cpp
+            sketch_cpp = project_dir / 'main' / 'sketch.ino.cpp'
+            # Prepend Arduino.h + velxio_compat.h if not already included.
+            # velxio_compat.h shims arduino-esp32 3.x APIs (ledcAttach, …)
+            # onto the 2.0.17 toolchain we currently pin. See
+            # esp-idf-template/main/velxio_compat.h.
+            if '#include' not in main_content or 'Arduino.h' not in main_content:
+                main_content = (
+                    '#include "Arduino.h"\n'
+                    '#include "velxio_compat.h"\n' + main_content
+                )
             else:
-                # Pure ESP-IDF mode: translate sketch
-                translated = self._translate_sketch_to_espidf(main_content)
-                (project_dir / 'main' / 'sketch_translated.c').write_text(
-                    translated, encoding='utf-8'
+                main_content = main_content.replace(
+                    '#include "Arduino.h"',
+                    '#include "Arduino.h"\n#include "velxio_compat.h"',
+                    1,
+                )
+            sketch_cpp.write_text(main_content, encoding='utf-8')
+
+            # Copy additional files (.h, .cpp)
+            for f in files:
+                if not f['name'].endswith('.ino'):
+                    (project_dir / 'main' / f['name']).write_text(
+                        f['content'], encoding='utf-8'
+                    )
+
+            # Remove the pure-C main to avoid conflict
+            main_c = project_dir / 'main' / 'main.c'
+            if main_c.exists():
+                main_c.unlink()
+            sketch_translated = project_dir / 'main' / 'sketch_translated.c'
+            if sketch_translated.exists():
+                sketch_translated.unlink()
+
+            # ── Resolve external Arduino libraries as IDF components ──────
+            # arduino-cli installs libraries in ~/Arduino/libraries/ but the
+            # ESP-IDF build system does not scan that path. We create a
+            # user_libs/ directory where each external library becomes a
+            # proper ESP-IDF component with its own CMakeLists.txt and
+            # INCLUDE_DIRS. The root CMakeLists.txt (template) adds user_libs
+            # to EXTRA_COMPONENT_DIRS so ESP-IDF discovers them automatically.
+            ext_headers = self._detect_external_includes(main_content)
+            component_names: list[str] = []
+            # arduino-esp32 component name (directory basename of ARDUINO_ESP32_PATH)
+            arduino_comp_name = Path(self.arduino_path).name if self.arduino_path else 'arduino-esp32'
+
+            if ext_headers:
+                user_libs_dir = project_dir / 'user_libs'
+                user_libs_dir.mkdir(exist_ok=True)
+
+                esp32_libs   = Path(self.arduino_path) / 'libraries' if self.arduino_path else None
+                arduino_libs = self._find_arduino_libraries_dir()
+
+                component_names, _ = self._resolve_library_components(
+                    ext_headers, arduino_libs, esp32_libs,
+                    arduino_comp_name, user_libs_dir,
                 )
 
-                # Remove Arduino main.cpp to avoid conflict
-                main_cpp = project_dir / 'main' / 'main.cpp'
-                if main_cpp.exists():
-                    main_cpp.unlink()
+            # Patch main/CMakeLists.txt — REQUIRES and INCLUDE_DIRS for user_libs_all.
+            # The single merged component means one entry covers all external headers.
+            if component_names:  # always ['user_libs_all'] when any lib was found
+                cmake_path = project_dir / 'main' / 'CMakeLists.txt'
+                cmake_text = cmake_path.read_text(encoding='utf-8')
 
-            # Build using cmake + ninja (more portable than idf.py on Windows)
-            build_dir = project_dir / 'build'
-            build_dir.mkdir(exist_ok=True)
-
-            env = self._build_env(idf_target)
-
-            # Step 1: cmake configure
-            cmake_cmd = [
-                'cmake',
-                '-G', 'Ninja',
-                '-Wno-dev',
-                f'-DIDF_TARGET={idf_target}',
-                '-DCMAKE_BUILD_TYPE=Release',
-                f'-DSDKCONFIG_DEFAULTS={project_dir / "sdkconfig.defaults"}',
-                str(project_dir),
-            ]
-
-            # ccache: ESP-IDF's tools/cmake/project.cmake enables ccache iff
-            # the CMake variable `CCACHE_ENABLE` is truthy. We don't go through
-            # `idf.py` (which would translate the env var for us), so wire it
-            # in here. Default ON; set IDF_CCACHE_ENABLE=0 in the env to
-            # bypass without rebuilding the image.
-            if os.environ.get('IDF_CCACHE_ENABLE', '1') not in ('0', 'false', 'False', ''):
-                cmake_cmd.append('-DCCACHE_ENABLE=1')
-
-            logger.info(f'[espidf] cmake: {" ".join(cmake_cmd)}')
-
-            def _run_cmake():
-                return subprocess.run(
-                    cmake_cmd,
-                    cwd=str(build_dir),
-                    capture_output=True,
-                    text=True,
-                    env=env,
-                    timeout=120,
-                )
-
-            try:
-                cmake_result = await asyncio.to_thread(_run_cmake)
-            except subprocess.TimeoutExpired:
-                return {
-                    'success': False,
-                    'error': 'ESP-IDF cmake configure timed out (120s)',
-                    'stdout': '',
-                    'stderr': '',
-                }
-
-            if cmake_result.returncode != 0:
-                logger.error(f'[espidf] cmake failed:\n{cmake_result.stderr}')
-                return {
-                    'success': False,
-                    'error': 'ESP-IDF cmake configure failed',
-                    'stdout': cmake_result.stdout,
-                    'stderr': cmake_result.stderr,
-                }
-
-            # Step 2: ninja build
-            ninja_cmd = ['ninja']
-            logger.info('[espidf] Building with ninja...')
-
-            # Cold ESP-IDF builds with external Arduino libraries (e.g. Adafruit
-            # BMP280 + BusIO + Unified Sensor → ~1480 build steps) regularly take
-            # 5-7 minutes on modest hardware. 300s used to cut them off at 98%;
-            # bump to 600s so first-run cold compiles complete. Subsequent
-            # builds reuse ninja's cache and finish in seconds.
-            NINJA_TIMEOUT_S = 600
-
-            def _run_ninja():
-                return subprocess.run(
-                    ninja_cmd,
-                    cwd=str(build_dir),
-                    capture_output=True,
-                    text=True,
-                    env=env,
-                    timeout=NINJA_TIMEOUT_S,
-                )
-
-            try:
-                ninja_result = await asyncio.to_thread(_run_ninja)
-            except subprocess.TimeoutExpired:
-                return {
-                    'success': False,
-                    'error': f'ESP-IDF build timed out ({NINJA_TIMEOUT_S}s)',
-                    'stdout': '',
-                    'stderr': '',
-                }
-
-            all_stdout = cmake_result.stdout + '\n' + ninja_result.stdout
-            all_stderr = cmake_result.stderr + '\n' + ninja_result.stderr
-
-            # Filter out expected but ugly warnings from stderr (e.g. absent git, cmake deprecation)
-            filtered_stderr_lines = []
-            for line in all_stderr.splitlines():
-                if 'fatal: not a git repository' in line:
-                    continue
-                if 'CMake Deprecation Warning' in line:
-                    continue
-                if 'Compatibility with CMake' in line:
-                    continue
-                filtered_stderr_lines.append(line)
-            all_stderr = '\n'.join(filtered_stderr_lines)
-
-            if ninja_result.returncode != 0:
-                # Extract the actual compiler errors from ninja's stdout.
-                # Ninja prints failed job blocks in stdout:
-                #   FAILED: path/to/file.obj
-                #   <compiler command>
-                #   sketch.ino.cpp:5:10: fatal error: DHT.h: No such file or directory
-                #   compilation terminated.
-                #   ninja: build stopped: subcommand failed.
-                stdout_lines = ninja_result.stdout.split('\n')
-                error_lines: list[str] = []
-                in_failed_block = False
-                for line in stdout_lines:
-                    stripped = line.strip()
-                    if stripped.startswith('FAILED:') or stripped == 'ninja: build stopped: subcommand failed.':
-                        in_failed_block = True
-                        error_lines.append(line)
-                        continue
-                    # Next [N/M] progress line ends the block
-                    if in_failed_block and stripped.startswith('[') and '/' in stripped and ']' in stripped:
-                        in_failed_block = False
-                    if in_failed_block:
-                        error_lines.append(line)
-                    elif ': error:' in line or 'fatal error:' in line.lower():
-                        # Explicit compiler error outside a FAILED block
-                        error_lines.append(line)
-
-                extracted = '\n'.join(l for l in error_lines if l.strip())
-
-                # First non-FAILED, non-command error line → short summary for toolbar
-                summary = 'ESP-IDF build failed'
-                for l in error_lines:
-                    s = l.strip()
-                    if s and not s.startswith('FAILED:') and not s.startswith('ninja:') and not s.startswith('/') and 'error:' in s.lower():
-                        summary = s
+                for old_req in [r'REQUIRES ${_arduino_comp_name}', f'REQUIRES {arduino_comp_name}']:
+                    if old_req in cmake_text:
+                        cmake_text = cmake_text.replace(
+                            old_req, f'{old_req} user_libs_all'
+                        )
                         break
-                if summary == 'ESP-IDF build failed' and error_lines:
-                    # Fall back to first non-empty error line
-                    for l in error_lines:
-                        if l.strip() and not l.strip().startswith('FAILED:'):
-                            summary = l.strip()
-                            break
 
-                # Put extracted errors in stderr so the console highlights them
-                combined_stderr = (extracted + '\n\n' + all_stderr).strip() if extracted else all_stderr
+                cmake_text = cmake_text.replace(
+                    'INCLUDE_DIRS "."',
+                    'INCLUDE_DIRS "." "../user_libs/user_libs_all"',
+                )
 
-                logger.error(f'[espidf] ninja build failed (stdout):\n{ninja_result.stdout[-4000:]}')
-                logger.error(f'[espidf] ninja build failed (stderr):\n{ninja_result.stderr[-2000:]}')
-                return {
-                    'success': False,
-                    'error': summary,
-                    'stdout': all_stdout,
-                    'stderr': combined_stderr,
-                }
+                cmake_path.write_text(cmake_text, encoding='utf-8')
+                logger.info('[espidf] Patched main CMakeLists: REQUIRES += user_libs_all, INCLUDE_DIRS += user_libs_all')
+        else:
+            # Pure ESP-IDF mode: translate sketch
+            translated = self._translate_sketch_to_espidf(main_content)
+            (project_dir / 'main' / 'sketch_translated.c').write_text(
+                translated, encoding='utf-8'
+            )
 
-            # Step 3: Merge binaries into flash image
-            try:
-                merged_path = self._merge_flash_image(build_dir, is_c3)
-            except FileNotFoundError as exc:
-                return {
-                    'success': False,
-                    'error': f'Binary merge failed: {exc}',
-                    'stdout': all_stdout,
-                    'stderr': all_stderr,
-                }
+            # Remove Arduino main.cpp to avoid conflict
+            main_cpp = project_dir / 'main' / 'main.cpp'
+            if main_cpp.exists():
+                main_cpp.unlink()
 
-            binary_b64 = base64.b64encode(merged_path.read_bytes()).decode('ascii')
-            logger.info(f'[espidf] Compilation successful — {len(binary_b64) // 1024} KB (base64), has_wifi={has_wifi}')
+        # Build using cmake + ninja (more portable than idf.py on Windows)
+        build_dir = project_dir / 'build'
+        build_dir.mkdir(exist_ok=True)
 
+        env = self._build_env(idf_target)
+
+        # Step 1: cmake configure
+        cmake_cmd = [
+            'cmake',
+            '-G', 'Ninja',
+            '-Wno-dev',
+            f'-DIDF_TARGET={idf_target}',
+            '-DCMAKE_BUILD_TYPE=Release',
+            f'-DSDKCONFIG_DEFAULTS={project_dir / "sdkconfig.defaults"}',
+            str(project_dir),
+        ]
+
+        # ccache: ESP-IDF's tools/cmake/project.cmake enables ccache iff
+        # the CMake variable `CCACHE_ENABLE` is truthy. We don't go through
+        # `idf.py` (which would translate the env var for us), so wire it
+        # in here. Default ON; set IDF_CCACHE_ENABLE=0 in the env to
+        # bypass without rebuilding the image.
+        if os.environ.get('IDF_CCACHE_ENABLE', '1') not in ('0', 'false', 'False', ''):
+            cmake_cmd.append('-DCCACHE_ENABLE=1')
+
+        logger.info(f'[espidf] cmake: {" ".join(cmake_cmd)}')
+
+        def _run_cmake():
+            return subprocess.run(
+                cmake_cmd,
+                cwd=str(build_dir),
+                capture_output=True,
+                text=True,
+                env=env,
+                timeout=120,
+            )
+
+        try:
+            cmake_result = await asyncio.to_thread(_run_cmake)
+        except subprocess.TimeoutExpired:
             return {
-                'success': True,
-                'hex_content': None,
-                'binary_content': binary_b64,
-                'binary_type': 'bin',
-                'has_wifi': has_wifi,
+                'success': False,
+                'error': 'ESP-IDF cmake configure timed out (120s)',
+                'stdout': '',
+                'stderr': '',
+            }
+
+        if cmake_result.returncode != 0:
+            logger.error(f'[espidf] cmake failed:\n{cmake_result.stderr}')
+            return {
+                'success': False,
+                'error': 'ESP-IDF cmake configure failed',
+                'stdout': cmake_result.stdout,
+                'stderr': cmake_result.stderr,
+            }
+
+        # Step 2: ninja build
+        ninja_cmd = ['ninja']
+        logger.info('[espidf] Building with ninja...')
+
+        # Cold ESP-IDF builds with external Arduino libraries (e.g. Adafruit
+        # BMP280 + BusIO + Unified Sensor → ~1480 build steps) regularly take
+        # 5-7 minutes on modest hardware. 300s used to cut them off at 98%;
+        # bump to 600s so first-run cold compiles complete. Subsequent
+        # builds reuse ninja's cache and finish in seconds.
+        NINJA_TIMEOUT_S = 600
+
+        def _run_ninja():
+            return subprocess.run(
+                ninja_cmd,
+                cwd=str(build_dir),
+                capture_output=True,
+                text=True,
+                env=env,
+                timeout=NINJA_TIMEOUT_S,
+            )
+
+        try:
+            ninja_result = await asyncio.to_thread(_run_ninja)
+        except subprocess.TimeoutExpired:
+            return {
+                'success': False,
+                'error': f'ESP-IDF build timed out ({NINJA_TIMEOUT_S}s)',
+                'stdout': '',
+                'stderr': '',
+            }
+
+        all_stdout = cmake_result.stdout + '\n' + ninja_result.stdout
+        all_stderr = cmake_result.stderr + '\n' + ninja_result.stderr
+
+        # Filter out expected but ugly warnings from stderr (e.g. absent git, cmake deprecation)
+        filtered_stderr_lines = []
+        for line in all_stderr.splitlines():
+            if 'fatal: not a git repository' in line:
+                continue
+            if 'CMake Deprecation Warning' in line:
+                continue
+            if 'Compatibility with CMake' in line:
+                continue
+            filtered_stderr_lines.append(line)
+        all_stderr = '\n'.join(filtered_stderr_lines)
+
+        if ninja_result.returncode != 0:
+            # Extract the actual compiler errors from ninja's stdout.
+            # Ninja prints failed job blocks in stdout:
+            #   FAILED: path/to/file.obj
+            #   <compiler command>
+            #   sketch.ino.cpp:5:10: fatal error: DHT.h: No such file or directory
+            #   compilation terminated.
+            #   ninja: build stopped: subcommand failed.
+            stdout_lines = ninja_result.stdout.split('\n')
+            error_lines: list[str] = []
+            in_failed_block = False
+            for line in stdout_lines:
+                stripped = line.strip()
+                if stripped.startswith('FAILED:') or stripped == 'ninja: build stopped: subcommand failed.':
+                    in_failed_block = True
+                    error_lines.append(line)
+                    continue
+                # Next [N/M] progress line ends the block
+                if in_failed_block and stripped.startswith('[') and '/' in stripped and ']' in stripped:
+                    in_failed_block = False
+                if in_failed_block:
+                    error_lines.append(line)
+                elif ': error:' in line or 'fatal error:' in line.lower():
+                    # Explicit compiler error outside a FAILED block
+                    error_lines.append(line)
+
+            extracted = '\n'.join(l for l in error_lines if l.strip())
+
+            # First non-FAILED, non-command error line → short summary for toolbar
+            summary = 'ESP-IDF build failed'
+            for l in error_lines:
+                s = l.strip()
+                if s and not s.startswith('FAILED:') and not s.startswith('ninja:') and not s.startswith('/') and 'error:' in s.lower():
+                    summary = s
+                    break
+            if summary == 'ESP-IDF build failed' and error_lines:
+                # Fall back to first non-empty error line
+                for l in error_lines:
+                    if l.strip() and not l.strip().startswith('FAILED:'):
+                        summary = l.strip()
+                        break
+
+            # Put extracted errors in stderr so the console highlights them
+            combined_stderr = (extracted + '\n\n' + all_stderr).strip() if extracted else all_stderr
+
+            logger.error(f'[espidf] ninja build failed (stdout):\n{ninja_result.stdout[-4000:]}')
+            logger.error(f'[espidf] ninja build failed (stderr):\n{ninja_result.stderr[-2000:]}')
+            return {
+                'success': False,
+                'error': summary,
+                'stdout': all_stdout,
+                'stderr': combined_stderr,
+            }
+
+        # Step 3: Merge binaries into flash image
+        try:
+            merged_path = self._merge_flash_image(build_dir, is_c3)
+        except FileNotFoundError as exc:
+            return {
+                'success': False,
+                'error': f'Binary merge failed: {exc}',
                 'stdout': all_stdout,
                 'stderr': all_stderr,
             }
+
+        binary_b64 = base64.b64encode(merged_path.read_bytes()).decode('ascii')
+        logger.info(f'[espidf] Compilation successful — {len(binary_b64) // 1024} KB (base64), has_wifi={has_wifi}')
+
+        return {
+            'success': True,
+            'hex_content': None,
+            'binary_content': binary_b64,
+            'binary_type': 'bin',
+            'has_wifi': has_wifi,
+            'stdout': all_stdout,
+            'stderr': all_stderr,
+        }
 
 
 # Singleton instance
