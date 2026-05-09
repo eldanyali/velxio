@@ -944,10 +944,29 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
         const b64 = uint8ArrayToBase64(padToFlashSize(firmware, board.boardKind));
         esp32Bridge.loadFirmware(b64);
 
-        // Queue code injection for after REPL boots
+        // Queue code injection for after REPL boots. Multi-file projects:
+        // every .py file other than the entry point gets materialized to the
+        // MicroPython filesystem (via a prelude executed inside the same raw
+        // REPL paste) before main.py runs, so `import mylib` resolves.
+        // Without this, ESP32 projects with helper modules crashed at runtime
+        // with ModuleNotFoundError.
         const mainFile = files.find((f) => f.name === 'main.py') ?? files[0];
         if (mainFile) {
-          esp32Bridge.setPendingMicroPythonCode(mainFile.content);
+          const auxFiles = files.filter(
+            (f) => f !== mainFile && f.name.endsWith('.py'),
+          );
+          const preludeLines = auxFiles.map((f) => {
+            // JSON.stringify produces an ASCII-safe Python-compatible
+            // string literal (both languages share the same \n \r \t \" \\
+            // escapes, and JSON does not emit any escape Python rejects).
+            const lit = JSON.stringify(f.content);
+            const path = JSON.stringify(f.name);
+            return `with open(${path},'w') as _f:\n    _f.write(${lit})`;
+          });
+          const prelude = preludeLines.length
+            ? preludeLines.join('\n') + '\n'
+            : '';
+          esp32Bridge.setPendingMicroPythonCode(prelude + mainFile.content);
         }
       } else {
         // RP2040 path: load firmware + filesystem in browser
