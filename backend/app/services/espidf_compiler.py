@@ -986,6 +986,13 @@ class ESPIDFCompiler:
             ninja_cmd = ['ninja']
             logger.info('[espidf] Building with ninja...')
 
+            # Cold ESP-IDF builds with external Arduino libraries (e.g. Adafruit
+            # BMP280 + BusIO + Unified Sensor → ~1480 build steps) regularly take
+            # 5-7 minutes on modest hardware. 300s used to cut them off at 98%;
+            # bump to 600s so first-run cold compiles complete. Subsequent
+            # builds reuse ninja's cache and finish in seconds.
+            NINJA_TIMEOUT_S = 600
+
             def _run_ninja():
                 return subprocess.run(
                     ninja_cmd,
@@ -993,7 +1000,7 @@ class ESPIDFCompiler:
                     capture_output=True,
                     text=True,
                     env=env,
-                    timeout=300,
+                    timeout=NINJA_TIMEOUT_S,
                 )
 
             try:
@@ -1001,7 +1008,7 @@ class ESPIDFCompiler:
             except subprocess.TimeoutExpired:
                 return {
                     'success': False,
-                    'error': 'ESP-IDF build timed out (300s)',
+                    'error': f'ESP-IDF build timed out ({NINJA_TIMEOUT_S}s)',
                     'stdout': '',
                     'stderr': '',
                 }
