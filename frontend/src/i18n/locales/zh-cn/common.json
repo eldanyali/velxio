@@ -34,6 +34,12 @@
       "ctaGithub": "在 GitHub 上查看",
       "trustLine": "无需注册 · 100% 在浏览器中运行 · 免费且开源",
       "imageAlt": "Velxio 编辑器中的 Arduino Uno 红绿灯电路"
+    },
+    "boards": {
+      "label": "支持的硬件",
+      "titleLine1": "每种架构。",
+      "titleLine2": "一个工具。",
+      "subtitle": "覆盖 5 种 CPU 架构的 19 款开发板 —— AVR8、ARM Cortex-M0+、RISC-V、Xtensa 和 Linux。全部在本地运行，无需云端。"
     }
   }
 }

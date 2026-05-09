@@ -859,16 +859,13 @@ export const LandingPage: React.FC = () => {
       {/* Boards */}
       <section className="landing-section">
         <div className="section-header">
-          <span className="section-label">Supported Hardware</span>
+          <span className="section-label">{t('landing.boards.label')}</span>
           <h2 className="section-title">
-            Every architecture.
+            {t('landing.boards.titleLine1')}
             <br />
-            One tool.
+            {t('landing.boards.titleLine2')}
           </h2>
-          <p className="section-sub">
-            19 boards across 5 CPU architectures — AVR8, ARM Cortex-M0+, RISC-V, Xtensa, and Linux.
-            All running locally, no cloud needed.
-          </p>
+          <p className="section-sub">{t('landing.boards.subtitle')}</p>
         </div>
 
         {/* ── AVR8 · avr8js ────────────────────────────────────────── */}

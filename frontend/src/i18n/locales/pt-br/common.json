@@ -34,6 +34,12 @@
       "ctaGithub": "Ver no GitHub",
       "trustLine": "Sem cadastro · Roda 100% no seu navegador · Gratuito e de código aberto",
       "imageAlt": "Editor Velxio com um circuito de semáforo em Arduino Uno"
+    },
+    "boards": {
+      "label": "Hardware suportado",
+      "titleLine1": "Toda arquitetura.",
+      "titleLine2": "Uma única ferramenta.",
+      "subtitle": "19 placas em 5 arquiteturas de CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa e Linux. Tudo executa localmente, sem nuvem."
     }
   }
 }

@@ -34,6 +34,12 @@
       "ctaGithub": "Auf GitHub ansehen",
       "trustLine": "Keine Anmeldung · Läuft zu 100% im Browser · Kostenlos und Open Source",
       "imageAlt": "Velxio-Editor mit einer Ampelschaltung auf Arduino Uno"
+    },
+    "boards": {
+      "label": "Unterstützte Hardware",
+      "titleLine1": "Jede Architektur.",
+      "titleLine2": "Ein Tool.",
+      "subtitle": "19 Boards über 5 CPU-Architekturen — AVR8, ARM Cortex-M0+, RISC-V, Xtensa und Linux. Alles lokal, ohne Cloud."
     }
   }
 }

@@ -34,6 +34,12 @@
       "ctaGithub": "Voir sur GitHub",
       "trustLine": "Aucune inscription · Fonctionne 100% dans votre navigateur · Gratuit et open-source",
       "imageAlt": "Éditeur Velxio avec un circuit de feux tricolores sur Arduino Uno"
+    },
+    "boards": {
+      "label": "Matériel pris en charge",
+      "titleLine1": "Toutes les architectures.",
+      "titleLine2": "Un seul outil.",
+      "subtitle": "19 cartes sur 5 architectures CPU — AVR8, ARM Cortex-M0+, RISC-V, Xtensa et Linux. Tout fonctionne en local, sans cloud."
     }
   }
 }

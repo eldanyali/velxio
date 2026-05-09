@@ -34,6 +34,12 @@
       "ctaGithub": "GitHub で見る",
       "trustLine": "登録不要 · ブラウザ内で 100% 動作 · 無料・オープンソース",
       "imageAlt": "Arduino Uno の信号機回路を表示している Velxio エディタ"
+    },
+    "boards": {
+      "label": "対応ハードウェア",
+      "titleLine1": "あらゆるアーキテクチャ。",
+      "titleLine2": "ひとつのツール。",
+      "subtitle": "5 つの CPU アーキテクチャに対応した 19 種のボード — AVR8、ARM Cortex-M0+、RISC-V、Xtensa、Linux。すべてローカルで動作し、クラウドは不要です。"
     }
   }
 }
