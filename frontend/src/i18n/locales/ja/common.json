@@ -69,6 +69,12 @@
         "title": "Monaco Editor + arduino-cli",
         "desc": "VS Code 相当の C++ エディタとマルチファイルワークスペース。ローカルの arduino-cli が実際の .hex / .uf2 / .bin ファイルにコンパイルします — クラウドへの往復は不要です。"
       }
+    },
+    "support": {
+      "title": "プロジェクトを支援する",
+      "subtitle": "Velxio は無料・オープンソースです。あなたの時間を節約できたなら、ぜひ開発の支援をご検討ください。",
+      "ctaSponsors": "GitHub Sponsors",
+      "ctaPaypal": "PayPal で寄付する"
     }
   }
 }

@@ -69,6 +69,12 @@
         "title": "Monaco Editor + arduino-cli",
         "desc": "Editor C++ no nível VS Code com workspace multi-arquivo. arduino-cli local compila para arquivos .hex / .uf2 / .bin reais — sem ida-e-volta à nuvem."
       }
+    },
+    "support": {
+      "title": "Apoie o projeto",
+      "subtitle": "Velxio é gratuito e de código aberto. Se ele te poupa tempo, considere apoiar seu desenvolvimento.",
+      "ctaSponsors": "GitHub Sponsors",
+      "ctaPaypal": "Doar via PayPal"
     }
   }
 }
