@@ -185,6 +185,12 @@ ENV ARDUINO_ESP32_PATH=/opt/arduino-esp32
 # image rebuild — still better than no cache.
 ENV CCACHE_DIR=/var/cache/ccache
 ENV IDF_CCACHE_ENABLE=1
+# CCACHE_BASEDIR makes ccache treat absolute paths under this prefix as
+# relative when computing the cache key. Combined with the persistent
+# /var/lib/velxio-build/<target>/ build dir we mount as a volume, this lets
+# ccache hit across compiles even though some flags (-I, -fmacro-prefix-map)
+# embed absolute paths into the command line.
+ENV CCACHE_BASEDIR=/var/lib/velxio-build
 RUN mkdir -p /var/cache/ccache \
     && ccache --max-size=2G \
     && ccache --set-config=compression=true \

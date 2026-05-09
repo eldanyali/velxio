@@ -28,10 +28,17 @@ services:
       # to disable without changing the Dockerfile.
       - IDF_CCACHE_ENABLE=1
       - CCACHE_DIR=/var/cache/ccache
+      # Persistent ESP-IDF build dir (one per board target). Lets ninja's
+      # incremental cache + ccache hits combine across compiles, taking warm
+      # builds from ~5-7 min to ~5-30s. Set VELXIO_PERSISTENT_BUILD_DIR=0
+      # to disable without rebuilding the image (fallback to per-compile
+      # tempfile.TemporaryDirectory behaviour).
+      - VELXIO_PERSISTENT_BUILD_DIR=1
     volumes:
       - ./data:/app/data
       - arduino-libs:/root/.arduino15
       - ccache:/var/cache/ccache
+      - velxio-build:/var/lib/velxio-build
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s
@@ -42,3 +49,4 @@ services:
 volumes:
   arduino-libs:
   ccache:
+  velxio-build:
