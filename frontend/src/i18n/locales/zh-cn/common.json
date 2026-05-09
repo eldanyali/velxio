@@ -77,6 +77,40 @@
       "ctaPaypal": "通过 PayPal 捐赠"
     }
   },
+  "examples": {
+    "heading": "精选项目",
+    "subtitle": "浏览并运行示例项目 —— 按开发板分类",
+    "searchPlaceholder": "搜索示例 —— 试试 'esp32 oled'、'blink'、'dht'…",
+    "searchLabel": "搜索示例",
+    "clearSearch": "清除搜索",
+    "clear": "清除",
+    "matchCount_other": "{{count}} 个结果",
+    "filters": {
+      "categoryLabel": "分类：",
+      "difficultyLabel": "难度：",
+      "category": {
+        "all": "全部",
+        "basics": "基础",
+        "sensors": "传感器",
+        "displays": "显示器",
+        "communication": "通信",
+        "games": "游戏",
+        "robotics": "机器人",
+        "circuits": "电路"
+      },
+      "difficulty": {
+        "all": "全部",
+        "beginner": "入门",
+        "intermediate": "中级",
+        "advanced": "高级"
+      }
+    },
+    "copyLink": "复制可分享链接",
+    "empty": "在所选筛选条件下未找到示例",
+    "emptyForQuery": "在所选筛选条件下未找到与「{{query}}」匹配的示例",
+    "resetFilters": "重置筛选",
+    "installing": "正在安装库（{{done}}/{{total}}）"
+  },
   "about": {
     "hero": {
       "title": "关于 Velxio",

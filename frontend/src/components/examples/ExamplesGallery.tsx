@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { exampleProjects, type ExampleProject } from '../../data/examples';
 import { ExampleThumbnail } from './ExampleThumbnail';
 import './ExamplesGallery.css';
@@ -44,6 +45,7 @@ function getBoardFilter(example: ExampleProject): string {
 }
 
 export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample }) => {
+  const { t } = useTranslation();
   const [selectedBoard, setSelectedBoard] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<ExampleProject['category'] | 'all'>(
     'all',
@@ -193,8 +195,8 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
   return (
     <div className="examples-gallery">
       <div className="examples-header">
-        <h1>Featured Projects</h1>
-        <p>Explore and run example projects — organized by board</p>
+        <h1>{t('examples.heading')}</h1>
+        <p>{t('examples.subtitle')}</p>
       </div>
 
       {/* Search */}
@@ -218,18 +220,18 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
           <input
             type="search"
             className="examples-search-input"
-            placeholder="Search examples — try 'esp32 oled', 'blink', 'dht'…"
+            placeholder={t('examples.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Search examples"
+            aria-label={t('examples.searchLabel')}
           />
           {search && (
             <button
               type="button"
               className="examples-search-clear"
               onClick={() => setSearch('')}
-              aria-label="Clear search"
-              title="Clear"
+              aria-label={t('examples.clearSearch')}
+              title={t('examples.clear')}
             >
               ×
             </button>
@@ -237,8 +239,7 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
         </div>
         {searchTokens.length > 0 && (
           <span className="examples-search-count">
-            {filteredExamples.length} match
-            {filteredExamples.length === 1 ? '' : 'es'}
+            {t('examples.matchCount', { count: filteredExamples.length })}
           </span>
         )}
       </div>
@@ -267,7 +268,7 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
       {/* Category + Difficulty filters */}
       <div className="examples-filters">
         <div className="filter-group">
-          <label>Category:</label>
+          <label>{t('examples.filters.categoryLabel')}</label>
           <div className="filter-buttons">
             {(
               [
@@ -287,14 +288,14 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
                 onClick={() => setSelectedCategory(cat)}
               >
                 {cat !== 'all' && getCategoryIcon(cat as ExampleProject['category'])}{' '}
-                {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {t(`examples.filters.category.${cat}`)}
               </button>
             ))}
           </div>
         </div>
 
         <div className="filter-group">
-          <label>Difficulty:</label>
+          <label>{t('examples.filters.difficultyLabel')}</label>
           <div className="filter-buttons">
             {(['all', 'beginner', 'intermediate', 'advanced'] as const).map((diff) => (
               <button
@@ -302,7 +303,7 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
                 className={`filter-button ${selectedDifficulty === diff ? 'active' : ''}`}
                 onClick={() => setSelectedDifficulty(diff)}
               >
-                {diff === 'all' ? 'All' : diff.charAt(0).toUpperCase() + diff.slice(1)}
+                {t(`examples.filters.difficulty.${diff}`)}
               </button>
             ))}
           </div>
@@ -356,7 +357,7 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
                   <button
                     className="example-copy-link"
                     onClick={(e) => handleCopyLink(e, example.id)}
-                    title="Copy shareable link"
+                    title={t('examples.copyLink')}
                   >
                     {copiedId === example.id ? (
                       <svg
@@ -397,9 +398,9 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
       {filteredExamples.length === 0 && (
         <div className="examples-empty">
           <p>
-            No examples found
-            {searchTokens.length > 0 ? ` for "${search.trim()}"` : ''} with the
-            selected filters
+            {searchTokens.length > 0
+              ? t('examples.emptyForQuery', { query: search.trim() })
+              : t('examples.empty')}
           </p>
           {(searchTokens.length > 0 ||
             selectedBoard !== 'all' ||
@@ -414,7 +415,7 @@ export const ExamplesGallery: React.FC<ExamplesGalleryProps> = ({ onLoadExample 
                 setSelectedDifficulty('all');
               }}
             >
-              Reset filters
+              {t('examples.resetFilters')}
             </button>
           )}
         </div>

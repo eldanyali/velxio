@@ -77,6 +77,40 @@
       "ctaPaypal": "PayPal で寄付する"
     }
   },
+  "examples": {
+    "heading": "おすすめプロジェクト",
+    "subtitle": "サンプルプロジェクトを探して実行 — ボード別に整理",
+    "searchPlaceholder": "サンプルを検索 — 例：「esp32 oled」「blink」「dht」…",
+    "searchLabel": "サンプルを検索",
+    "clearSearch": "検索をクリア",
+    "clear": "クリア",
+    "matchCount_other": "{{count}} 件",
+    "filters": {
+      "categoryLabel": "カテゴリ：",
+      "difficultyLabel": "難易度：",
+      "category": {
+        "all": "すべて",
+        "basics": "基礎",
+        "sensors": "センサー",
+        "displays": "ディスプレイ",
+        "communication": "通信",
+        "games": "ゲーム",
+        "robotics": "ロボティクス",
+        "circuits": "回路"
+      },
+      "difficulty": {
+        "all": "すべて",
+        "beginner": "初級",
+        "intermediate": "中級",
+        "advanced": "上級"
+      }
+    },
+    "copyLink": "共有リンクをコピー",
+    "empty": "選択したフィルタに一致するサンプルが見つかりません",
+    "emptyForQuery": "「{{query}}」に一致するサンプルが見つかりません（選択したフィルタ条件で）",
+    "resetFilters": "フィルタをリセット",
+    "installing": "ライブラリをインストール中（{{done}}/{{total}}）"
+  },
   "about": {
     "hero": {
       "title": "Velxio について",

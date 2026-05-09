@@ -77,6 +77,41 @@
       "ctaPaypal": "Donar con PayPal"
     }
   },
+  "examples": {
+    "heading": "Proyectos destacados",
+    "subtitle": "Explora y ejecuta proyectos de ejemplo — organizados por placa",
+    "searchPlaceholder": "Buscar ejemplos — prueba 'esp32 oled', 'blink', 'dht'…",
+    "searchLabel": "Buscar ejemplos",
+    "clearSearch": "Limpiar búsqueda",
+    "clear": "Limpiar",
+    "matchCount_one": "{{count}} coincidencia",
+    "matchCount_other": "{{count}} coincidencias",
+    "filters": {
+      "categoryLabel": "Categoría:",
+      "difficultyLabel": "Dificultad:",
+      "category": {
+        "all": "Todas",
+        "basics": "Básicos",
+        "sensors": "Sensores",
+        "displays": "Pantallas",
+        "communication": "Comunicación",
+        "games": "Juegos",
+        "robotics": "Robótica",
+        "circuits": "Circuitos"
+      },
+      "difficulty": {
+        "all": "Todas",
+        "beginner": "Principiante",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzado"
+      }
+    },
+    "copyLink": "Copiar enlace para compartir",
+    "empty": "No se encontraron ejemplos con los filtros seleccionados",
+    "emptyForQuery": "No se encontraron ejemplos para \"{{query}}\" con los filtros seleccionados",
+    "resetFilters": "Restablecer filtros",
+    "installing": "Instalando librerías ({{done}}/{{total}})"
+  },
   "about": {
     "hero": {
       "title": "Acerca de Velxio",

@@ -77,6 +77,43 @@
       "ctaPaypal": "Пожертвовать через PayPal"
     }
   },
+  "examples": {
+    "heading": "Избранные проекты",
+    "subtitle": "Изучайте и запускайте примеры — сгруппированные по плате",
+    "searchPlaceholder": "Поиск примеров — попробуйте 'esp32 oled', 'blink', 'dht'…",
+    "searchLabel": "Поиск примеров",
+    "clearSearch": "Очистить поиск",
+    "clear": "Очистить",
+    "matchCount_one": "{{count}} совпадение",
+    "matchCount_few": "{{count}} совпадения",
+    "matchCount_many": "{{count}} совпадений",
+    "matchCount_other": "{{count}} совпадений",
+    "filters": {
+      "categoryLabel": "Категория:",
+      "difficultyLabel": "Сложность:",
+      "category": {
+        "all": "Все",
+        "basics": "Основы",
+        "sensors": "Датчики",
+        "displays": "Дисплеи",
+        "communication": "Связь",
+        "games": "Игры",
+        "robotics": "Робототехника",
+        "circuits": "Схемы"
+      },
+      "difficulty": {
+        "all": "Все",
+        "beginner": "Новичок",
+        "intermediate": "Средний",
+        "advanced": "Продвинутый"
+      }
+    },
+    "copyLink": "Скопировать ссылку для шаринга",
+    "empty": "Не найдено примеров с выбранными фильтрами",
+    "emptyForQuery": "Не найдено примеров по запросу «{{query}}» с выбранными фильтрами",
+    "resetFilters": "Сбросить фильтры",
+    "installing": "Установка библиотек ({{done}}/{{total}})"
+  },
   "about": {
     "hero": {
       "title": "О Velxio",

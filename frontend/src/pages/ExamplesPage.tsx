@@ -6,14 +6,18 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ExamplesGallery } from '../components/examples/ExamplesGallery';
 import { AppHeader } from '../components/layout/AppHeader';
+import { useLocalizedHref } from '../i18n/useLocalizedNavigate';
 import { useSEO } from '../utils/useSEO';
 import { getSeoMeta } from '../seoRoutes';
 import { loadExample, type LibraryInstallProgress } from '../utils/loadExample';
 import type { ExampleProject } from '../data/examples';
 
 export const ExamplesPage: React.FC = () => {
+  const { t } = useTranslation();
+  const localize = useLocalizedHref();
   useSEO(getSeoMeta('/examples')!);
 
   const navigate = useNavigate();
@@ -21,7 +25,7 @@ export const ExamplesPage: React.FC = () => {
 
   const handleLoadExample = async (example: ExampleProject) => {
     await loadExample(example, setInstalling);
-    navigate('/editor');
+    navigate(localize('/editor'));
   };
 
   return (
@@ -61,7 +65,10 @@ export const ExamplesPage: React.FC = () => {
             }}
           >
             <div style={{ fontSize: 14, color: '#ccc', marginBottom: 12 }}>
-              Installing libraries ({installing.done + 1}/{installing.total})
+              {t('examples.installing', {
+                done: installing.done + 1,
+                total: installing.total,
+              })}
             </div>
             <div style={{ fontSize: 16, color: '#00e5ff', fontWeight: 600, marginBottom: 16 }}>
               {installing.current}
