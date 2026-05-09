@@ -333,6 +333,42 @@
       "loadingInstalled": "Chargement des bibliothèques installées...",
       "noneInstalled": "Aucune bibliothèque installée pour le moment.",
       "useSearchTab": "Utilisez l'onglet Rechercher pour installer des bibliothèques."
+    },
+    "installLibs": {
+      "title": "BIBLIOTHÈQUES REQUISES",
+      "installingProgress": "Installation {{done}} sur {{total}}…",
+      "allDone": "Toutes les bibliothèques ont été installées avec succès",
+      "required_one": "Ce projet nécessite {{count}} bibliothèque. Installez-la pour compiler correctement.",
+      "required_other": "Ce projet nécessite {{count}} bibliothèques. Installez-les pour compiler correctement.",
+      "wokwiHosted": "Bibliothèque hébergée par Wokwi",
+      "pending": "en attente",
+      "installing": "installation…",
+      "installed": "installée",
+      "errorStatus": "erreur",
+      "close": "Fermer",
+      "skip": "Ignorer",
+      "installAll": "Tout installer ({{count}})",
+      "installingShort": "Installation…"
+    },
+    "serial": {
+      "title": "Moniteur série",
+      "addBoard": "Ajoutez une carte pour démarrer le moniteur série.",
+      "autoscroll": "Défilement auto",
+      "clearTitle": "Effacer la sortie de cette carte",
+      "clear": "Effacer",
+      "send": "Envoyer",
+      "iotGatewayTitle": "Cliquez pour ouvrir via IoT Gateway",
+      "openIotGateway": "Ouvrir IoT Gateway",
+      "waitingData": "En attente de données série...",
+      "startSim": "Démarrez la simulation pour voir la sortie série.",
+      "placeholderText": "Tapez un message à envoyer...",
+      "placeholderPython": "Tapez une expression Python... (Ctrl+C pour interrompre)",
+      "lineEnd": {
+        "none": "Aucune fin de ligne",
+        "nl": "Nouvelle ligne",
+        "cr": "Retour chariot",
+        "both": "NL et CR"
+      }
     }
   }
 }

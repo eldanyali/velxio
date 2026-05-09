@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSimulatorStore } from '../../store/useSimulatorStore';
 import { getTabSessionId } from '../../simulation/Esp32Bridge';
 import type { BoardKind } from '../../types/board';
@@ -71,6 +72,7 @@ const BOARD_COLOR: Partial<Record<string, string>> = {
 };
 
 export const SerialMonitor: React.FC = () => {
+  const { t } = useTranslation();
   const boards = useSimulatorStore((s) => s.boards);
   const activeBoardId = useSimulatorStore((s) => s.activeBoardId);
   const serialWriteToBoard = useSimulatorStore((s) => s.serialWriteToBoard);
@@ -176,9 +178,9 @@ export const SerialMonitor: React.FC = () => {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <span style={styles.title}>Serial Monitor</span>
+          <span style={styles.title}>{t('editor.serial.title')}</span>
         </div>
-        <pre style={styles.output}>Add a board to start the serial monitor.</pre>
+        <pre style={styles.output}>{t('editor.serial.addBoard')}</pre>
       </div>
     );
   }
@@ -231,14 +233,14 @@ export const SerialMonitor: React.FC = () => {
               onChange={(e) => setAutoscroll(e.target.checked)}
               style={styles.checkbox}
             />
-            Autoscroll
+            {t('editor.serial.autoscroll')}
           </label>
           <button
             onClick={() => resolvedTabId && clearBoardSerialOutput(resolvedTabId)}
             style={styles.clearBtn}
-            title="Clear output for this board"
+            title={t('editor.serial.clearTitle')}
           >
-            Clear
+            {t('editor.serial.clear')}
           </button>
         </div>
       </div>
@@ -284,9 +286,9 @@ export const SerialMonitor: React.FC = () => {
                         fontWeight: 'bold',
                         cursor: 'pointer',
                       }}
-                      title="Click to open through IoT Gateway"
+                      title={t('editor.serial.iotGatewayTitle')}
                     >
-                      {m[0]} (Open IoT Gateway ↗)
+                      {m[0]} ({t('editor.serial.openIotGateway')} ↗)
                     </a>,
                   );
                   lastIdx = end;
@@ -297,8 +299,8 @@ export const SerialMonitor: React.FC = () => {
               return text;
             })()
           : activeBoard?.running
-            ? 'Waiting for serial data...\n'
-            : 'Start simulation to see serial output.\n'}
+            ? t('editor.serial.waitingData') + '\n'
+            : t('editor.serial.startSim') + '\n'}
       </pre>
 
       {/* Input row */}
@@ -310,8 +312,8 @@ export const SerialMonitor: React.FC = () => {
           onKeyDown={handleKeyDown}
           placeholder={
             isMicroPython
-              ? 'Type Python expression... (Ctrl+C to interrupt)'
-              : 'Type message to send...'
+              ? t('editor.serial.placeholderPython')
+              : t('editor.serial.placeholderText')
           }
           style={styles.input}
           disabled={!activeBoard?.running}
@@ -321,13 +323,13 @@ export const SerialMonitor: React.FC = () => {
           onChange={(e) => setLineEnding(e.target.value as typeof lineEnding)}
           style={styles.select}
         >
-          <option value="none">No line ending</option>
-          <option value="nl">Newline</option>
-          <option value="cr">Carriage return</option>
-          <option value="both">Both NL &amp; CR</option>
+          <option value="none">{t('editor.serial.lineEnd.none')}</option>
+          <option value="nl">{t('editor.serial.lineEnd.nl')}</option>
+          <option value="cr">{t('editor.serial.lineEnd.cr')}</option>
+          <option value="both">{t('editor.serial.lineEnd.both')}</option>
         </select>
         <button onClick={handleSend} disabled={!activeBoard?.running} style={styles.sendBtn}>
-          Send
+          {t('editor.serial.send')}
         </button>
       </div>
     </div>

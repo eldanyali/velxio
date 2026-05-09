@@ -333,6 +333,42 @@
       "loadingInstalled": "Carregando bibliotecas instaladas...",
       "noneInstalled": "Nenhuma biblioteca instalada ainda.",
       "useSearchTab": "Use a aba Buscar para instalar bibliotecas."
+    },
+    "installLibs": {
+      "title": "BIBLIOTECAS NECESSÁRIAS",
+      "installingProgress": "Instalando {{done}} de {{total}}…",
+      "allDone": "Todas as bibliotecas foram instaladas com sucesso",
+      "required_one": "Este projeto requer {{count}} biblioteca. Instale para compilar corretamente.",
+      "required_other": "Este projeto requer {{count}} bibliotecas. Instale-as para compilar corretamente.",
+      "wokwiHosted": "Biblioteca hospedada na Wokwi",
+      "pending": "pendente",
+      "installing": "instalando…",
+      "installed": "instalada",
+      "errorStatus": "erro",
+      "close": "Fechar",
+      "skip": "Pular",
+      "installAll": "Instalar todas ({{count}})",
+      "installingShort": "Instalando…"
+    },
+    "serial": {
+      "title": "Monitor serial",
+      "addBoard": "Adicione uma placa para iniciar o monitor serial.",
+      "autoscroll": "Autoscroll",
+      "clearTitle": "Limpar a saída desta placa",
+      "clear": "Limpar",
+      "send": "Enviar",
+      "iotGatewayTitle": "Clique para abrir via IoT Gateway",
+      "openIotGateway": "Abrir IoT Gateway",
+      "waitingData": "Aguardando dados serial...",
+      "startSim": "Inicie a simulação para ver a saída serial.",
+      "placeholderText": "Digite uma mensagem para enviar...",
+      "placeholderPython": "Digite expressão Python... (Ctrl+C para interromper)",
+      "lineEnd": {
+        "none": "Sem terminador de linha",
+        "nl": "Nova linha",
+        "cr": "Retorno de carro",
+        "both": "Ambos NL e CR"
+      }
     }
   }
 }

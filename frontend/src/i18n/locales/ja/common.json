@@ -329,6 +329,41 @@
       "loadingInstalled": "インストール済みライブラリを読み込み中...",
       "noneInstalled": "まだライブラリはインストールされていません。",
       "useSearchTab": "ライブラリをインストールするには「検索」タブを使用してください。"
+    },
+    "installLibs": {
+      "title": "必要なライブラリ",
+      "installingProgress": "インストール中 {{done}}/{{total}}…",
+      "allDone": "すべてのライブラリが正常にインストールされました",
+      "required_other": "このプロジェクトには {{count}} 個のライブラリが必要です。正しくコンパイルするためにインストールしてください。",
+      "wokwiHosted": "Wokwi 提供ライブラリ",
+      "pending": "待機中",
+      "installing": "インストール中…",
+      "installed": "インストール済み",
+      "errorStatus": "エラー",
+      "close": "閉じる",
+      "skip": "スキップ",
+      "installAll": "すべてインストール（{{count}}）",
+      "installingShort": "インストール中…"
+    },
+    "serial": {
+      "title": "シリアルモニタ",
+      "addBoard": "シリアルモニタを開始するにはボードを追加してください。",
+      "autoscroll": "自動スクロール",
+      "clearTitle": "このボードの出力をクリア",
+      "clear": "クリア",
+      "send": "送信",
+      "iotGatewayTitle": "クリックで IoT Gateway 経由で開く",
+      "openIotGateway": "IoT Gateway を開く",
+      "waitingData": "シリアルデータを待機中...",
+      "startSim": "シミュレーションを開始するとシリアル出力が表示されます。",
+      "placeholderText": "送信するメッセージを入力...",
+      "placeholderPython": "Python 式を入力...（Ctrl+C で中断）",
+      "lineEnd": {
+        "none": "改行なし",
+        "nl": "LF（改行）",
+        "cr": "CR（復帰）",
+        "both": "NL と CR"
+      }
     }
   }
 }

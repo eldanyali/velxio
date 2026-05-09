@@ -329,6 +329,41 @@
       "loadingInstalled": "正在加载已安装的库...",
       "noneInstalled": "尚未安装任何库。",
       "useSearchTab": "请在「搜索」标签中安装库。"
+    },
+    "installLibs": {
+      "title": "所需的库",
+      "installingProgress": "正在安装 {{done}}/{{total}}…",
+      "allDone": "所有库已成功安装",
+      "required_other": "本项目需要 {{count}} 个库。请安装以便正确编译。",
+      "wokwiHosted": "由 Wokwi 托管的库",
+      "pending": "待安装",
+      "installing": "正在安装…",
+      "installed": "已安装",
+      "errorStatus": "错误",
+      "close": "关闭",
+      "skip": "跳过",
+      "installAll": "全部安装（{{count}}）",
+      "installingShort": "正在安装…"
+    },
+    "serial": {
+      "title": "串口监视器",
+      "addBoard": "请先添加开发板以启动串口监视器。",
+      "autoscroll": "自动滚动",
+      "clearTitle": "清空此开发板的输出",
+      "clear": "清空",
+      "send": "发送",
+      "iotGatewayTitle": "点击通过 IoT Gateway 打开",
+      "openIotGateway": "打开 IoT Gateway",
+      "waitingData": "等待串口数据...",
+      "startSim": "启动仿真以查看串口输出。",
+      "placeholderText": "输入要发送的消息...",
+      "placeholderPython": "输入 Python 表达式...（按 Ctrl+C 中断）",
+      "lineEnd": {
+        "none": "无行结束符",
+        "nl": "换行符",
+        "cr": "回车符",
+        "both": "换行 + 回车"
+      }
     }
   }
 }

@@ -333,6 +333,42 @@
       "loadingInstalled": "Installierte Bibliotheken werden geladen...",
       "noneInstalled": "Noch keine Bibliotheken installiert.",
       "useSearchTab": "Nutze den Tab Suchen, um Bibliotheken zu installieren."
+    },
+    "installLibs": {
+      "title": "ERFORDERLICHE BIBLIOTHEKEN",
+      "installingProgress": "Installiere {{done}} von {{total}}…",
+      "allDone": "Alle Bibliotheken erfolgreich installiert",
+      "required_one": "Dieses Projekt benötigt {{count}} Bibliothek. Installiere sie, um korrekt zu kompilieren.",
+      "required_other": "Dieses Projekt benötigt {{count}} Bibliotheken. Installiere sie, um korrekt zu kompilieren.",
+      "wokwiHosted": "Von Wokwi gehostete Bibliothek",
+      "pending": "ausstehend",
+      "installing": "installiere…",
+      "installed": "installiert",
+      "errorStatus": "Fehler",
+      "close": "Schließen",
+      "skip": "Überspringen",
+      "installAll": "Alle installieren ({{count}})",
+      "installingShort": "Installiere…"
+    },
+    "serial": {
+      "title": "Serial Monitor",
+      "addBoard": "Füge ein Board hinzu, um den Serial Monitor zu starten.",
+      "autoscroll": "Auto-Scroll",
+      "clearTitle": "Ausgabe dieses Boards löschen",
+      "clear": "Löschen",
+      "send": "Senden",
+      "iotGatewayTitle": "Klicken, um über IoT Gateway zu öffnen",
+      "openIotGateway": "IoT Gateway öffnen",
+      "waitingData": "Warte auf serielle Daten...",
+      "startSim": "Starte die Simulation, um serielle Ausgabe zu sehen.",
+      "placeholderText": "Nachricht zum Senden eingeben...",
+      "placeholderPython": "Python-Ausdruck eingeben... (Strg+C zum Abbrechen)",
+      "lineEnd": {
+        "none": "Kein Zeilenende",
+        "nl": "Zeilenumbruch",
+        "cr": "Wagenrücklauf",
+        "both": "NL und CR"
+      }
     }
   }
 }

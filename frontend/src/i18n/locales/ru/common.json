@@ -341,6 +341,44 @@
       "loadingInstalled": "Загрузка установленных библиотек...",
       "noneInstalled": "Пока нет установленных библиотек.",
       "useSearchTab": "Используйте вкладку Поиск, чтобы установить библиотеки."
+    },
+    "installLibs": {
+      "title": "ТРЕБУЕМЫЕ БИБЛИОТЕКИ",
+      "installingProgress": "Установка {{done}} из {{total}}…",
+      "allDone": "Все библиотеки успешно установлены",
+      "required_one": "Этому проекту нужна {{count}} библиотека. Установите её, чтобы корректно скомпилировать.",
+      "required_few": "Этому проекту нужны {{count}} библиотеки. Установите их, чтобы корректно скомпилировать.",
+      "required_many": "Этому проекту нужны {{count}} библиотек. Установите их, чтобы корректно скомпилировать.",
+      "required_other": "Этому проекту нужны {{count}} библиотек. Установите их, чтобы корректно скомпилировать.",
+      "wokwiHosted": "Библиотека на серверах Wokwi",
+      "pending": "в очереди",
+      "installing": "устанавливается…",
+      "installed": "установлена",
+      "errorStatus": "ошибка",
+      "close": "Закрыть",
+      "skip": "Пропустить",
+      "installAll": "Установить всё ({{count}})",
+      "installingShort": "Установка…"
+    },
+    "serial": {
+      "title": "Serial Monitor",
+      "addBoard": "Добавьте плату, чтобы запустить Serial Monitor.",
+      "autoscroll": "Автопрокрутка",
+      "clearTitle": "Очистить вывод для этой платы",
+      "clear": "Очистить",
+      "send": "Отправить",
+      "iotGatewayTitle": "Нажмите, чтобы открыть через IoT Gateway",
+      "openIotGateway": "Открыть IoT Gateway",
+      "waitingData": "Ожидание serial-данных...",
+      "startSim": "Запустите симуляцию, чтобы увидеть serial-вывод.",
+      "placeholderText": "Введите сообщение для отправки...",
+      "placeholderPython": "Введите Python-выражение... (Ctrl+C — прерывание)",
+      "lineEnd": {
+        "none": "Без перевода строки",
+        "nl": "Newline",
+        "cr": "Carriage return",
+        "both": "NL и CR"
+      }
     }
   }
 }
