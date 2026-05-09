@@ -198,8 +198,38 @@ export const EditorToolbar = ({
         name: f.name,
         content: f.content,
       }));
-      const result = await compileCode(sketchFiles, fqbn, currentProject?.id ?? null);
 
+      // Stream live cmake + ninja output into the compilation console as
+      // it arrives, instead of waiting for the whole build to finish.
+      // Each poll the backend returns the cumulative stdout buffer; we
+      // append only the delta since the previous call as 'info' lines.
+      let lastStreamedLen = 0;
+      const result = await compileCode(
+        sketchFiles,
+        fqbn,
+        currentProject?.id ?? null,
+        ({ stdout }) => {
+          if (stdout.length <= lastStreamedLen) return;
+          const delta = stdout.slice(lastStreamedLen);
+          lastStreamedLen = stdout.length;
+          const newLines = delta.split('\n').filter((s) => s.trim());
+          if (!newLines.length) return;
+          const now = new Date();
+          setCompileLogs((prev: CompilationLog[]) => [
+            ...prev,
+            ...newLines.map((line) => ({
+              timestamp: now,
+              type: 'info' as const,
+              message: line,
+            })),
+          ]);
+        },
+      );
+
+      // After the build settles, append the structured analysis on top of
+      // the live stream — parseCompileResult highlights FAILED blocks and
+      // tags compiler errors with type='error', which the console uses for
+      // colour + the auto-switch-to-errors filter.
       const resultLogs = parseCompileResult(result, boardLabel);
       setCompileLogs((prev: CompilationLog[]) => [...prev, ...resultLogs]);
 
@@ -456,7 +486,31 @@ export const EditorToolbar = ({
       try {
         const groupFiles = useEditorStore.getState().getGroupFiles(board.activeFileGroupId);
         const sketchFiles = groupFiles.map((f) => ({ name: f.name, content: f.content }));
-        const result = await compileCode(sketchFiles, fqbn, currentProject?.id ?? null);
+
+        // Stream live cmake + ninja output per-board (Compile-All flow).
+        let lastStreamedLen = 0;
+        const result = await compileCode(
+          sketchFiles,
+          fqbn,
+          currentProject?.id ?? null,
+          ({ stdout }) => {
+            if (stdout.length <= lastStreamedLen) return;
+            const delta = stdout.slice(lastStreamedLen);
+            lastStreamedLen = stdout.length;
+            const newLines = delta.split('\n').filter((s) => s.trim());
+            if (!newLines.length) return;
+            const now = new Date();
+            setCompileLogs((prev: CompilationLog[]) => [
+              ...prev,
+              ...newLines.map((line) => ({
+                timestamp: now,
+                type: 'info' as const,
+                message: `${label}: ${line}`,
+              })),
+            ]);
+          },
+        );
+
         const resultLogs = parseCompileResult(result, label);
         setCompileLogs((prev: CompilationLog[]) => [...prev, ...resultLogs]);
 

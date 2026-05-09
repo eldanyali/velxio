@@ -27,9 +27,22 @@ interface CompileStatusResponse {
   state: 'pending' | 'running' | 'done' | 'error';
   started_at: number;
   finished_at: number | null;
+  stdout: string;
   result: CompileResult | null;
   error: string | null;
 }
+
+/**
+ * Live progress callback — called on every poll while state ∈ {pending,
+ * running}. `stdout` is the full live cmake + ninja output captured so far
+ * (cap of ~256 KB on the server side, tail kept). Caller can compute a
+ * delta against the previous call if it wants to append-only render.
+ */
+export type CompileProgress = (info: {
+  state: 'pending' | 'running';
+  stdout: string;
+  elapsedSeconds: number;
+}) => void;
 
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_DURATION_MS = 15 * 60 * 1000; // 15 minutes — covers cold ESP-IDF builds
@@ -40,16 +53,21 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
  * Compile a sketch via the async job pipeline.
  *
  *   POST /compile/start                  → { job_id }
- *   GET  /compile/status/<job_id>  (×N)  → { state, result?, error? }
+ *   GET  /compile/status/<job_id>  (×N)  → { state, stdout, result?, error? }
  *
  * Each individual request returns in milliseconds, so Cloudflare's 100s edge
  * timeout never kicks in — even when the underlying ESP-IDF cold build runs
  * for 5-7 minutes. Falls back to throwing an Error after MAX_POLL_DURATION_MS.
+ *
+ * `onProgress` (optional): called every poll with the live cmake + ninja
+ * output so the editor can stream the compilation console instead of
+ * waiting for everything at the end.
  */
 export async function compileCode(
   files: SketchFile[],
   board: string = 'arduino:avr:uno',
   projectId?: string | null,
+  onProgress?: CompileProgress,
 ): Promise<CompileResult> {
   console.log('Sending compilation request to:', `${API_BASE}/compile/start`);
   console.log('Board:', board);
@@ -119,10 +137,24 @@ export async function compileCode(
       console.error(`[compile] job ${jobId} errored:`, status.error);
       return {
         success: false,
-        stdout: '',
+        stdout: status.stdout || '',
         stderr: '',
         error: status.error || 'Compile failed',
       };
+    }
+
+    // state ∈ {pending, running} — surface live build output if requested
+    if (onProgress) {
+      try {
+        onProgress({
+          state: status.state,
+          stdout: status.stdout || '',
+          elapsedSeconds: Math.round((Date.now() - startedAt) / 1000),
+        });
+      } catch (err) {
+        // A faulty UI hook must never break the polling loop.
+        console.warn('[compile] onProgress threw:', err);
+      }
     }
 
     await sleep(POLL_INTERVAL_MS);
