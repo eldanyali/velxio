@@ -20,7 +20,8 @@ import './components/velxio-components/EPaperElement';
 import App from './App.tsx';
 
 // Configure monaco-editor for offline use via local static assets
-loader.config({ paths: { vs: '/monaco/vs' } });
+const monacoVsPath = `${import.meta.env.BASE_URL}monaco/vs`;
+loader.config({ paths: { vs: monacoVsPath } });
 
 createRoot(document.getElementById('root')!).render(<App />);
 
