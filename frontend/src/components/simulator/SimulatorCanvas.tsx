@@ -1757,26 +1757,35 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
         !dialogOpen && !isTouchDevice && (wireInProgress || isSelected || isHovered);
       return (
         <React.Fragment key={component.id}>
-          <InstrumentComponent
-            id={component.id}
-            metadataId={component.metadataId}
-            x={component.x}
-            y={component.y}
-            isSelected={isSelected}
-            onMouseDown={(e) => handleComponentMouseDown(component.id, e)}
-          />
-          {!running && (
-            <PinOverlay
-              componentId={component.id}
-              componentX={component.x}
-              componentY={component.y}
-              onPinClick={handlePinClick}
-              showPins={showPinsForComponent}
-              zoom={zoom}
-              wrapperOffsetX={0}
-              wrapperOffsetY={0}
+          <div
+            className="component-interactive-group"
+            onMouseEnter={() => setHoveredComponentId(component.id)}
+            onMouseLeave={() =>
+              setHoveredComponentId((curr) => (curr === component.id ? null : curr))
+            }
+            style={{ display: 'contents' }}
+          >
+            <InstrumentComponent
+              id={component.id}
+              metadataId={component.metadataId}
+              x={component.x}
+              y={component.y}
+              isSelected={isSelected}
+              onMouseDown={(e) => handleComponentMouseDown(component.id, e)}
             />
-          )}
+            {!running && (
+              <PinOverlay
+                componentId={component.id}
+                componentX={component.x}
+                componentY={component.y}
+                onPinClick={handlePinClick}
+                showPins={showPinsForComponent}
+                zoom={zoom}
+                wrapperOffsetX={0}
+                wrapperOffsetY={0}
+              />
+            )}
+          </div>
         </React.Fragment>
       );
     }
@@ -1800,33 +1809,38 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
 
     return (
       <React.Fragment key={component.id}>
-        <DynamicComponent
-          id={component.id}
-          metadata={metadata}
-          properties={component.properties}
-          x={component.x}
-          y={component.y}
-          isSelected={isSelected}
-          onMouseDown={(e) => {
-            handleComponentMouseDown(component.id, e);
-          }}
+        <div
+          className="component-interactive-group"
           onMouseEnter={() => setHoveredComponentId(component.id)}
           onMouseLeave={() =>
             setHoveredComponentId((curr) => (curr === component.id ? null : curr))
           }
-        />
-
-        {/* Pin overlay for wire creation - hide when running */}
-        {!running && (
-          <PinOverlay
-            componentId={component.id}
-            componentX={component.x}
-            componentY={component.y}
-            onPinClick={handlePinClick}
-            showPins={showPinsForComponent}
-            zoom={zoom}
+          style={{ display: 'contents' }}
+        >
+          <DynamicComponent
+            id={component.id}
+            metadata={metadata}
+            properties={component.properties}
+            x={component.x}
+            y={component.y}
+            isSelected={isSelected}
+            onMouseDown={(e) => {
+              handleComponentMouseDown(component.id, e);
+            }}
           />
-        )}
+
+          {/* Pin overlay for wire creation - hide when running */}
+          {!running && (
+            <PinOverlay
+              componentId={component.id}
+              componentX={component.x}
+              componentY={component.y}
+              onPinClick={handlePinClick}
+              showPins={showPinsForComponent}
+              zoom={zoom}
+            />
+          )}
+        </div>
       </React.Fragment>
     );
   };
