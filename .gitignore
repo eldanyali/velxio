@@ -35,6 +35,11 @@ build/
 .DS_Store
 Thumbs.db
 
+# Third-party reference repositories (optional clones — not required to run
+# Velxio). Clone them manually when needed for offline hacking or metadata
+# generation. See CLAUDE.md "Wokwi Libraries" section for details.
+third-party/
+
 # Build outputs
 frontend/dist/
 frontend/.vite/
