@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client';
+import { loader } from '@monaco-editor/react';
 import './index.css';
 // Side-effect import: initialises i18next BEFORE any component renders so
 // useTranslation() always resolves against a live instance. Must come
@@ -17,6 +18,10 @@ import './components/velxio-components/RaspberryPi3Element';
 import './components/velxio-components/Bmp280Element';
 import './components/velxio-components/EPaperElement';
 import App from './App.tsx';
+
+// Configure monaco-editor for offline use via local static assets
+const monacoVsPath = `${import.meta.env.BASE_URL}monaco/vs`;
+loader.config({ paths: { vs: monacoVsPath } });
 
 createRoot(document.getElementById('root')!).render(<App />);
 
