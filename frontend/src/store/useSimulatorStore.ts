@@ -17,6 +17,7 @@ import { Esp32Bridge } from '../simulation/Esp32Bridge';
 import { useEditorStore } from './useEditorStore';
 import { useVfsStore } from './useVfsStore';
 import { boardPinToNumber, isBoardComponent } from '../utils/boardPinMapping';
+import { autoWireColor, DEFAULT_WIRE_COLOR } from '../utils/wireUtils';
 import { createSerialBatcher } from './serialBatcher';
 import {
   bindBoard as icBindBoard,
@@ -1654,12 +1655,16 @@ export const useSimulatorStore = create<SimulatorState>((set, get) => {
       const state = get();
       if (!state.wireInProgress) return;
       const { startEndpoint, waypoints, color } = state.wireInProgress;
+
+      // Finish wire: auto-detect color from pin name
+      const finalColor = color === DEFAULT_WIRE_COLOR ? autoWireColor(endpoint.pinName) : color;
+
       const newWire: Wire = {
         id: `wire-${Date.now()}`,
         start: startEndpoint,
         end: endpoint,
         waypoints,
-        color,
+        color: finalColor,
       };
       set((state) => ({ wires: [...state.wires, newWire], wireInProgress: null }));
     },
