@@ -234,6 +234,7 @@
       "rotate": "Drehen",
       "delete": "Löschen",
       "deselect": "Auswahl aufheben",
+      "changeColor": "Farbe ändern",
       "deleteKind": {
         "wire": "Leitung löschen",
         "component": "Komponente löschen",

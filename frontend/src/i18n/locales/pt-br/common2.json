@@ -234,6 +234,7 @@
       "rotate": "Girar",
       "delete": "Excluir",
       "deselect": "Desselecionar",
+      "changeColor": "Mudar cor",
       "deleteKind": {
         "wire": "Excluir fio",
         "component": "Excluir componente",

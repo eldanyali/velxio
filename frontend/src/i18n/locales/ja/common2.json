@@ -234,6 +234,7 @@
       "rotate": "回転",
       "delete": "削除",
       "deselect": "選択解除",
+      "changeColor": "色を変更",
       "deleteKind": {
         "wire": "配線を削除",
         "component": "コンポーネントを削除",

@@ -234,6 +234,7 @@
       "rotate": "旋转",
       "delete": "删除",
       "deselect": "取消选择",
+      "changeColor": "更改颜色",
       "deleteKind": {
         "wire": "删除导线",
         "component": "删除组件",

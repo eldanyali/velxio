@@ -234,6 +234,7 @@
       "rotate": "Rotar",
       "delete": "Eliminar",
       "deselect": "Deseleccionar",
+      "changeColor": "Cambiar color",
       "deleteKind": {
         "wire": "Eliminar cable",
         "component": "Eliminar componente",
