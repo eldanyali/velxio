@@ -20,7 +20,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
     "check": "npm run lint && npm run format:check",
     "preview": "vite preview",
-    "postinstall": "mkdir -p public/monaco && cp -r node_modules/monaco-editor/min/vs public/monaco/vs",
+    "postinstall": "mkdir -p public/monaco && printf \"*\\n!.gitignore\\n\" > public/monaco/.gitignore && cp -r node_modules/monaco-editor/min/vs public/monaco/vs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
