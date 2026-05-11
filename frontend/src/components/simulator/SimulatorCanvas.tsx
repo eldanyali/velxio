@@ -2351,7 +2351,8 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
                     label="Wire"
                     currentColor={wire?.color}
                     onColorChange={(color) => {
-                      updateWire(selectedWireId, { color });
+                      if (!wire) return;
+                      recordUpdateWire(selectedWireId, { color: wire.color }, { color });
                     }}
                     onDelete={() => {
                       // Recorded so the touch / mobile delete is also undoable.
