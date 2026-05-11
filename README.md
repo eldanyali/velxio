@@ -539,8 +539,16 @@ See [LICENSE](LICENSE) and [COMMERCIAL_LICENSE.md](COMMERCIAL_LICENSE.md) for fu
 - [Wokwi](https://wokwi.com) — Inspiration
 - [avr8js](https://github.com/wokwi/avr8js) — AVR8 emulator
 - [wokwi-elements](https://github.com/wokwi/wokwi-elements) — Electronic web components
+- [wokwi-boards](https://github.com/wokwi/wokwi-boards) — Board SVG assets
+- [wokwi-features](https://github.com/wokwi/wokwi-features) — Wokwi feature definitions
 - [rp2040js](https://github.com/wokwi/rp2040js) — RP2040 emulator
+- [ngspice-wasm](https://github.com/wokwi/ngspice-wasm) — ngspice compiled to WebAssembly (electrical simulation)
 - [lcgamboa/qemu](https://github.com/lcgamboa/qemu) — QEMU fork for ESP32 Xtensa emulation
+- [espressif/qemu](https://github.com/espressif/qemu) — Espressif QEMU ESP32 emulator
+- [esp32-camera](https://github.com/espressif/esp32-camera) — ESP32 camera driver reference
+- [fritzing-parts](https://github.com/fritzing/fritzing-parts) — Electronic component SVG assets
+- [picowi](https://github.com/jbentham/picowi) — Raspberry Pi Pico W WiFi reference
+- [100 Days 100 IoT Projects](https://github.com/velxio/100_Days_100_IoT_Projects) — IoT example projects collection
 - [arduino-cli](https://github.com/arduino/arduino-cli) — Arduino compiler
 - [Monaco Editor](https://microsoft.github.io/monaco-editor/) — Code editor
 - [QEMU](https://www.qemu.org) — Machine emulator (Raspberry Pi 3)
