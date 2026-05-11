@@ -2344,10 +2344,15 @@ export const SimulatorCanvas = ({ headerSlot }: SimulatorCanvasProps = {}) => {
           {!wireInProgress &&
             (() => {
               if (selectedWireId) {
+                const wire = wires.find((w) => w.id === selectedWireId);
                 return (
                   <SelectionActionBar
                     kind="wire"
                     label="Wire"
+                    currentColor={wire?.color}
+                    onColorChange={(color) => {
+                      updateWire(selectedWireId, { color });
+                    }}
                     onDelete={() => {
                       // Recorded so the touch / mobile delete is also undoable.
                       recordRemoveWire(selectedWireId);
