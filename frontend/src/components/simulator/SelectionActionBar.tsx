@@ -18,6 +18,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { WIRE_KEY_COLORS } from '../../utils/wireUtils';
 
 export type SelectionKind = 'wire' | 'component' | 'board';
 
@@ -30,6 +31,8 @@ interface SelectionActionBarProps {
   onDelete: () => void;
   onRotate?: () => void;
   onDeselect: () => void;
+  onColorChange?: (color: string) => void;
+  currentColor?: string;
 }
 
 const ICON_SIZE = 16;
@@ -126,12 +129,16 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
   onDelete,
   onRotate,
   onDeselect,
+  onColorChange,
+  currentColor,
 }) => {
   const { t } = useTranslation();
+  const [showPalette, setShowPalette] = React.useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const deleteRef = useRef<HTMLButtonElement | null>(null);
   const rotateRef = useRef<HTMLButtonElement | null>(null);
   const deselectRef = useRef<HTMLButtonElement | null>(null);
+  const colorToggleRef = useRef<HTMLButtonElement | null>(null);
 
   // Stop native touch events from reaching the canvas listener so it can't
   // call preventDefault on touchend (which would kill the synthetic click).
@@ -154,6 +161,7 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
   useTouchSafeAction(deleteRef, onDelete);
   useTouchSafeAction(rotateRef, onRotate ?? noop);
   useTouchSafeAction(deselectRef, onDeselect);
+  useTouchSafeAction(colorToggleRef, () => setShowPalette(!showPalette));
 
   if (!kind) return null;
 
@@ -163,6 +171,8 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
       role="toolbar"
       aria-label={t('editor.selectionBar.label')}
       className="selection-action-bar"
+      onMouseDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
       style={{
         position: 'absolute',
         top: 12,
@@ -195,6 +205,63 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
       >
         {label}
       </span>
+
+      {kind === 'wire' && onColorChange && (
+        <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+          <button
+            type="button"
+            ref={colorToggleRef}
+            onClick={() => setShowPalette(!showPalette)}
+            style={{ ...buttonStyle, padding: '6px 8px' }}
+            title="Change color"
+          >
+            <div
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                backgroundColor: currentColor || '#22c55e',
+                border: '2px solid rgba(255,255,255,0.2)',
+              }}
+            />
+          </button>
+
+          {showPalette && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                marginTop: 8,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 8,
+                padding: '10px',
+                background: '#252526',
+                border: '1px solid #3c3c3c',
+                borderRadius: 8,
+                boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+                justifyContent: 'center',
+                width: 240,
+                zIndex: 101,
+              }}
+            >
+              {Object.values(WIRE_KEY_COLORS).map((color) => (
+                <ColorButton
+                  key={color}
+                  color={color}
+                  isSelected={color.toLowerCase() === currentColor?.toLowerCase()}
+                  onClick={() => {
+                    onColorChange(color);
+                    setShowPalette(false);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {canRotate && onRotate && (
         <button
@@ -237,6 +304,35 @@ export const SelectionActionBar: React.FC<SelectionActionBarProps> = ({
         <CloseIcon />
       </button>
     </div>
+  );
+};
+
+const ColorButton: React.FC<{
+  color: string;
+  isSelected: boolean;
+  onClick: () => void;
+}> = ({ color, isSelected, onClick }) => {
+  const ref = useRef<HTMLButtonElement | null>(null);
+  useTouchSafeAction(ref, onClick);
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={onClick}
+      style={{
+        width: 22,
+        height: 22,
+        borderRadius: '50%',
+        backgroundColor: color,
+        border: isSelected ? '2px solid #fff' : '1px solid rgba(255,255,255,0.2)',
+        cursor: 'pointer',
+        padding: 0,
+        flexShrink: 0,
+        boxShadow: isSelected ? '0 0 6px rgba(255,255,255,0.5)' : 'none',
+      }}
+      title={color}
+    />
   );
 };
 
