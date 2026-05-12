@@ -20,12 +20,17 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
+        run: npm ci
+
+      - name: Verify build script exists
         run: |
-          npm install
+          if ! npm run | grep -q "build"; then
+            echo "❌ No build script found in package.json"
+            exit 1
+          fi
 
       - name: Build project
-        run: |
-          npm run build
+        run: npm run build
 
       - name: Prepare artifact
         run: |
